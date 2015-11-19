@@ -1,18 +1,4 @@
-Acronyms
+Datatool
 ========
-Reads structured files with acronyms, encoded in JSON, and converts it into several output formats.
+Reads structured files with (SKB) data, encoded in JSON, and converts it into several output formats.
 :toc:
-
-bla foo, files are in the SKB
-
-
-Overview
---------
-
-
-Features
-~~~~~~~~
-
-
-Concepts and Realization
-~~~~~~~~~~~~~~~~~~~~~~~~
