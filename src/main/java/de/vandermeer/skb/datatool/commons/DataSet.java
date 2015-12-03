@@ -1,0 +1,179 @@
+/* Copyright 2014 Sven van der Meer <vdmeer.sven@mykolab.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.vandermeer.skb.datatool.commons;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+
+import de.vandermeer.skb.base.console.Skb_Console;
+import de.vandermeer.skb.base.info.DirectoryLoader;
+import de.vandermeer.skb.base.info.FileSource;
+import de.vandermeer.skb.base.info.FileSourceList;
+
+/**
+ * Generic data set for the data tools.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
+ * @param <T>
+ * @since      v0.0.1
+ */
+public class DataSet<E extends DataEntry> {
+
+	/** The map of entries. */
+	Map<String, E> entries;
+
+	/** Number of read files. */
+	int files;
+
+	/** Class of the data entry implementation. */
+	Class<E> clazz;
+
+	/** A map of keys to string pairs for de-referenced values that impact key auto-generation. */
+	Map<String, Pair<String, String>> refKeyMap;
+
+	/**
+	 * Returns a new, empty data set.
+	 */
+	public DataSet(Class<E> clazz){
+		this.entries = new HashMap<>();
+		this.files = 0;
+		this.clazz = clazz;
+	}
+
+	/**
+	 * Sets the reference key map.
+	 * This map is used for key auto-generation where the key is a reference (SKB link) to another data entry.
+	 * This happens for instance when the name of an affiliation is given as an acronym.
+	 * Here, a set of acronyms with a pair of sort and long strings can be set.
+	 * @param map new reference key map
+	 */
+	public void setRefKeyMap(Map<String, Pair<String, String>> map){
+		this.refKeyMap = map;
+	}
+
+	/**
+	 * Loads a data set from file system.
+	 * @param dl the directory loader with files to load encodings from
+	 * @param fileExt the file extension used (translated to "." + fileExt + ".json"), empty if none used
+	 * @param keySeparator character to separate key fields
+	 * @param target a target for character conversions
+	 * @param appName name of the calling application for logging and errors
+	 * @return 0 on success, larger than zero on JSON parsing error (number of found errors)
+	 */
+	public int load(DirectoryLoader dl, String fileExt, char keySeparator, DataTarget target, String appName){
+		int ret = 0;
+		FileSourceList fsl = dl.load();
+
+		//get shortest absolute path, everything else is part of the key
+		Set<String> paths = new HashSet<>();
+		for(FileSource fs : fsl.getSource()){
+			paths.add(fs.getAbsolutePath());
+		}
+		String pathRemove = StringUtils.getCommonPrefix(paths.toArray(new String[]{}));
+		if(pathRemove.endsWith(File.separator)){
+			pathRemove = StringUtils.substringBeforeLast(pathRemove, File.separator);
+		}
+
+		for(FileSource fs : fsl.getSource()){
+			String keyStart = StringUtils.substringAfterLast(fs.getAbsoluteName(), pathRemove + File.separator);
+			keyStart = StringUtils.replaceChars(keyStart, File.separatorChar, keySeparator);
+			keyStart = StringUtils.replace(keyStart, "." + fileExt + ".json", Character.toString(keySeparator));
+			ObjectMapper om = new ObjectMapper();
+			om.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+			try{
+				List<Map<String, Object>> jsonList = om.readValue(fs.asFile(), new TypeReference<ArrayList<HashMap<String, Object>>>(){});
+				for(Map<String, Object> entryMap : jsonList){
+					E entry = this.clazz.newInstance();
+					entry.setRefKeyMap(this.refKeyMap);
+					entry.load(entryMap, keyStart, keySeparator, target);
+					if(StringUtils.isEmpty(entry.getKey())){
+						Skb_Console.conError("{}: empty key found in file <{}>", new Object[]{appName, fs.getAbsoluteName()});
+						continue;
+					}
+					else if(entry.getKey().contains("#dummy")){
+						continue;
+					}
+
+					@SuppressWarnings("unchecked")
+					String dup = entry.testDuplicate((Collection<DataEntry>) this.entries.values());
+					if(this.entries.containsKey(entry.getKey())){
+						Skb_Console.conError("{}: duplicate key <{}> found in file <{}>", new Object[]{appName, entry.getKey(), fs.getAbsoluteName()});
+					}
+					else if(dup!=null){
+						Skb_Console.conError("{}: entry already in map: k1 <{}> <> k2 <{}> found in file <{}>", new Object[]{appName, dup, entry.getKey(), fs.getAbsoluteName()});
+					}
+					else{
+						if(target==null || (!ArrayUtils.contains(target.getExcluded(), entry.getCompareString()))){
+							this.entries.put(entry.getKey(), entry);
+						}
+					}
+				}
+				this.files++;
+			}
+			catch(IllegalArgumentException iaex){
+				Skb_Console.conError("{}: problem creating entry: <{}> in file <{}>", new Object[]{appName, iaex.getMessage(), fs.getAbsoluteName()});
+			}
+			catch(NullPointerException npe){
+				npe.printStackTrace();
+			}
+			catch(Exception ex){
+				Skb_Console.conError("reading acronym from JSON failed with exception <{}>, cause <{}> and message <{}> in file <{}>", new Object[]{ex.getClass().getSimpleName(), ex.getCause(), ex.getMessage(), fs.getAbsoluteName()});
+				ret++;
+			}
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Returns the number of read files.
+	 * @return number of files read
+	 */
+	public int getFileNumber(){
+		return this.files;
+	}
+
+	/**
+	 * Returns loaded data set.
+	 * @return loaded data set, empty if none loaded or found
+	 */
+	public TreeSet<E> getEntries(){
+		return new TreeSet<E>(this.entries.values());
+	}
+
+	/**
+	 * Returns the loaded data map.
+	 * @return loaded data map, empty if none loaded or found
+	 */
+	public Map<String, E> getMap(){
+		return this.entries;
+	}
+}

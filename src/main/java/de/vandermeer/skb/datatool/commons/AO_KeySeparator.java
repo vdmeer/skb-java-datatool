@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package de.vandermeer.skb.datatool.acronyms;
+package de.vandermeer.skb.datatool.commons;
 
 import org.apache.commons.cli.Option;
 
@@ -24,7 +24,7 @@ import de.vandermeer.execs.options.AbstractApplicationOption;
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
- * @since      v0.2.0
+ * @since      v0.0.1
  */
 public class AO_KeySeparator extends AbstractApplicationOption<Character> {
 

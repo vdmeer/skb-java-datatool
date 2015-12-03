@@ -13,30 +13,38 @@
  * limitations under the License.
  */
 
-package de.vandermeer.skb.datatool.acronyms;
+package de.vandermeer.skb.datatool.commons;
+
+import java.util.Set;
 
 import de.vandermeer.skb.base.encodings.TranslatorFactory;
 
 /**
- * An acronym targets with configuration information for the tool.
+ * Generic data target for the data tools.
  *
- * @author     Sven van der Meer &lt;sven.van.der.meer@ericsson.com&gt;
- * @version    v2.0.0 build 150826 (26-Aug-15) for Java 1.8
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
  * @since      v0.0.1
  */
-public interface AcronymTarget {
+public interface DataTarget {
 
 	/**
-	 * Returns the required translation target.
-	 * @return translation target, null if none required
+	 * Returns the entries to be excluded from processing.
+	 * @return excluded characters, empty if none set
 	 */
-	TranslatorFactory.Target getTranslationTarget();
+	String[] getExcluded();
 
 	/**
 	 * Returns the name of the target, as it should be used in the CLI.
 	 * @return target name
 	 */
 	String getTargetName();
+
+	/**
+	 * Returns the required translation target.
+	 * @return translation target, null if none required
+	 */
+	TranslatorFactory.Target getTranslationTarget();
 
 	/**
 	 * Returns the file extension used for this target.
@@ -46,13 +54,19 @@ public interface AcronymTarget {
 
 	/**
 	 * Returns the file name of the STG template for the target.
-	 * @return STG file name
+	 * @return STG file name if data entry type is supported, null otherwise
 	 */
-	String getStgFileName();
+	String getStgFileName(DataEntryType type);
+
+	/**
+	 * Returns the data entry types the target supports.
+	 * @return data entry types, empty if none are supported
+	 */
+	Set<DataEntryType> getSupportedTypes();
 
 	/**
 	 * Returns the description of the target.
 	 * @return description
 	 */
-	public String getDescription();
+	String getDescription();
 }

@@ -14,7 +14,7 @@
  */
 
 
-build(ee) ::= <<
+build(entry, entry2) ::= <<
 /* Copyright 2015 Sven van der Meer \<vdmeer.sven@mykolab.com\>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,17 +44,36 @@ public class Text2Latex implements Translator {
 
 	/** Array of searchable strings. */
 	protected String[] searchList = new String[]{
-		<ee:{e | "<e.text>"}; separator=", ">
+		<entry:{e | "<e.text>"}; separator=", ">
 	};
 
 	/** Array of replacements for searchable strings. */
 	protected String[] replacementList = new String[]{
-		<ee:{e | "<e.latex>"}; separator=", ">
+		<entry:{e | "<e.latex>"}; separator=", ">
+	};
+
+	/** Array of searchable HTML entity strings. */
+	protected String[] searchListHE = new String[]{
+		<entry2:{h | "<h.htmlEntity>"}; separator=", ">
+	};
+
+	/** Array of replacements for searchable HTML entity strings. */
+	protected String[] replacementListHE = new String[]{
+		<entry2:{h | "<h.htmlEntityRepl>"}; separator=", ">
+	};
+
+	/** Array of LaTeX replacements for replacements of HTML entity strings. */
+	protected String[] latexListHE = new String[]{
+		<entry2:{h | "<h.latex>"}; separator=", ">
 	};
 
 	@Override
 	public String translate(String input){
-		return StringUtils.replaceEach(input, this.searchList, this.replacementList);
+		String ret = StringUtils.replaceEach(input, this.searchListHE, this.replacementListHE);
+		ret = StringUtils.replaceEach(ret, this.searchList, this.replacementList);
+		ret = StringUtils.replaceEach(ret, this.replacementListHE, this.searchListHE);
+		ret = StringUtils.replaceEach(ret, this.searchListHE, this.latexListHE);
+		return ret;
 	}
 }
 

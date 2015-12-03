@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Sven van der Meer <vdmeer.sven@mykolab.com>
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,33 @@
  * limitations under the License.
  */
 
-/*
- * build
+package de.vandermeer.skb.datatool.commons;
+
+
+/**
+ * A key in a data entry.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
+ * @since      v0.0.1
  */
-build(entry) ::= <<
-<entry:{a | <a.short> = <a.long>}; separator="\n">
->>
+public interface EntryKey {
+
+	/**
+	 * Returns the key.
+	 * @return key
+	 */
+	String getKey();
+
+	/**
+	 * Returns the key's description
+	 * @return key description
+	 */
+	String getDescription();
+
+	/**
+	 * Returns the type of the key.
+	 * @return key type
+	 */
+	Class<?> getType();
+}

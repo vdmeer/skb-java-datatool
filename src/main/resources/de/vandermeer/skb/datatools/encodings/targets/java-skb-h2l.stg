@@ -14,7 +14,7 @@
  */
 
 
-build(ee) ::= <<
+build(entry, entry2) ::= <<
 /* Copyright 2015 Sven van der Meer \<vdmeer.sven@mykolab.com\>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,12 +44,12 @@ public class Html2Latex implements Translator {
 
 	/** Array of searchable strings. */
 	protected String[] searchList = new String[]{
-		<ee:{e | <if(e.htmlCode&&e.htmlEntity)>"<e.htmlCode>", "<e.htmlEntity>"<elseif(e.htmlCode)>"<e.htmlCode>"<elseif(e.htmlEntity)>"<e.htmlEntity>"<endif>}; separator=", ">
+		<entry:{e | <if(e.htmlCode&&e.htmlEntity)>"<e.htmlCode>", "<e.htmlEntity>"<elseif(e.htmlCode)>"<e.htmlCode>"<elseif(e.htmlEntity)>"<e.htmlEntity>"<endif>}; separator=", ">
 	};
 
 	/** Array of replacements for searchable strings. */
 	protected String[] replacementList = new String[]{
-		<ee:{e | <if(e.htmlCode&&e.htmlEntity)>"<e.latex>", "<e.latex>"<elseif(e.htmlCode)>"<e.latex>"<elseif(e.htmlEntity)>"<e.latex>"<endif>}; separator=", ">
+		<entry:{e | <if(e.htmlCode&&e.htmlEntity)>"<e.latex>", "<e.latex>"<elseif(e.htmlCode)>"<e.latex>"<elseif(e.htmlEntity)>"<e.latex>"<endif>}; separator=", ">
 	};
 
 	@Override

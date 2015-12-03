@@ -13,111 +13,121 @@
  * limitations under the License.
  */
 
-package de.vandermeer.skb.datatool.encodings;
+package de.vandermeer.skb.datatool.entries;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
+import org.apache.commons.lang3.tuple.Pair;
+
+import de.vandermeer.skb.datatool.commons.DataEntry;
+import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataTarget;
+import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
+import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
+import de.vandermeer.skb.datatool.commons.Utilities;
 
 /**
- * A single encoding with all its definitions.
+ * A single encoding entry.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public class EncodingEntry implements Comparable<EncodingEntry> {
+public class EncodingEntry implements DataEntry {
 
 	/** Decimal number of the encoding. */
-	int dec;
+	Object dec;
 
 	/** Textual representation of the encoding. */
-	String text;
+	Object text;
 
 	/** HTML code for the encoding. */
 	String htmlCode;
 
 	/** HTML entity of the encoding. */
-	String htmlEntity;
+	Object htmlEntity;
 
 	/** Unicode number. */
 	String ucNumber;
 
 	/** Unicode block of the encoding. */
-	String ucBlock;
+	Object ucBlock;
 
 	/** Unicode set of the encoding. */
-	String ucSet;
+	Object ucSet;
 
-	/** Description for the acronym. */
-	String description;
+	/** Description for the encoding. */
+	Object description;
 
 	/** LaTeX representation of the encoding. */
-	String latex;
+	Object latex;
 
 	/** AsciiDoc representation of the encoding. */
-	String ad;
+	Object ad;
 
-	/**
-	 * Returns a new encoding entry.
-	 * @param map a map with information for short form, long form, URL, Wikipedia URL and description
-	 * @throws IllegalArgumentException if any of the required arguments are not set or empty
-	 */
-	public EncodingEntry(Map<String, Object> map){
-		StrBuilder msg = new StrBuilder(50);
+	/** Encoding schema. */
+	DataEntrySchema schema = StandardDataEntrySchemas.CHAR_ENCODINGS;
 
-		if(!map.containsKey("d") || map.get("d")==null || StringUtils.isEmpty(map.get("d").toString())){
-			msg.appendSeparator(", ");
-			msg.append("no decimal entry (d)");
-		}
-		else{
-			this.dec = (Integer)map.get("d");
-		}
+	@Override
+	public String getKey() {
+		return Integer.toString((Integer)this.dec);
+	}
 
-		if(!map.containsKey("c") || map.get("c")==null || StringUtils.isEmpty(map.get("c").toString())){
-			msg.appendSeparator(", ");
-			msg.append("no character entry (c)");
-		}
-		else{
-			this.text = StringUtils.replaceEach(
-					map.get("c").toString(),
-					new String[]{"\"", "\\"},
-					new String[]{"\\\"", "\\\\"}
-			);
-		}
+	@Override
+	public String testDuplicate(Collection<DataEntry> set) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	@Override
+	public DataEntrySchema getSchema(){
+		return this.schema;
+	}
+
+	@Override
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, DataTarget target) {
+		StrBuilder msg;
+		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
 			throw new IllegalArgumentException(msg.toString());
 		}
+		msg = new StrBuilder(50);
 
-		this.htmlCode = String.format("&#%d;", this.dec);
-		this.ucNumber = String.format("U+%4H", this.dec);
+		this.dec = Utilities.getDataObject(StandardEntryKeys.ENC_DEC, entryMap);
+		this.text = Utilities.getDataObject(StandardEntryKeys.ENC_CHAR, entryMap);
+		this.text = StringUtils.replaceEach(
+				(String)this.text,
+				new String[]{"\"", "\\"},
+				new String[]{"\\\"", "\\\\"}
+		);
 
-		if(map.get("he")!=null){
-			this.htmlEntity = map.get("he").toString();
-		}
+		this.htmlCode = String.format("&#%d;", (Integer)this.dec);
+		this.ucNumber = String.format("U+%4H", (Integer)this.dec);
 
-		if(map.get("l")!=null){
+		this.htmlEntity = Utilities.getDataObject(StandardEntryKeys.HTML_ENTITY, entryMap);
+
+		this.latex = Utilities.getDataObject(StandardEntryKeys.LATEX, entryMap);
+		if(this.latex!=null){
 			this.latex = StringUtils.replaceEach(
-					map.get("l").toString(),
+					(String)this.latex,
 					new String[]{"\"", "\\"},
 					new String[]{"\\\"", "\\\\"}
 			);
 		}
-		if(map.get("ad")!=null){
-			this.ad = map.get("ad").toString();
-		}
 
-		if(map.get("b")!=null){
-			this.ucBlock = map.get("b").toString();
-		}
-		if(map.get("s")!=null){
-			this.ucSet = map.get("s").toString();
-		}
-		if(map.get("dn")!=null){
-			this.description = map.get("dn").toString();
-		}
+		this.ad = Utilities.getDataObject(StandardEntryKeys.ASCII_DOC, entryMap);
+		this.description = Utilities.getDataObject(StandardEntryKeys.DESCR, entryMap);
+
+		this.ucBlock = Utilities.getDataObject(StandardEntryKeys.UNICODE_BLOCK, entryMap);
+		this.ucSet = Utilities.getDataObject(StandardEntryKeys.UNICODE_SET, entryMap);
+	}
+
+	@Override
+	public String getCompareString() {
+		return (String)this.text;
 	}
 
 	/**
@@ -125,7 +135,7 @@ public class EncodingEntry implements Comparable<EncodingEntry> {
 	 * @return decimal number of the encoding
 	 */
 	public int getDec(){
-		return this.dec;
+		return (Integer)this.dec;
 	}
 
 	/**
@@ -133,7 +143,7 @@ public class EncodingEntry implements Comparable<EncodingEntry> {
 	 * @return textual representation of the encoding, null if not set
 	 */
 	public String getText(){
-		return this.text;
+		return (String)this.text;
 	}
 
 	/**
@@ -149,7 +159,7 @@ public class EncodingEntry implements Comparable<EncodingEntry> {
 	 * @return the HTML entity set of the encoding, null if not set
 	 */
 	public String getHtmlEntity(){
-		return this.htmlEntity;
+		return (String)this.htmlEntity;
 	}
 
 	/**
@@ -165,7 +175,7 @@ public class EncodingEntry implements Comparable<EncodingEntry> {
 	 * @return the Unicode block of the encoding, null if not set
 	 */
 	public String getUcBlock(){
-		return this.ucBlock;
+		return (String)this.ucBlock;
 	}
 
 	/**
@@ -173,7 +183,7 @@ public class EncodingEntry implements Comparable<EncodingEntry> {
 	 * @return the Unicode set of the encoding, null if not set
 	 */
 	public String getUcSet(){
-		return this.ucSet;
+		return (String)this.ucSet;
 	}
 
 	/**
@@ -181,7 +191,7 @@ public class EncodingEntry implements Comparable<EncodingEntry> {
 	 * @return LaTeX representation of the encoding, null if not set
 	 */
 	public String getLatex(){
-		return this.latex;
+		return (String)this.latex;
 	}
 
 	/**
@@ -189,22 +199,19 @@ public class EncodingEntry implements Comparable<EncodingEntry> {
 	 * @return AsciiDoc representation of the encoding, null if not set
 	 */
 	public String getAd(){
-		return this.ad;
+		return (String)this.ad;
 	}
 
 	/**
-	 * Returns a description for the acronym.
-	 * @return acronym description, null if not set
+	 * Returns a description for the encoding.
+	 * @return encoding description, null if not set
 	 */
 	public String getDescription(){
-		return this.description;
+		return (String)this.description;
 	}
 
 	@Override
-	public int compareTo(EncodingEntry o) {
-		if(o==null){
-			return -1;
-		}
-		return this.text.compareTo(o.text);
+	public void setRefKeyMap(Map<String, Pair<String, String>> map) {
+		// encodings do not need that
 	}
 }

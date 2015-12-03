@@ -17,16 +17,13 @@ delimiters "$", "$"
 
 /*
  * build
- * ae = AcronymEntry
- * maxAcr = longest acronym to determine width
- * maxAcrInt = length of longest acronym to determine width
  */
-build(ae, maxAcr, maxAcrInt) ::= <<
+build(entry) ::= <<
 <html>
 	<head></head>
 	<body>
 		<table>
-			$ae:{a | <tr><td>$a.short$</td><td>$a.long$</td></tr>}; separator="\n"$
+			$entry:{a | <tr><td>$a.short$</td><td>$a.long$</td></tr>}; separator="\n"$
 		</table>
 	</body>
 </html>
