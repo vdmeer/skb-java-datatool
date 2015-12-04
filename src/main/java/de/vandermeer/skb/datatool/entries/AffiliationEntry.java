@@ -15,18 +15,17 @@
 
 package de.vandermeer.skb.datatool.entries;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.ObjectGeo;
 import de.vandermeer.skb.datatool.commons.ObjectLinks;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
@@ -65,9 +64,6 @@ public class AffiliationEntry implements DataEntry {
 
 	/** Affiliation schema. */
 	DataEntrySchema schema = StandardDataEntrySchemas.AFFILIATIONS;
-
-	/** A map of keys to string pairs for de-referenced values that impact key auto-generation. */
-	Map<String, Pair<String, String>> refKeyMap;
 
 	/**
 	 * Returns the long name of the affiliation.
@@ -140,7 +136,7 @@ public class AffiliationEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) throws URISyntaxException {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) throws URISyntaxException {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
@@ -149,12 +145,12 @@ public class AffiliationEntry implements DataEntry {
 
 		msg = new StrBuilder(50);
 
-		this.longName = Utilities.getDataObject(StandardEntryKeys.AFF_LONG, entryMap, translator);
-		this.shortName = Utilities.getDataObject(StandardEntryKeys.AFF_SHORT, entryMap, translator);
-		this.acronymLink = Utilities.getDataObject(StandardEntryKeys.ACR, entryMap);
-		this.address = Utilities.getDataObject(StandardEntryKeys.AFF_ADDR, entryMap, translator);
-		this.geo = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO, entryMap);
-		this.links = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS, entryMap);
+		this.longName = Utilities.getDataObject(StandardEntryKeys.AFF_LONG, entryMap, translator, linkMap);
+		this.shortName = Utilities.getDataObject(StandardEntryKeys.AFF_SHORT, entryMap, translator, linkMap);
+		this.acronymLink = Utilities.getDataObject(StandardEntryKeys.ACR, entryMap, linkMap);
+		this.address = Utilities.getDataObject(StandardEntryKeys.AFF_ADDR, entryMap, translator, linkMap);
+		this.geo = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO, entryMap, linkMap);
+		this.links = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS, entryMap, linkMap);
 
 		if(this.longName==null){
 			if(this.acronymLink==null){
@@ -166,12 +162,6 @@ public class AffiliationEntry implements DataEntry {
 			if(this.acronymLink==null && this.shortName==null){
 				msg.appendSeparator(", ");
 				msg.append("no short name nor acronym given");
-			}
-			if(this.acronymLink!=null){
-				if(!((String)this.acronymLink).startsWith("skb://acronyms/")){
-					msg.appendSeparator(", ");
-					msg.append("invalid acronym format");
-				}
 			}
 			if(this.acronymLink!=null && this.shortName!=null){
 				msg.appendSeparator(", ");
@@ -188,7 +178,7 @@ public class AffiliationEntry implements DataEntry {
 			msg.append("wrong end of keyStart");
 		}
 		else{
-			Object k = Utilities.getDataObject(StandardEntryKeys.KEY, entryMap, translator);
+			Object k = Utilities.getDataObject(StandardEntryKeys.KEY, entryMap, translator, linkMap);
 			if(k!=null){
 				this.key = keyStart + k;
 			}
@@ -196,22 +186,14 @@ public class AffiliationEntry implements DataEntry {
 				this.key = keyStart + this.shortName;
 			}
 			else if(this.acronymLink!=null){
-				if(this.refKeyMap==null){
-					this.key = keyStart + StringUtils.substringAfterLast((String)this.acronymLink, ":");
+				Object obj = Utilities.getLinkObject(this.acronymLink, linkMap);
+				if(obj instanceof AcronymEntry){
+					this.longName = ((AcronymEntry)obj).getLong();
+					this.shortName = ((AcronymEntry)obj).getShort();
+					this.key = keyStart + this.shortName;
 				}
 				else{
-					URI uri = new URI((String)this.acronymLink);
-					String acr = StringUtils.substringAfterLast(uri.getPath(), "/");
-					Pair<String, String> p = this.refKeyMap.get(acr);
-					if(p==null){
-						msg.appendSeparator(", ");
-						msg.append("invalid link to acronym <" + this.acronymLink + "> - cannot create key");
-					}
-					else{
-						this.longName = p.getValue();
-						this.shortName = p.getKey();
-						this.key = keyStart + this.shortName;
-					}
+					msg.appendSeparator(", ").append(obj);
 				}
 			}
 			else{
@@ -233,10 +215,5 @@ public class AffiliationEntry implements DataEntry {
 	@Override
 	public DataEntrySchema getSchema(){
 		return this.schema;
-	}
-
-	@Override
-	public void setRefKeyMap(Map<String, Pair<String, String>> map){
-		this.refKeyMap = map;
 	}
 }

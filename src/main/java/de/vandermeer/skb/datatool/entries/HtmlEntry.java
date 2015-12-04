@@ -20,11 +20,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
 import de.vandermeer.skb.datatool.commons.Utilities;
@@ -84,17 +84,17 @@ public class HtmlEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
 			throw new IllegalArgumentException(msg.toString());
 		}
 
-		this.htmlEntity = Utilities.getDataObject(StandardEntryKeys.HTML_ENTITY, entryMap);
+		this.htmlEntity = Utilities.getDataObject(StandardEntryKeys.HTML_ENTITY, entryMap, linkMap);
 		this.htmlEntityRepl = StringUtils.replace(StringUtils.replace((String)this.htmlEntity, "<", REPLACEMENT_PATTERN_START), ">", REPLACEMENT_PATTERN_END);
 
-		this.latex = Utilities.getDataObject(StandardEntryKeys.LATEX, entryMap);
+		this.latex = Utilities.getDataObject(StandardEntryKeys.LATEX, entryMap, linkMap);
 		if(this.latex!=null){
 			this.latex = StringUtils.replaceEach(
 					(String)this.latex,
@@ -103,8 +103,8 @@ public class HtmlEntry implements DataEntry {
 			);
 		}
 
-		this.ad = Utilities.getDataObject(StandardEntryKeys.ASCII_DOC, entryMap);
-		this.description = Utilities.getDataObject(StandardEntryKeys.DESCR, entryMap);
+		this.ad = Utilities.getDataObject(StandardEntryKeys.ASCII_DOC, entryMap, linkMap);
+		this.description = Utilities.getDataObject(StandardEntryKeys.DESCR, entryMap, linkMap);
 	}
 
 	/**
@@ -145,10 +145,5 @@ public class HtmlEntry implements DataEntry {
 	 */
 	public String getDescription(){
 		return (String)this.description;
-	}
-
-	@Override
-	public void setRefKeyMap(Map<String, Pair<String, String>> map) {
-		// HTML entries do not need that
 	}
 }

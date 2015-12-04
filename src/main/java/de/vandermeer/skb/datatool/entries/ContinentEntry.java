@@ -19,11 +19,11 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.lang3.text.StrBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
 import de.vandermeer.skb.datatool.commons.Utilities;
@@ -71,7 +71,7 @@ public class ContinentEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
@@ -80,17 +80,12 @@ public class ContinentEntry implements DataEntry {
 	
 		msg = new StrBuilder(50);
 
-		this.key = Utilities.getDataObject(StandardEntryKeys.KEY, entryMap);
-		this.name = Utilities.getDataObject(StandardEntryKeys.GEO_NAME, entryMap, translator);
+		this.key = Utilities.getDataObject(StandardEntryKeys.KEY, entryMap, linkMap);
+		this.name = Utilities.getDataObject(StandardEntryKeys.GEO_NAME, entryMap, translator, linkMap);
 	}
 
 	@Override
 	public String getCompareString() {
 		return (String)this.name;
-	}
-
-	@Override
-	public void setRefKeyMap(Map<String, Pair<String, String>> map) {
-		// continents do not need that
 	}
 }

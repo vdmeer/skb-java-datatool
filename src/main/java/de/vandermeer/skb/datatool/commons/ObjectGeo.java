@@ -15,9 +15,13 @@
 
 package de.vandermeer.skb.datatool.commons;
 
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.apache.commons.lang3.text.StrBuilder;
+
+import de.vandermeer.skb.datatool.entries.CityEntry;
+import de.vandermeer.skb.datatool.entries.CountryEntry;
 
 /**
  * A special data object for geographic information (continent, country, city).
@@ -38,7 +42,7 @@ public class ObjectGeo  implements EntryObject {
 	Object cityLink;
 
 	/** A city as expanded object from an SKB link. */
-	Object cityExp;
+	String cityExp;
 
 	/** A country as name. */
 	Object country;
@@ -47,24 +51,56 @@ public class ObjectGeo  implements EntryObject {
 	Object countryLink;
 
 	/** A country as expanded object from an SKB link. */
-	Object countryExp;
+	String countryExp;
 
 	@Override
-	public String load(Map<String, Object> entryMap) {
+	public String load(Map<String, Object> entryMap, Map<DataEntryType, Map<String, Object>> linkMap) {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
 			return msg.toString();
 		}
 
-		this.city = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO_CITY, entryMap);
-		this.cityLink = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO_CITY_LINK, entryMap);
-//		this.cityExp = TypeUtilities.getDataObject(StandardEntryKeys.OBJ_GEO_CITY, entryMap);
+		this.city = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO_CITY, entryMap, linkMap);
+		this.cityLink = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO_CITY_LINK, entryMap, linkMap);
+		if(this.cityLink!=null){
+			try {
+				Object obj = Utilities.getLinkObject(this.cityLink, linkMap);
+				if(obj instanceof CityEntry){
+					CityEntry city = (CityEntry)obj;
+					this.cityExp = city.getName();
+					if(city.getCountry()!=null){
+						this.countryLink = "skb://countries/" + city.getKey();//TODO
+						this.countryExp = city.getCountryEntry().getName();
+					}
+				}
+				else{
+					msg.appendSeparator(", ").append(obj);
+				}
+			}
+			catch (URISyntaxException e) {
+				msg.appendSeparator(", ").append(e.getMessage());
+			}
+		}
+		else{
+			this.country = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO_COUNTRY, entryMap, linkMap);
+			this.countryLink = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO_COUNTRY_LINK, entryMap, linkMap);
+			if(this.countryLink!=null){
+				try {
+					Object obj = Utilities.getLinkObject(this.countryLink, linkMap);
+					if(obj instanceof CountryEntry){
+						this.countryExp = ((CountryEntry)obj).getName();
+					}
+				}
+				catch (URISyntaxException e) {
+					msg.appendSeparator(", ").append(e.getMessage());
+				}
+			}
+		}
 
-		this.country = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO_COUNTRY, entryMap);
-		this.countryLink = Utilities.getDataObject(StandardEntryKeys.OBJ_GEO_COUNTRY_LINK, entryMap);
-//		this.countryExp = TypeUtilities.getDataObject(StandardEntryKeys.OBJ_GEO_CITY, entryMap);
-
+		if(msg.size()>0){
+			return msg.toString();
+		}
 		return null;
 	}
 
@@ -82,11 +118,27 @@ public class ObjectGeo  implements EntryObject {
 	}
 
 	/**
+	 * Returns the name of the expanded city.
+	 * @return expanded city
+	 */
+	public String getCityExp(){
+		return this.cityExp;
+	}
+
+	/**
 	 * Returns the name of the country.
 	 * @return country name
 	 */
 	public String getCountry(){
 		return (String)this.country;
+	}
+
+	/**
+	 * Returns the name of the expanded country.
+	 * @return expanded country
+	 */
+	public String getCountryExp(){
+		return this.countryExp;
 	}
 
 	/**

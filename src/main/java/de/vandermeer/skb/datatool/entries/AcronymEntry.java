@@ -20,11 +20,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.ObjectLinks;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
@@ -83,7 +83,7 @@ public class AcronymEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
@@ -92,9 +92,9 @@ public class AcronymEntry implements DataEntry {
 
 		msg = new StrBuilder(50);
 
-		this.acShort = Utilities.getDataObject(StandardEntryKeys.ACR_SHORT, entryMap, translator);
-		this.acShortOrig = Utilities.getDataObject(StandardEntryKeys.ACR_SHORT, entryMap);
-		this.acLong = Utilities.getDataObject(StandardEntryKeys.ACR_LONG, entryMap, translator);
+		this.acShort = Utilities.getDataObject(StandardEntryKeys.ACR_SHORT, entryMap, translator, linkMap);
+		this.acShortOrig = Utilities.getDataObject(StandardEntryKeys.ACR_SHORT, entryMap, linkMap);
+		this.acLong = Utilities.getDataObject(StandardEntryKeys.ACR_LONG, entryMap, translator, linkMap);
 
 		if(keyStart==null){
 			msg.appendSeparator(", ");
@@ -126,8 +126,8 @@ public class AcronymEntry implements DataEntry {
 			throw new IllegalArgumentException(msg.toString());
 		}
 
-		this.description = Utilities.getDataObject(StandardEntryKeys.DESCR, entryMap, translator);
-		this.links = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS, entryMap);
+		this.description = Utilities.getDataObject(StandardEntryKeys.DESCR, entryMap, translator, linkMap);
+		this.links = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS, entryMap, linkMap);
 	}
 
 	/**
@@ -170,11 +170,6 @@ public class AcronymEntry implements DataEntry {
 	@Override
 	public String getCompareString() {
 		return (String)this.acShort;
-	}
-
-	@Override
-	public void setRefKeyMap(Map<String, Pair<String, String>> map) {
-		// acronyms do not need that
 	}
 
 	/**

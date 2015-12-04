@@ -20,6 +20,7 @@ import java.util.Set;
 
 import de.vandermeer.skb.datatool.entries.AcronymEntry;
 import de.vandermeer.skb.datatool.entries.AffiliationEntry;
+import de.vandermeer.skb.datatool.entries.CityEntry;
 import de.vandermeer.skb.datatool.entries.ContinentEntry;
 import de.vandermeer.skb.datatool.entries.CountryEntry;
 import de.vandermeer.skb.datatool.entries.EncodingEntry;
@@ -42,9 +43,11 @@ public enum StandardDataEntryTypes implements DataEntryType {
 
 	COUNTRIES ("countries", "country", CountryEntry.class),
 
+	CITIES ("cities", "city", CityEntry.class),
+
 	ENCODINGS ("encodings", "cmap", EncodingEntry.class),
 
-	HTML_ENTITIES ("html-entitis", "hmap", HtmlEntry.class),
+	HTML_ENTITIES ("html-entities", "hmap", HtmlEntry.class),
 	;
 
 	/** Name of the type .*/
@@ -56,6 +59,9 @@ public enum StandardDataEntryTypes implements DataEntryType {
 	/** The supported class of the type. */
 	Class<?> typeClass;
 
+	/** An SKB link that can be used to point to this entry type. */
+	String skbLink;
+
 	/**
 	 * Creates a new data entry type.
 	 * @param type the type name
@@ -65,6 +71,7 @@ public enum StandardDataEntryTypes implements DataEntryType {
 		this.type = type;
 		this.inputFileExtension = inputFileExtension;
 		this.typeClass = typeClass;
+		this.skbLink = "skb://" + type;
 	}
 
 	@Override
@@ -94,4 +101,13 @@ public enum StandardDataEntryTypes implements DataEntryType {
 		return ret;
 	}
 
+	//TODO JDOC
+	public static StandardDataEntryTypes getTypeForLink(String skbLink){
+		for(StandardDataEntryTypes t : StandardDataEntryTypes.values()){
+			if(t.skbLink.equals(skbLink)){
+				return t;
+			}
+		}
+		return null;
+	}
 }

@@ -15,19 +15,16 @@
 
 package de.vandermeer.skb.datatool.entries;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataSet;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
 import de.vandermeer.skb.datatool.commons.Utilities;
@@ -51,7 +48,7 @@ public class CountryEntry implements DataEntry {
 	Object continent;
 
 	/** A de-referenced continent entry. */
-	Object continentEntry;
+	ContinentEntry continentEntry;
 
 	/** ISO 2 character code. */
 	Object isoA2;
@@ -92,7 +89,7 @@ public class CountryEntry implements DataEntry {
 	 * @return country continent entry
 	 */
 	public ContinentEntry getContinentEntry(){
-		return (ContinentEntry)this.continentEntry;
+		return this.continentEntry;
 	}
 
 	/**
@@ -144,7 +141,7 @@ public class CountryEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) throws URISyntaxException {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
@@ -153,19 +150,22 @@ public class CountryEntry implements DataEntry {
 	
 		msg = new StrBuilder(50);
 
-		this.name = Utilities.getDataObject(StandardEntryKeys.GEO_NAME, entryMap, translator);
+		this.name = Utilities.getDataObject(StandardEntryKeys.GEO_NAME, entryMap, translator, linkMap);
 
-		this.continent = Utilities.getDataObject(StandardEntryKeys.GEO_CONTINENT, entryMap, translator);
-		if(!((String)this.continent).startsWith("skb://continents/")){
-			msg.appendSeparator(", ");
-			msg.append("invalid continent link format");
+		this.continent = Utilities.getDataObject(StandardEntryKeys.GEO_CONTINENT, entryMap, translator, linkMap);
+		Object obj = Utilities.getLinkObject(this.continent, linkMap);
+		if(obj instanceof ContinentEntry){
+			this.continentEntry = (ContinentEntry)obj;
+		}
+		else{
+			msg.appendSeparator(", ").append(obj);
 		}
 
-		this.isoA2 = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_A2, entryMap);
-		this.isoA3 = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_A3, entryMap);
-		this.isoNumeric = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_NU, entryMap);
-		this.e164 = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_E164, entryMap);
-		this.tld = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_TLD, entryMap);
+		this.isoA2 = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_A2, entryMap, linkMap);
+		this.isoA3 = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_A3, entryMap, linkMap);
+		this.isoNumeric = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_NU, entryMap, linkMap);
+		this.e164 = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_E164, entryMap, linkMap);
+		this.tld = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_TLD, entryMap, linkMap);
 
 		this.key = (String)this.tld;
 
@@ -177,16 +177,5 @@ public class CountryEntry implements DataEntry {
 	@Override
 	public String getCompareString() {
 		return (String)this.tld;
-	}
-
-	@Override
-	public void setRefKeyMap(Map<String, Pair<String, String>> map) {
-		// countries do not need that
-	}
-
-	public void setContinentEntry(DataSet<ContinentEntry> ds) throws URISyntaxException{
-		URI uri = new URI((String)this.continent);
-		String c = StringUtils.substringAfterLast(uri.getPath(), "/");
-		this.continentEntry = ds.getMap().get(c);
 	}
 }

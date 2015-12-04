@@ -25,21 +25,13 @@ import de.vandermeer.execs.options.AO_Verbose;
 import de.vandermeer.execs.options.ApplicationOption;
 import de.vandermeer.execs.options.ExecS_CliParser;
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
 import de.vandermeer.skb.base.info.DirectoryLoader;
 import de.vandermeer.skb.base.info.FileTarget;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.datatool.commons.DataSetBuilder;
 import de.vandermeer.skb.datatool.commons.DataTarget;
 import de.vandermeer.skb.datatool.commons.StandardDataEntryTypes;
 import de.vandermeer.skb.datatool.commons.StandardDataTargets;
-import de.vandermeer.skb.datatool.entries.AcronymEntry;
-import de.vandermeer.skb.datatool.entries.AcronymUtilities;
-import de.vandermeer.skb.datatool.entries.AffiliationEntry;
-import de.vandermeer.skb.datatool.entries.ContinentEntry;
-import de.vandermeer.skb.datatool.entries.EncodingEntry;
-import de.vandermeer.skb.datatool.entries.HtmlEntry;
 
 /**
  * Tool to read all SKB data and cross reference if possible.
@@ -187,97 +179,51 @@ public class DataTool implements ExecS_Application {
 			}
 		}
 
-		DataSetBuilder dsb = new DataSetBuilder()
-			.setAppName(this.getAppName())
-			.setKeySeparator(this.optionKeySep.getValue())
-			.setDirectory(this.optionDirIn.getValue())
-		;
 		String[] excluded = null;
 		if(target!=null){
-			dsb.setTranslator(TranslatorFactory.getTranslator(target.getTranslationTarget()));
 			excluded = target.getExcluded();
 		}
+		DataLoader loader = new DataLoader(this.getAppName(), this.optionKeySep.getValue(), this.optionDirIn.getValue(), target, verbose);
+		DataSet<?> entries1 = null;
+		DataSet<?> entries2 = null;
 
 		switch(type){
 			case ACRONYMS:
-				DataSet<AcronymEntry> acronyms = dsb.build(StandardDataEntryTypes.ACRONYMS);
-				if(acronyms==null){
-					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
-					return -4;
-				}
-				AcronymUtilities.setLongestAcr(acronyms);
-				ToolUtils.writeStats(acronyms, type.getType(), this.getAppName(), this.verbose);
-				if(target!=null){
-					ST st = ToolUtils.writeST(acronyms, type, target, this.getAppName());
-					ret = ToolUtils.writeOutput(st, ft, this.getAppName());
-				}
+				entries1 = loader.loadAcronyms();
 				break;
-
 			case AFFILIATIONS:
-				acronyms = dsb.build(StandardDataEntryTypes.ACRONYMS);
-				if(acronyms==null){
-					Skb_Console.conError("{}: errors creating data set for acronyms", new Object[]{this.getAppName()});
-					return -4;
-				}
-				ToolUtils.writeStats(acronyms, "acronyms", this.getAppName(), this.verbose);
-				DataSet<AffiliationEntry> affiliations = dsb.build(StandardDataEntryTypes.AFFILIATIONS, excluded, AcronymUtilities.toREfKeyMap(acronyms));
-				if(affiliations==null){
-					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
-					return -5;
-				}
-				ToolUtils.writeStats(affiliations, type.getType(), this.getAppName(), this.verbose);
-				if(target!=null){
-					ST st = ToolUtils.writeST(affiliations, type, target, this.getAppName());
-					ret = ToolUtils.writeOutput(st, ft, this.getAppName());
-				}
+				entries1 = loader.loadAffiliations();
 				break;
-
 			case CONTINENTS:
-				DataSet<ContinentEntry> continents = dsb.build(StandardDataEntryTypes.CONTINENTS, excluded);
-				if(continents==null){
-					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
-					return -4;
-				}
-				ToolUtils.writeStats(continents, "continents", this.getAppName(), this.verbose);
-				if(target!=null){
-					ST st = ToolUtils.writeST(continents, type, target, this.getAppName());
-					ret = ToolUtils.writeOutput(st, ft, this.getAppName());
-				}
+				entries1 = loader.loadContinents();
 				break;
-
 			case COUNTRIES:
+				entries1 = loader.loadCountries();
 				break;
-
+			case CITIES:
+				entries1 = loader.loadCities();
+				break;
 			case HTML_ENTITIES:
-				DataSet<HtmlEntry> htmlEntities = dsb.build(StandardDataEntryTypes.HTML_ENTITIES, excluded);
-				if(htmlEntities==null){
-					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
-					return -4;
-				}
-				ToolUtils.writeStats(htmlEntities, type.getType(), this.getAppName(), this.verbose);
+				entries1 = loader.loadHtmlEntyties(excluded);
 				break;
-
 			case ENCODINGS:
-				htmlEntities = dsb.build(StandardDataEntryTypes.HTML_ENTITIES, excluded);
-				if(htmlEntities==null){
-					Skb_Console.conError("{}: errors creating data set for html entities", new Object[]{this.getAppName()});
-					return -4;
-				}
-				ToolUtils.writeStats(htmlEntities, "html entities", this.getAppName(), this.verbose);
-				DataSet<EncodingEntry> encodings = dsb.build(StandardDataEntryTypes.ENCODINGS, excluded);
-				if(encodings==null){
-					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
-					return -5;
-				}
-				ToolUtils.writeStats(encodings, type.getType(), this.getAppName(), this.verbose);
-				if(target!=null){
-					ST st = ToolUtils.writeST(encodings, type, target, this.getAppName());
-					st = ToolUtils.addToST(htmlEntities, st, this.getAppName());
-					ret = ToolUtils.writeOutput(st, ft, this.getAppName());
-				}
+				entries1 = loader.loadEncodings(excluded);
+				entries2 = loader.loadHtmlEntyties(excluded);
 				break;
 			default:
 				break;
+		}
+
+		if(entries1==null){
+			return -4;
+		}
+
+		if(target!=null){
+			ST st = ToolUtils.writeST(entries1, type, target, this.getAppName());
+			if(entries2!=null){
+				st = ToolUtils.addToST(entries2, st, this.getAppName());
+			}
+			ret = ToolUtils.writeOutput(st, ft, this.getAppName());
 		}
 
 		if(this.verbose){

@@ -59,7 +59,7 @@ public enum StandardDataTargets implements DataTarget {
 			new HashMap<DataEntryType, String>() {private static final long serialVersionUID = 1L;{
 				put(StandardDataEntryTypes.ACRONYMS, "de/vandermeer/skb/datatool/acronyms/targets/html-table.stg");
 				put(StandardDataEntryTypes.CONTINENTS, "de/vandermeer/skb/datatool/continents/targets/html-table.stg");
-				put(StandardDataEntryTypes.COUNTRIES, "de/vandermeer/skb/datatool/countries/targets/html-table.stg");
+				put(StandardDataEntryTypes.CITIES, "de/vandermeer/skb/datatool/cities/targets/html-table.stg");
 			}},
 			TranslatorFactory.Target.Text2HTML,
 			"Simple HTML table"

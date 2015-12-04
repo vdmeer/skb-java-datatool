@@ -92,8 +92,8 @@ public enum StandardDataEntrySchemas implements DataEntrySchema {
 				put(StandardEntryKeys.GEO_NAME, true);
 				put(StandardEntryKeys.GEO_CONTINENT, true);
 				put(StandardEntryKeys.GEO_COUNTRY_A2, true);
-				put(StandardEntryKeys.GEO_COUNTRY_A3, true);
-				put(StandardEntryKeys.GEO_COUNTRY_NU, true);
+				put(StandardEntryKeys.GEO_COUNTRY_A3, false);
+				put(StandardEntryKeys.GEO_COUNTRY_NU, false);
 				put(StandardEntryKeys.GEO_COUNTRY_E164, false);
 				put(StandardEntryKeys.GEO_COUNTRY_TLD, true);
 			}}

@@ -14,7 +14,7 @@
  */
 
 
-build(ee, entry2) ::= <<
+build(entry, entry2) ::= <<
 /* Copyright 2015 Sven van der Meer \<vdmeer.sven@mykolab.com\>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

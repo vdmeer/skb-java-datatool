@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Sven van der Meer <vdmeer.sven@mykolab.com>
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,18 @@
  * limitations under the License.
  */
 
+delimiters "$", "$"
+
 /*
  * build
  */
 build(entry) ::= <<
-<entry:{a | <a.key> - <a.name> - <a.shortName><if(a.geo.cityExp)> - <a.geo.cityExp><endif><if(a.geo.countryExp)> - <a.geo.countryExp><endif>}; separator="\n">
+<html>
+	<head></head>
+	<body>
+		<table>
+			$entry:{c | <tr><td>$c.key$</td><td>$c.name$</td><td>$if(c.countryEntry)$$c.countryEntry.name$$endif$</td></tr>}; separator="\n"$
+		</table>
+	</body>
+</html>
 >>

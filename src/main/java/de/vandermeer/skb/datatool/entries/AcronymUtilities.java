@@ -32,9 +32,9 @@ import de.vandermeer.skb.datatool.commons.DataSet;
 public abstract class AcronymUtilities {
 
 	/**
-	 * Converts a data set fo acronyms into a de-referenced key map.
+	 * Converts a data set of acronyms into a de-referenced key map.
 	 * @param ds the data set with acronym entries
-	 * @return a map of string to short/long pairs of all acornyms found, empty map if none found
+	 * @return a map of string to short/long pairs of all acronyms found, empty map if none found
 	 */
 	public final static Map<String, Pair<String, String>> toREfKeyMap(DataSet<AcronymEntry> ds){
 		Map<String, Pair<String, String>> ret = new HashMap<>();

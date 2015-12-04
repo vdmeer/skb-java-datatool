@@ -38,15 +38,15 @@ public class ObjectLinks implements EntryObject {
 	Object wikipedia;
 
 	@Override
-	public String load(Map<String, Object> entryMap) {
+	public String load(Map<String, Object> entryMap, Map<DataEntryType, Map<String, Object>> linkMap) {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
 			return msg.toString();
 		}
 
-		this.url = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS_U, entryMap);
-		this.wikipedia = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS_W, entryMap);
+		this.url = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS_U, entryMap, linkMap);
+		this.wikipedia = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS_W, entryMap, linkMap);
 
 		return null;
 	}

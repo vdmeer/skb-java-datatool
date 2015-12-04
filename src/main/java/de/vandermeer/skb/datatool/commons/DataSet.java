@@ -27,7 +27,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -54,13 +53,8 @@ public class DataSet<E extends DataEntry> {
 	/** Class of the data entry implementation. */
 	Class<E> clazz;
 
-	/**
-	 * Reference key map.
-	 * This map is used for key auto-generation where the key is a reference (SKB link) to another data entry.
-	 * This happens for instance when the name of an affiliation is given as an acronym.
-	 * Here, a set of acronyms with a pair of sort and long strings can be set.
-	 */
-	Map<String, Pair<String, String>> refKeyMap;
+	/** Map of data entries that entries of this set can link to. */
+	final Map<DataEntryType, Map<String, Object>> linkMap;
 
 	/** Separator character for auto-generated keys. */
 	char keySeparator;
@@ -81,6 +75,7 @@ public class DataSet<E extends DataEntry> {
 		this.entries = new HashMap<>();
 		this.files = 0;
 		this.clazz = clazz;
+		this.linkMap = new HashMap<>();
 	}
 
 	/**
@@ -142,8 +137,7 @@ public class DataSet<E extends DataEntry> {
 				List<Map<String, Object>> jsonList = om.readValue(fs.asFile(), new TypeReference<ArrayList<HashMap<String, Object>>>(){});
 				for(Map<String, Object> entryMap : jsonList){
 					E entry = this.clazz.newInstance();
-					entry.setRefKeyMap(this.refKeyMap);
-					entry.load(entryMap, keyStart, this.keySeparator, this.translator);
+					entry.load(entryMap, keyStart, this.keySeparator, this.translator, this.linkMap);
 
 					if(StringUtils.isEmpty(entry.getKey())){
 						Skb_Console.conError("{}: empty key found in file <{}>", new Object[]{this.appName, fs.getAbsoluteName()});

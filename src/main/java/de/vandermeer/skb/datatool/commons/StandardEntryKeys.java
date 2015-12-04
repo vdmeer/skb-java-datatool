@@ -59,8 +59,8 @@ public enum StandardEntryKeys implements EntryKey {
 	GEO_CITY_COUNTY		("y", "county the city is in", String.class),
 	GEO_COUNTRY_A2		("a2", "ISO 3166-1, 2 character code for a country", String.class),
 	GEO_COUNTRY_A3		("a3", "ISO 3166-1, 3 character code for a country", String.class),
-	GEO_COUNTRY_NU		("nu", "ISO 3166-1, numeric code for a country", Integer.class),
-	GEO_COUNTRY_E164	("e", "E.164 code for a country", Integer.class),
+	GEO_COUNTRY_NU		("nu", "ISO 3166-1, numeric code for a country", String.class),
+	GEO_COUNTRY_E164	("e", "E.164 code for a country", String.class),
 	GEO_COUNTRY_TLD		("t", "cc TLD (top level domain) for a country", String.class),
 
 	OBJ_LINKS	("links", "a links object with URLs and URNs", ObjectLinks.class),

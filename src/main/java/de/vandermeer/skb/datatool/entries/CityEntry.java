@@ -15,15 +15,17 @@
 
 package de.vandermeer.skb.datatool.entries;
 
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.ObjectLinks;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
@@ -47,6 +49,9 @@ public class CityEntry implements DataEntry {
 	/** City's country. */
 	Object country;
 
+	/** A de-referenced continent entry. */
+	CountryEntry countryEntry;
+
 	/** Links for the city. */
 	Object links;
 
@@ -69,7 +74,7 @@ public class CityEntry implements DataEntry {
 	Object county;
 
 	/** City schema. */
-	DataEntrySchema schema = StandardDataEntrySchemas.ACRONYMS;
+	DataEntrySchema schema = StandardDataEntrySchemas.GEO_CITIES;
 
 	@Override
 	public DataEntrySchema getSchema(){
@@ -95,6 +100,14 @@ public class CityEntry implements DataEntry {
 	 */
 	public String getCountry(){
 		return (String)this.country;
+	}
+
+	/**
+	 * Returns the city's country entry.
+	 * @return ccity's country entry
+	 */
+	public CountryEntry getCountryEntry(){
+		return this.countryEntry;
 	}
 
 	/**
@@ -152,6 +165,7 @@ public class CityEntry implements DataEntry {
 	public String getCounty(){
 		return (String)this.county;
 	}
+
 	@Override
 	public String testDuplicate(Collection<DataEntry> set) {
 		// TODO Auto-generated method stub
@@ -159,7 +173,7 @@ public class CityEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) throws URISyntaxException {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
@@ -168,32 +182,46 @@ public class CityEntry implements DataEntry {
 	
 		msg = new StrBuilder(50);
 
-		this.name = Utilities.getDataObject(StandardEntryKeys.GEO_NAME, entryMap, translator);
-		this.country = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY, entryMap);
+		this.name = Utilities.getDataObject(StandardEntryKeys.GEO_NAME, entryMap, translator, linkMap);
 
-		this.iata = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_IATA, entryMap, translator);
-		this.icao = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_ICAO, entryMap, translator);
-		this.wac = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_WAC, entryMap, translator);
-		this.county = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_COUNTY, entryMap, translator);
-		this.region = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_REGION, entryMap, translator);
-		this.state = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_STATE, entryMap, translator);
-
-		Object k = Utilities.getDataObject(StandardEntryKeys.KEY, entryMap);
-		if(k!=null){
-			this.key = (String)k;
+		this.country = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY, entryMap, linkMap);
+		Object obj = Utilities.getLinkObject(this.country, linkMap);
+		if(obj instanceof CountryEntry){
+			this.countryEntry = (CountryEntry)obj;
 		}
 		else{
-			this.key = (String)this.name;
+			msg.appendSeparator(", ").append(obj);
+		}
+
+		this.iata = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_IATA, entryMap, translator, linkMap);
+		this.icao = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_ICAO, entryMap, translator, linkMap);
+		this.wac = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_WAC, entryMap, translator, linkMap);
+		this.county = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_COUNTY, entryMap, translator, linkMap);
+		this.region = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_REGION, entryMap, translator, linkMap);
+		this.state = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_STATE, entryMap, translator, linkMap);
+
+		Object k = Utilities.getDataObject(StandardEntryKeys.KEY, entryMap, linkMap);
+		if(k!=null){
+			this.key = keyStart + k.toString().toLowerCase();
+			this.key = StringUtils.replaceChars(this.key, " ", "-");
+			this.key = StringUtils.replaceChars(this.key, ".", "");
+		}
+		else if(this.name!=null){
+			this.key = keyStart + this.name.toString().toLowerCase();
+			this.key = StringUtils.replaceChars(this.key, " ", "-");
+			this.key = StringUtils.replaceChars(this.key, ".", "");
+		}
+		else{
+			msg.appendSeparator(", ").append("could not generate key, no key or name given");
+		}
+
+		if(msg.size()>0){
+			throw new IllegalArgumentException(msg.toString());
 		}
 	}
 
 	@Override
 	public String getCompareString() {
 		return (String)this.name;
-	}
-
-	@Override
-	public void setRefKeyMap(Map<String, Pair<String, String>> map) {
-		// cities do not need that
 	}
 }

@@ -29,9 +29,10 @@ public interface EntryObject {
 	/**
 	 * Loads an entry object from a given map with tests against expected keys
 	 * @param entryMap map of entries to load from
-	 * @return
+	 * @param linkMap map of data entries that can be linked
+	 * @return empty string on success, string with error description otherwise
 	 */
-	String load(Map<String, Object> entryMap);
+	String load(Map<String, Object> entryMap, Map<DataEntryType, Map<String, Object>> linkMap);
 
 	/**
 	 * Returns the schema for the entry object.

@@ -15,6 +15,8 @@
 
 package de.vandermeer.skb.datatool.commons;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.apache.commons.lang3.ClassUtils;
@@ -31,14 +33,43 @@ import de.vandermeer.skb.base.encodings.Translator;
  */
 public abstract class Utilities {
 
+	public static Object getLinkObject(Object skbLink, Map<DataEntryType, Map<String, Object>> linkMap) throws URISyntaxException {
+		if(skbLink==null || linkMap==null){
+			return "arguments null";
+		}
+
+		URI uri = new URI(skbLink.toString());
+		if(!"skb".equals(uri.getScheme())){
+			return "unknwon scheme in link <" + skbLink +">";
+		}
+
+		DataEntryType type = StandardDataEntryTypes.getTypeForLink(uri.getScheme() + "://" + uri.getAuthority());
+		if(type==null){
+			return "no data entry type for link <" + uri.getScheme() + "://" + uri.getAuthority() +">";
+		}
+
+		Map<String, Object> map = linkMap.get(type);
+		if(map==null){
+			return "no entry for type <" + type.getType() + "> in link map";
+		}
+
+		String key = StringUtils.substringAfterLast(uri.getPath(), "/");
+		Object ret = map.get(key);
+		if(ret==null){
+			return "no entry for <" + uri.getAuthority() + "> key <" + key + "> in link map";
+		}
+		return ret;
+	}
+
 	/**
 	 * Takes the given entry map and tries to generate a special data object from it.
 	 * @param key the key pointing to the map entry with object class information indicating which data object should be generated
 	 * @param entryMap the map with entries used to generate the data object
+	 * @param linkMap map of data entries that can be linked
 	 * @return a new data object of specific type (as read from the map) on success, null on no success
 	 */
-	public static Object getDataObject(EntryKey key, Map<String, Object> entryMap){
-		return getDataObject(key, entryMap, null);
+	public static Object getDataObject(EntryKey key, Map<String, Object> entryMap, Map<DataEntryType, Map<String, Object>> linkMap){
+		return getDataObject(key, entryMap, null, linkMap);
 	}
 
 	/**
@@ -46,9 +77,10 @@ public abstract class Utilities {
 	 * @param key the key pointing to the map entry with object class information indicating which data object should be generated
 	 * @param entryMap the map with entries used to generate the data object
 	 * @param translator a translator for character encoding translations
+	 * @param linkMap map of data entries that can be linked
 	 * @return a new data object of specific type (as read from the map) on success, null on no success
 	 */
-	public static Object getDataObject(EntryKey key, Map<String, Object> entryMap, Translator translator){
+	public static Object getDataObject(EntryKey key, Map<String, Object> entryMap, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap){
 		if(!entryMap.containsKey(key.getKey())){
 			return null;
 		}
@@ -63,11 +95,23 @@ public abstract class Utilities {
 		if(key.getType().equals(Integer.class) && data instanceof Integer){
 			return data;
 		}
+
 		if(ClassUtils.isAssignable(key.getType(), ObjectLinks.class)){
 			Object ret = new ObjectLinks();
-			if(ret instanceof Map){
+			if(data instanceof Map){
 				@SuppressWarnings("unchecked")
-				String err = ((ObjectLinks)ret).load((Map<String, Object>)data);
+				String err = ((ObjectLinks)ret).load((Map<String, Object>)data, linkMap);
+				if(StringUtils.isNoneEmpty(err)){
+					throw new IllegalArgumentException(err);
+				}
+			}
+			return ret;
+		}
+		if(ClassUtils.isAssignable(key.getType(), ObjectGeo.class)){
+			Object ret = new ObjectGeo();
+			if(data instanceof Map){
+				@SuppressWarnings("unchecked")
+				String err = ((ObjectGeo)ret).load((Map<String, Object>)data, linkMap);
 				if(StringUtils.isNoneEmpty(err)){
 					throw new IllegalArgumentException(err);
 				}

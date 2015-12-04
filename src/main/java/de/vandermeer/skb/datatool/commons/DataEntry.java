@@ -19,8 +19,6 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import de.vandermeer.skb.base.encodings.Translator;
 
 /**
@@ -58,9 +56,10 @@ public interface DataEntry extends Comparable<DataEntry> {
 	 * @param keySeparator separator for the key
 	 * @param translator a text/encoding conversion translator, null if none applicable
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
+	 * @param linkMap map of data entries that can be linked
 	 * @throws URISyntaxException if an SKB link is used to de-reference an entry and the URL is not formed well
 	 */
-	void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) throws URISyntaxException;
+	void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) throws URISyntaxException;
 
 	/**
 	 * Returns the schema for the data entry.
@@ -78,13 +77,4 @@ public interface DataEntry extends Comparable<DataEntry> {
 		}
 		return this.getCompareString().compareTo(o.getCompareString());
 	}
-
-	/**
-	 * Sets the reference key map.
-	 * This map is used for key auto-generation where the key is a reference (SKB link) to another data entry.
-	 * This happens for instance when the name of an affiliation is given as an acronym.
-	 * Here, a set of acronyms with a pair of sort and long strings can be set.
-	 * @param map new reference key map
-	 */
-	void setRefKeyMap(Map<String, Pair<String, String>> map);
 }
