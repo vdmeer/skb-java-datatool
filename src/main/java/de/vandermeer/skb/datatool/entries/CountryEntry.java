@@ -25,11 +25,9 @@ import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.base.encodings.Translator;
-import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.datatool.commons.DataTarget;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
 import de.vandermeer.skb.datatool.commons.Utilities;
@@ -146,7 +144,7 @@ public class CountryEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, DataTarget target) {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
@@ -154,10 +152,6 @@ public class CountryEntry implements DataEntry {
 		}
 	
 		msg = new StrBuilder(50);
-		Translator translator = null;
-		if(target!=null){
-			translator = TranslatorFactory.getTranslator(target.getTranslationTarget());
-		}
 
 		this.name = Utilities.getDataObject(StandardEntryKeys.GEO_NAME, entryMap, translator);
 

@@ -25,10 +25,8 @@ import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.base.encodings.Translator;
-import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataTarget;
 import de.vandermeer.skb.datatool.commons.ObjectGeo;
 import de.vandermeer.skb.datatool.commons.ObjectLinks;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
@@ -142,7 +140,7 @@ public class AffiliationEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, DataTarget target) throws URISyntaxException {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) throws URISyntaxException {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
@@ -150,10 +148,6 @@ public class AffiliationEntry implements DataEntry {
 		}
 
 		msg = new StrBuilder(50);
-		Translator translator = null;
-		if(target!=null){
-			translator = TranslatorFactory.getTranslator(target.getTranslationTarget());
-		}
 
 		this.longName = Utilities.getDataObject(StandardEntryKeys.AFF_LONG, entryMap, translator);
 		this.shortName = Utilities.getDataObject(StandardEntryKeys.AFF_SHORT, entryMap, translator);

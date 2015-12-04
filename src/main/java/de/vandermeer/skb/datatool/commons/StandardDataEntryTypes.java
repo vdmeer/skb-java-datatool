@@ -18,6 +18,13 @@ package de.vandermeer.skb.datatool.commons;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.vandermeer.skb.datatool.entries.AcronymEntry;
+import de.vandermeer.skb.datatool.entries.AffiliationEntry;
+import de.vandermeer.skb.datatool.entries.ContinentEntry;
+import de.vandermeer.skb.datatool.entries.CountryEntry;
+import de.vandermeer.skb.datatool.entries.EncodingEntry;
+import de.vandermeer.skb.datatool.entries.HtmlEntry;
+
 /**
  * A standard set of data entry types.
  *
@@ -27,17 +34,17 @@ import java.util.Set;
  */
 public enum StandardDataEntryTypes implements DataEntryType {
 
-	ACRONYMS ("acronyms", "acr"),
+	ACRONYMS ("acronyms", "acr", AcronymEntry.class),
 
-	AFFILIATIONS ("affiliations", "aff"),
+	AFFILIATIONS ("affiliations", "aff", AffiliationEntry.class),
 
-	CONTINENTS ("continents", "cont"),
+	CONTINENTS ("continents", "cont", ContinentEntry.class),
 
-	COUNTRIES ("countries", "country"),
+	COUNTRIES ("countries", "country", CountryEntry.class),
 
-	ENCODINGS ("encodings", "cmap"),
+	ENCODINGS ("encodings", "cmap", EncodingEntry.class),
 
-	HTML_ENTITIES ("html-entitis", "hmap"),
+	HTML_ENTITIES ("html-entitis", "hmap", HtmlEntry.class),
 	;
 
 	/** Name of the type .*/
@@ -46,14 +53,18 @@ public enum StandardDataEntryTypes implements DataEntryType {
 	/** File extension for the type, without ".json" .*/
 	String inputFileExtension;
 
+	/** The supported class of the type. */
+	Class<?> typeClass;
+
 	/**
 	 * Creates a new data entry type.
 	 * @param type the type name
 	 * @param inputFileExtension the file extension
 	 */
-	StandardDataEntryTypes(String type, String inputFileExtension){
+	StandardDataEntryTypes(String type, String inputFileExtension, Class<?> typeClass){
 		this.type = type;
 		this.inputFileExtension = inputFileExtension;
+		this.typeClass = typeClass;
 	}
 
 	@Override
@@ -66,9 +77,10 @@ public enum StandardDataEntryTypes implements DataEntryType {
 		return this.inputFileExtension;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public String getFullInputFileExtension() {
-		return this.inputFileExtension + ".json";
+	public <E extends DataEntry> Class<E> getTypeClass(){
+		return (Class<E>) this.typeClass;
 	}
 
 	@Override

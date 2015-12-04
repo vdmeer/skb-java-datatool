@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import de.vandermeer.skb.base.encodings.Translator;
+
 /**
  * Generic data entry for the data tools.
  *
@@ -54,11 +56,11 @@ public interface DataEntry extends Comparable<DataEntry> {
 	 * @param entryMap map with content for the entry
 	 * @param keyStart start of an entry key, if generated
 	 * @param keySeparator separator for the key
-	 * @param target a text/encoding conversion target
+	 * @param translator a text/encoding conversion translator, null if none applicable
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 * @throws URISyntaxException if an SKB link is used to de-reference an entry and the URL is not formed well
 	 */
-	void load(Map<String, Object> entryMap, String keyStart, char keySeparator, DataTarget target) throws URISyntaxException;
+	void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) throws URISyntaxException;
 
 	/**
 	 * Returns the schema for the data entry.

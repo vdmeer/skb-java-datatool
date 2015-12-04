@@ -17,17 +17,10 @@ package de.vandermeer.skb.datatool.commons;
 
 import java.util.Map;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
-import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.base.encodings.Translator;
-import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
-import de.vandermeer.skb.base.info.DirectoryLoader;
 
 /**
  * Utility methods for common tasks.
@@ -37,47 +30,6 @@ import de.vandermeer.skb.base.info.DirectoryLoader;
  * @since      v0.0.1
  */
 public abstract class Utilities {
-
-	/**
-	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
-	 * @param directory the directory that contains JSON files to load information from, the directory will be read recursively
-	 * @param type the class of the entry type to generate a data set for
-	 * @param entryType the data entry type
-	 * @param keySep a character to use as key separator
-	 * @param target the target with encoding translation information
-	 * @param appName name of the calling application
-	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
-	 */
-	public static <E extends DataEntry> DataSet<E> loadDataSet(String directory, Class<E> type, DataEntryType entryType, char keySep, DataTarget target, String appName){
-		return loadDataSet(directory, type, entryType, keySep, target, appName, null);
-	}
-
-	/**
-	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
-	 * @param directory the directory that contains JSON files to load information from, the directory will be read recursively
-	 * @param type the class of the entry type to generate a data set for
-	 * @param entryType the data entry type
-	 * @param keySep a character to use as key separator
-	 * @param target the target with encoding translation information
-	 * @param appName name of the calling application
-	 * @param refKeyMap a map of de-referenced keys
-	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
-	 */
-	public static <E extends DataEntry> DataSet<E> loadDataSet(String directory, Class<E> type, DataEntryType entryType, char keySep, DataTarget target, String appName, Map<String, Pair<String, String>> refKeyMap){
-		IOFileFilter fileFilter = new WildcardFileFilter(new String[]{
-				"*." + entryType.getFullInputFileExtension()
-		});
-		DirectoryLoader dl = new CommonsDirectoryWalker(directory, DirectoryFileFilter.INSTANCE, fileFilter);
-		if(dl.getLoadErrors().size()>0){
-			Skb_Console.conError("{}: errors loading files from directory <{}>\n{}", new Object[]{appName, directory, dl.getLoadErrors().render()});
-			return null;
-		}
-
-		DataSet<E> ds = new DataSet<>(type);
-		ds.setRefKeyMap(refKeyMap);
-		ds.load(dl, entryType.getInputFileExtension(), keySep, target, appName);
-		return ds;
-	}
 
 	/**
 	 * Takes the given entry map and tries to generate a special data object from it.

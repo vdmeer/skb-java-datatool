@@ -39,10 +39,16 @@ public interface DataEntryType {
 	String getInputFileExtension();
 
 	/**
-	 * Returns the full file extension (type plus JOSN).
-	 * @return full type extension
+	 * Returns the class used for initialization of a data set with this data entry.
+	 * @return the class
 	 */
-	String getFullInputFileExtension();
+	<E extends DataEntry> Class<E> getTypeClass();
+
+//	/**
+//	 * Returns the full file extension (type plus JOSN).
+//	 * @return full type extension
+//	 */
+//	String getFullInputFileExtension();
 
 	/**
 	 * Returns the target the type supports

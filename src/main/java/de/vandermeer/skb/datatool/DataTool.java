@@ -25,14 +25,15 @@ import de.vandermeer.execs.options.AO_Verbose;
 import de.vandermeer.execs.options.ApplicationOption;
 import de.vandermeer.execs.options.ExecS_CliParser;
 import de.vandermeer.skb.base.console.Skb_Console;
+import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
 import de.vandermeer.skb.base.info.DirectoryLoader;
 import de.vandermeer.skb.base.info.FileTarget;
 import de.vandermeer.skb.datatool.commons.DataSet;
+import de.vandermeer.skb.datatool.commons.DataSetBuilder;
 import de.vandermeer.skb.datatool.commons.DataTarget;
 import de.vandermeer.skb.datatool.commons.StandardDataEntryTypes;
 import de.vandermeer.skb.datatool.commons.StandardDataTargets;
-import de.vandermeer.skb.datatool.commons.Utilities;
 import de.vandermeer.skb.datatool.entries.AcronymEntry;
 import de.vandermeer.skb.datatool.entries.AcronymUtilities;
 import de.vandermeer.skb.datatool.entries.AffiliationEntry;
@@ -186,9 +187,20 @@ public class DataTool implements ExecS_Application {
 			}
 		}
 
+		DataSetBuilder dsb = new DataSetBuilder()
+			.setAppName(this.getAppName())
+			.setKeySeparator(this.optionKeySep.getValue())
+			.setDirectory(this.optionDirIn.getValue())
+		;
+		String[] excluded = null;
+		if(target!=null){
+			dsb.setTranslator(TranslatorFactory.getTranslator(target.getTranslationTarget()));
+			excluded = target.getExcluded();
+		}
+
 		switch(type){
 			case ACRONYMS:
-				DataSet<AcronymEntry> acronyms = Utilities.loadDataSet(this.optionDirIn.getValue(), AcronymEntry.class, type, this.optionKeySep.getValue(), null, this.getAppName());
+				DataSet<AcronymEntry> acronyms = dsb.build(StandardDataEntryTypes.ACRONYMS);
 				if(acronyms==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -4;
@@ -202,13 +214,13 @@ public class DataTool implements ExecS_Application {
 				break;
 
 			case AFFILIATIONS:
-				acronyms = Utilities.loadDataSet(this.optionDirIn.getValue(), AcronymEntry.class, type, this.optionKeySep.getValue(), null, this.getAppName());
+				acronyms = dsb.build(StandardDataEntryTypes.ACRONYMS);
 				if(acronyms==null){
 					Skb_Console.conError("{}: errors creating data set for acronyms", new Object[]{this.getAppName()});
 					return -4;
 				}
 				ToolUtils.writeStats(acronyms, "acronyms", this.getAppName(), this.verbose);
-				DataSet<AffiliationEntry> affiliations = Utilities.loadDataSet(this.optionDirIn.getValue(), AffiliationEntry.class, type, this.optionKeySep.getValue(), target, this.getAppName(), AcronymUtilities.toREfKeyMap(acronyms));
+				DataSet<AffiliationEntry> affiliations = dsb.build(StandardDataEntryTypes.AFFILIATIONS, excluded, AcronymUtilities.toREfKeyMap(acronyms));
 				if(affiliations==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -5;
@@ -221,7 +233,7 @@ public class DataTool implements ExecS_Application {
 				break;
 
 			case CONTINENTS:
-				DataSet<ContinentEntry> continents = Utilities.loadDataSet(this.optionDirIn.getValue(), ContinentEntry.class, type, this.optionKeySep.getValue(), target, this.getAppName());
+				DataSet<ContinentEntry> continents = dsb.build(StandardDataEntryTypes.CONTINENTS, excluded);
 				if(continents==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -4;
@@ -237,7 +249,7 @@ public class DataTool implements ExecS_Application {
 				break;
 
 			case HTML_ENTITIES:
-				DataSet<HtmlEntry> htmlEntities = Utilities.loadDataSet(this.optionDirIn.getValue(), HtmlEntry.class, type, this.optionKeySep.getValue(), null, this.getAppName());
+				DataSet<HtmlEntry> htmlEntities = dsb.build(StandardDataEntryTypes.HTML_ENTITIES, excluded);
 				if(htmlEntities==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -4;
@@ -246,13 +258,13 @@ public class DataTool implements ExecS_Application {
 				break;
 
 			case ENCODINGS:
-				htmlEntities = Utilities.loadDataSet(this.optionDirIn.getValue(), HtmlEntry.class, type, this.optionKeySep.getValue(), null, this.getAppName());
+				htmlEntities = dsb.build(StandardDataEntryTypes.HTML_ENTITIES, excluded);
 				if(htmlEntities==null){
 					Skb_Console.conError("{}: errors creating data set for html entities", new Object[]{this.getAppName()});
 					return -4;
 				}
 				ToolUtils.writeStats(htmlEntities, "html entities", this.getAppName(), this.verbose);
-				DataSet<EncodingEntry> encodings = Utilities.loadDataSet(this.optionDirIn.getValue(), EncodingEntry.class, type, this.optionKeySep.getValue(), target, this.getAppName());
+				DataSet<EncodingEntry> encodings = dsb.build(StandardDataEntryTypes.ENCODINGS, excluded);
 				if(encodings==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -5;

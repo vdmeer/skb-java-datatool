@@ -22,9 +22,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 
+import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataTarget;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
 import de.vandermeer.skb.datatool.commons.Utilities;
@@ -88,7 +88,7 @@ public class EncodingEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, DataTarget target) {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){

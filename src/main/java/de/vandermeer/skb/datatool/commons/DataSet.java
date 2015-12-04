@@ -33,9 +33,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.base.info.DirectoryLoader;
+import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.base.info.FileSource;
-import de.vandermeer.skb.base.info.FileSourceList;
 
 /**
  * Generic data set for the data tools.
@@ -55,56 +54,88 @@ public class DataSet<E extends DataEntry> {
 	/** Class of the data entry implementation. */
 	Class<E> clazz;
 
-	/** A map of keys to string pairs for de-referenced values that impact key auto-generation. */
+	/**
+	 * Reference key map.
+	 * This map is used for key auto-generation where the key is a reference (SKB link) to another data entry.
+	 * This happens for instance when the name of an affiliation is given as an acronym.
+	 * Here, a set of acronyms with a pair of sort and long strings can be set.
+	 */
 	Map<String, Pair<String, String>> refKeyMap;
+
+	/** Separator character for auto-generated keys. */
+	char keySeparator;
+
+	/** Character and encoding translator. */
+	Translator translator;
+
+	/** Characters excluded from translation. */
+	String[] excluded;
+
+	/** Name of the calling application. */
+	String appName;
 
 	/**
 	 * Returns a new, empty data set.
 	 */
-	public DataSet(Class<E> clazz){
+	DataSet(Class<E> clazz){
 		this.entries = new HashMap<>();
 		this.files = 0;
 		this.clazz = clazz;
 	}
 
 	/**
-	 * Sets the reference key map.
-	 * This map is used for key auto-generation where the key is a reference (SKB link) to another data entry.
-	 * This happens for instance when the name of an affiliation is given as an acronym.
-	 * Here, a set of acronyms with a pair of sort and long strings can be set.
-	 * @param map new reference key map
+	 * Returns the path common to all files in the given file list.
+	 * The rest (after this common path) will be used for auto-key-generation
+	 * @param fsl list of data files
+	 * @return common path of all files in the list
 	 */
-	public void setRefKeyMap(Map<String, Pair<String, String>> map){
-		this.refKeyMap = map;
+	String calcCommonPath(List<FileSource> fsl){
+		//get shortest absolute path, everything else is part of the key
+		Set<String> paths = new HashSet<>();
+		for(FileSource fs : fsl){
+			paths.add(fs.getAbsolutePath());
+		}
+		String ret = StringUtils.getCommonPrefix(paths.toArray(new String[]{}));
+		if(ret.endsWith(File.separator)){
+			ret = StringUtils.substringBeforeLast(ret, File.separator);
+		}
+		return ret;
+	}
+
+	/**
+	 * Returns the start of a key for key auto-generation
+	 * @param fs the file name
+	 * @param commonPath the common path of all file names
+	 * @return start of the key
+	 */
+	String calcKeyStart(FileSource fs, String commonPath){
+		//remove common path
+		String ret = StringUtils.substringAfterLast(fs.getAbsoluteName(), commonPath + File.separator);
+
+		//replace all path sepataros with key separators
+		ret = StringUtils.replaceChars(ret, File.separatorChar, this.keySeparator);
+
+		//remove the last dot (".json")
+		ret = StringUtils.substringBeforeLast(ret, ".");
+		//remove the last dot (".entry") - the entry file extension
+		ret = StringUtils.substringBeforeLast(ret, ".");
+
+		//return the key plus a final separator
+		return ret + this.keySeparator;
 	}
 
 	/**
 	 * Loads a data set from file system.
-	 * @param dl the directory loader with files to load encodings from
+	 * @param fsl list of files to load data from
 	 * @param fileExt the file extension used (translated to "." + fileExt + ".json"), empty if none used
-	 * @param keySeparator character to separate key fields
-	 * @param target a target for character conversions
-	 * @param appName name of the calling application for logging and errors
 	 * @return 0 on success, larger than zero on JSON parsing error (number of found errors)
 	 */
-	public int load(DirectoryLoader dl, String fileExt, char keySeparator, DataTarget target, String appName){
+	public int load(List<FileSource> fsl, String fileExt){
 		int ret = 0;
-		FileSourceList fsl = dl.load();
+		String commonPath = this.calcCommonPath(fsl);
 
-		//get shortest absolute path, everything else is part of the key
-		Set<String> paths = new HashSet<>();
-		for(FileSource fs : fsl.getSource()){
-			paths.add(fs.getAbsolutePath());
-		}
-		String pathRemove = StringUtils.getCommonPrefix(paths.toArray(new String[]{}));
-		if(pathRemove.endsWith(File.separator)){
-			pathRemove = StringUtils.substringBeforeLast(pathRemove, File.separator);
-		}
-
-		for(FileSource fs : fsl.getSource()){
-			String keyStart = StringUtils.substringAfterLast(fs.getAbsoluteName(), pathRemove + File.separator);
-			keyStart = StringUtils.replaceChars(keyStart, File.separatorChar, keySeparator);
-			keyStart = StringUtils.replace(keyStart, "." + fileExt + ".json", Character.toString(keySeparator));
+		for(FileSource fs : fsl){
+			String keyStart = this.calcKeyStart(fs, commonPath);
 			ObjectMapper om = new ObjectMapper();
 			om.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 			try{
@@ -112,9 +143,10 @@ public class DataSet<E extends DataEntry> {
 				for(Map<String, Object> entryMap : jsonList){
 					E entry = this.clazz.newInstance();
 					entry.setRefKeyMap(this.refKeyMap);
-					entry.load(entryMap, keyStart, keySeparator, target);
+					entry.load(entryMap, keyStart, this.keySeparator, this.translator);
+
 					if(StringUtils.isEmpty(entry.getKey())){
-						Skb_Console.conError("{}: empty key found in file <{}>", new Object[]{appName, fs.getAbsoluteName()});
+						Skb_Console.conError("{}: empty key found in file <{}>", new Object[]{this.appName, fs.getAbsoluteName()});
 						continue;
 					}
 					else if(entry.getKey().contains("#dummy")){
@@ -124,13 +156,13 @@ public class DataSet<E extends DataEntry> {
 					@SuppressWarnings("unchecked")
 					String dup = entry.testDuplicate((Collection<DataEntry>) this.entries.values());
 					if(this.entries.containsKey(entry.getKey())){
-						Skb_Console.conError("{}: duplicate key <{}> found in file <{}>", new Object[]{appName, entry.getKey(), fs.getAbsoluteName()});
+						Skb_Console.conError("{}: duplicate key <{}> found in file <{}>", new Object[]{this.appName, entry.getKey(), fs.getAbsoluteName()});
 					}
 					else if(dup!=null){
-						Skb_Console.conError("{}: entry already in map: k1 <{}> <> k2 <{}> found in file <{}>", new Object[]{appName, dup, entry.getKey(), fs.getAbsoluteName()});
+						Skb_Console.conError("{}: entry already in map: k1 <{}> <> k2 <{}> found in file <{}>", new Object[]{this.appName, dup, entry.getKey(), fs.getAbsoluteName()});
 					}
 					else{
-						if(target==null || (!ArrayUtils.contains(target.getExcluded(), entry.getCompareString()))){
+						if(this.excluded==null || (!ArrayUtils.contains(this.excluded, entry.getCompareString()))){
 							this.entries.put(entry.getKey(), entry);
 						}
 					}
@@ -138,7 +170,7 @@ public class DataSet<E extends DataEntry> {
 				this.files++;
 			}
 			catch(IllegalArgumentException iaex){
-				Skb_Console.conError("{}: problem creating entry: <{}> in file <{}>", new Object[]{appName, iaex.getMessage(), fs.getAbsoluteName()});
+				Skb_Console.conError("{}: problem creating entry: <{}> in file <{}>", new Object[]{this.appName, iaex.getMessage(), fs.getAbsoluteName()});
 			}
 			catch(NullPointerException npe){
 				npe.printStackTrace();

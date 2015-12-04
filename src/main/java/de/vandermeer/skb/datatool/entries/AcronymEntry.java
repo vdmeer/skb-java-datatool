@@ -23,10 +23,8 @@ import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.base.encodings.Translator;
-import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataTarget;
 import de.vandermeer.skb.datatool.commons.ObjectLinks;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
@@ -85,7 +83,7 @@ public class AcronymEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, DataTarget target) {
+	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator) {
 		StrBuilder msg;
 		msg = this.schema.testSchema(entryMap);
 		if(msg.size()>0){
@@ -93,10 +91,6 @@ public class AcronymEntry implements DataEntry {
 		}
 
 		msg = new StrBuilder(50);
-		Translator translator = null;
-		if(target!=null){
-			translator = TranslatorFactory.getTranslator(target.getTranslationTarget());
-		}
 
 		this.acShort = Utilities.getDataObject(StandardEntryKeys.ACR_SHORT, entryMap, translator);
 		this.acShortOrig = Utilities.getDataObject(StandardEntryKeys.ACR_SHORT, entryMap);
