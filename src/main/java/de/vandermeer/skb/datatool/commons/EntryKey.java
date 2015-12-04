@@ -15,7 +15,6 @@
 
 package de.vandermeer.skb.datatool.commons;
 
-
 /**
  * A key in a data entry.
  *

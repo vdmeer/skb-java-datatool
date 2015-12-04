@@ -1,3 +1,18 @@
+/* Copyright 2014 Sven van der Meer <vdmeer.sven@mykolab.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package de.vandermeer.skb.datatool.entries;
 
 import java.util.HashMap;
@@ -7,8 +22,20 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import de.vandermeer.skb.datatool.commons.DataSet;
 
+/**
+ * Utility methods for dealing with acronym data entries.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
+ * @since      v0.0.1
+ */
 public abstract class AcronymUtilities {
 
+	/**
+	 * Converts a data set fo acronyms into a de-referenced key map.
+	 * @param ds the data set with acronym entries
+	 * @return a map of string to short/long pairs of all acornyms found, empty map if none found
+	 */
 	public final static Map<String, Pair<String, String>> toREfKeyMap(DataSet<AcronymEntry> ds){
 		Map<String, Pair<String, String>> ret = new HashMap<>();
 		for(AcronymEntry entry : ds.getEntries()){
@@ -17,6 +44,10 @@ public abstract class AcronymUtilities {
 		return ret;
 	}
 
+	/**
+	 * Sets the longest acronym (plain text) in a set of acronyms.
+	 * @param ds data set of acronyms
+	 */
 	public final static void setLongestAcr(DataSet<AcronymEntry> ds){
 		String maxShort = "";
 		String key = null;

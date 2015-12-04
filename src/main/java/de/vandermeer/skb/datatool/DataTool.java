@@ -28,10 +28,8 @@ import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
 import de.vandermeer.skb.base.info.DirectoryLoader;
 import de.vandermeer.skb.base.info.FileTarget;
-import de.vandermeer.skb.datatool.commons.AO_KeySeparator;
 import de.vandermeer.skb.datatool.commons.DataSet;
 import de.vandermeer.skb.datatool.commons.DataTarget;
-import de.vandermeer.skb.datatool.commons.FileExtensions;
 import de.vandermeer.skb.datatool.commons.StandardDataEntryTypes;
 import de.vandermeer.skb.datatool.commons.StandardDataTargets;
 import de.vandermeer.skb.datatool.commons.Utilities;
@@ -164,7 +162,7 @@ public class DataTool implements ExecS_Application {
 			}
 		}
 		FileTarget ft = null;
-		if(target!=null && this.optionFileOut!=null){
+		if(target!=null && this.optionFileOut.getValue()!=null){
 			String fn = this.optionFileOut.getValue() + "." + target.getExtension();
 			FileTarget.createFile(fn);
 			if(this.optionFileOut.getValue()!=null){
@@ -190,48 +188,48 @@ public class DataTool implements ExecS_Application {
 
 		switch(type){
 			case ACRONYMS:
-				DataSet<AcronymEntry> acronyms = Utilities.loadDataSet(this.optionDirIn.getValue(), AcronymEntry.class, FileExtensions.ACRONYMS, this.optionKeySep.getValue(), null, this.getAppName(), this.verbose);
+				DataSet<AcronymEntry> acronyms = Utilities.loadDataSet(this.optionDirIn.getValue(), AcronymEntry.class, type, this.optionKeySep.getValue(), null, this.getAppName());
 				if(acronyms==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -4;
 				}
 				AcronymUtilities.setLongestAcr(acronyms);
-				Utilities.writeStats(acronyms, type.getType(), this.getAppName(), this.verbose);
+				ToolUtils.writeStats(acronyms, type.getType(), this.getAppName(), this.verbose);
 				if(target!=null){
-					ST st = Utilities.writeST(acronyms, type, target, this.getAppName());
-					ret = Utilities.writeFile(st, ft, this.getAppName());
+					ST st = ToolUtils.writeST(acronyms, type, target, this.getAppName());
+					ret = ToolUtils.writeOutput(st, ft, this.getAppName());
 				}
 				break;
 
 			case AFFILIATIONS:
-				acronyms = Utilities.loadDataSet(this.optionDirIn.getValue(), AcronymEntry.class, FileExtensions.ACRONYMS, this.optionKeySep.getValue(), null, this.getAppName(), this.verbose);
+				acronyms = Utilities.loadDataSet(this.optionDirIn.getValue(), AcronymEntry.class, type, this.optionKeySep.getValue(), null, this.getAppName());
 				if(acronyms==null){
 					Skb_Console.conError("{}: errors creating data set for acronyms", new Object[]{this.getAppName()});
 					return -4;
 				}
-				Utilities.writeStats(acronyms, "acronyms", this.getAppName(), this.verbose);
-				DataSet<AffiliationEntry> affiliations = Utilities.loadDataSet(this.optionDirIn.getValue(), AffiliationEntry.class, FileExtensions.AFFILIATIONS, this.optionKeySep.getValue(), target, this.getAppName(), this.verbose, AcronymUtilities.toREfKeyMap(acronyms));
+				ToolUtils.writeStats(acronyms, "acronyms", this.getAppName(), this.verbose);
+				DataSet<AffiliationEntry> affiliations = Utilities.loadDataSet(this.optionDirIn.getValue(), AffiliationEntry.class, type, this.optionKeySep.getValue(), target, this.getAppName(), AcronymUtilities.toREfKeyMap(acronyms));
 				if(affiliations==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -5;
 				}
-				Utilities.writeStats(affiliations, type.getType(), this.getAppName(), this.verbose);
+				ToolUtils.writeStats(affiliations, type.getType(), this.getAppName(), this.verbose);
 				if(target!=null){
-					ST st = Utilities.writeST(affiliations, type, target, this.getAppName());
-					ret = Utilities.writeFile(st, ft, this.getAppName());
+					ST st = ToolUtils.writeST(affiliations, type, target, this.getAppName());
+					ret = ToolUtils.writeOutput(st, ft, this.getAppName());
 				}
 				break;
 
 			case CONTINENTS:
-				DataSet<ContinentEntry> continents = Utilities.loadDataSet(this.optionDirIn.getValue(), ContinentEntry.class, FileExtensions.CONTINENTS, this.optionKeySep.getValue(), target, this.getAppName(), this.verbose);
+				DataSet<ContinentEntry> continents = Utilities.loadDataSet(this.optionDirIn.getValue(), ContinentEntry.class, type, this.optionKeySep.getValue(), target, this.getAppName());
 				if(continents==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -4;
 				}
-				Utilities.writeStats(continents, "continents", this.getAppName(), this.verbose);
+				ToolUtils.writeStats(continents, "continents", this.getAppName(), this.verbose);
 				if(target!=null){
-					ST st = Utilities.writeST(continents, type, target, this.getAppName());
-					ret = Utilities.writeFile(st, ft, this.getAppName());
+					ST st = ToolUtils.writeST(continents, type, target, this.getAppName());
+					ret = ToolUtils.writeOutput(st, ft, this.getAppName());
 				}
 				break;
 
@@ -239,51 +237,36 @@ public class DataTool implements ExecS_Application {
 				break;
 
 			case HTML_ENTITIES:
-				DataSet<HtmlEntry> htmlEntities = Utilities.loadDataSet(this.optionDirIn.getValue(), HtmlEntry.class, FileExtensions.HTML_ENTITIES, this.optionKeySep.getValue(), null, this.getAppName(), this.verbose);
+				DataSet<HtmlEntry> htmlEntities = Utilities.loadDataSet(this.optionDirIn.getValue(), HtmlEntry.class, type, this.optionKeySep.getValue(), null, this.getAppName());
 				if(htmlEntities==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -4;
 				}
-				Utilities.writeStats(htmlEntities, type.getType(), this.getAppName(), this.verbose);
+				ToolUtils.writeStats(htmlEntities, type.getType(), this.getAppName(), this.verbose);
 				break;
 
 			case ENCODINGS:
-				htmlEntities = Utilities.loadDataSet(this.optionDirIn.getValue(), HtmlEntry.class, FileExtensions.HTML_ENTITIES, this.optionKeySep.getValue(), null, this.getAppName(), this.verbose);
+				htmlEntities = Utilities.loadDataSet(this.optionDirIn.getValue(), HtmlEntry.class, type, this.optionKeySep.getValue(), null, this.getAppName());
 				if(htmlEntities==null){
 					Skb_Console.conError("{}: errors creating data set for html entities", new Object[]{this.getAppName()});
 					return -4;
 				}
-//				Utilities.writeStats(htmlEntities, "html entities", this.getAppName(), this.verbose);
-				DataSet<EncodingEntry> encodings = Utilities.loadDataSet(this.optionDirIn.getValue(), EncodingEntry.class, FileExtensions.ENCODINGS, this.optionKeySep.getValue(), target, this.getAppName(), this.verbose);
+				ToolUtils.writeStats(htmlEntities, "html entities", this.getAppName(), this.verbose);
+				DataSet<EncodingEntry> encodings = Utilities.loadDataSet(this.optionDirIn.getValue(), EncodingEntry.class, type, this.optionKeySep.getValue(), target, this.getAppName());
 				if(encodings==null){
 					Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), type.getType()});
 					return -5;
 				}
-				Utilities.writeStats(encodings, type.getType(), this.getAppName(), this.verbose);
+				ToolUtils.writeStats(encodings, type.getType(), this.getAppName(), this.verbose);
 				if(target!=null){
-					ST st = Utilities.writeST(encodings, type, target, this.getAppName());
-					st = Utilities.addToST(htmlEntities, st, this.getAppName());
-					ret = Utilities.writeFile(st, ft, this.getAppName());
+					ST st = ToolUtils.writeST(encodings, type, target, this.getAppName());
+					st = ToolUtils.addToST(htmlEntities, st, this.getAppName());
+					ret = ToolUtils.writeOutput(st, ft, this.getAppName());
 				}
 				break;
 			default:
 				break;
 		}
-
-//		String acrDir = this.optionDirIn.getValue() + File.separator + "acronyms";
-//		DataSet<AcronymEntry> acronyms = null;
-//		File f = new File(acrDir);
-//		if(f.exists() && f.isDirectory() && f.canRead()){
-//			acronyms = Utilities.loadDataSet(this.optionDirIn.getValue(), AcronymEntry.class, FileExtensions.ACRONYMS, this.optionKeySep.getValue(), null, this.getAppName(), this.verbose);
-//			AcronymUtilities.setLongestAcr(acronyms);
-//		}
-//
-//		String affDir = this.optionDirIn.getValue() + File.separator + "affiliations";
-//		DataSet<AffiliationEntry, AffiliationTarget> affiliations = null;
-//		f = new File(affDir);
-//		if(f.exists() && f.isDirectory() && f.canRead()){
-//			affiliations = Utilities.loadDataSet(this.optionDirIn.getValue(), AffiliationEntry.class, FileExtensions.AFFILIATIONS, this.optionKeySep.getValue(), null, this.getAppName(), this.verbose, AcronymUtilities.toREfKeyMap(acronyms));
-//		}
 
 		if(this.verbose){
 			Skb_Console.conInfo("{}: done", this.getAppName());

@@ -18,9 +18,9 @@ public class QuickTest {
 //				"affiliations",
 
 				"--target",
-//				"html-tab",
+				"html-tab",
 //				"latex-acr",
-				"text-plain",
+//				"text-plain",
 //				"java-skb-t2h",
 
 				"--input-dir",
@@ -28,8 +28,8 @@ public class QuickTest {
 
 				"--verbose",
 
-//				"--output-file",
-//				"2",
+				"--output-file",
+				"2",
 
 //				"--key-sep",
 //				"/"

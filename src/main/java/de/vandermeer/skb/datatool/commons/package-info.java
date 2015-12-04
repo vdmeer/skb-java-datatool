@@ -13,17 +13,10 @@
  * limitations under the License.
  */
 
-package de.vandermeer.skb.datatool.entries;
-
-import de.vandermeer.skb.datatool.commons.DataTarget;
-
 /**
- * Base for city targets.
- *
+ * Common definitions, interfaces, classes for the data tool.
+ * 
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
- * @since      v0.0.1
+ * @version    v0.0.2 build 150910 (10-Sep-15) for Java 1.7
  */
-public interface CityTarget extends DataTarget {
-
-}
+package de.vandermeer.skb.datatool.commons;

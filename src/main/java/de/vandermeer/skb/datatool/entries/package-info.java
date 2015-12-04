@@ -14,7 +14,7 @@
  */
 
 /**
- * Tool for reading acronym lists (JSON) and generating various outputs, such as Java and LaTeX files, using them.
+ * Data entries for handling specific types of data, for instance acronyms or affiliations.
  * 
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.2 build 150910 (10-Sep-15) for Java 1.7

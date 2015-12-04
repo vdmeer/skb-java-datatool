@@ -83,6 +83,12 @@ public enum StandardEntryKeys implements EntryKey {
 	/** Key type. */
 	private Class<?> type;
 
+	/**
+	 * Creates a new standard entry key.
+	 * @param key the name of the key
+	 * @param description the key's description
+	 * @param type the class the key expects as type for values
+	 */
 	StandardEntryKeys(String key, String description, Class<?> type){
 		this.key = key;
 		this.description = description;

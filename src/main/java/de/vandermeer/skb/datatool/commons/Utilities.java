@@ -1,34 +1,71 @@
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package de.vandermeer.skb.datatool.commons;
 
-import java.io.IOException;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
 
 import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
 import de.vandermeer.skb.base.info.DirectoryLoader;
-import de.vandermeer.skb.base.info.FileTarget;
-import de.vandermeer.skb.base.info.StgFileLoader;
 
+/**
+ * Utility methods for common tasks.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
+ * @since      v0.0.1
+ */
 public abstract class Utilities {
 
-	public static <E extends DataEntry> DataSet<E> loadDataSet(String directory, Class<E> type, FileExtensions extension, char keySep, DataTarget target, String appName, boolean verbose){
-		return loadDataSet(directory, type, extension, keySep, target, appName, verbose, null);
+	/**
+	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
+	 * @param directory the directory that contains JSON files to load information from, the directory will be read recursively
+	 * @param type the class of the entry type to generate a data set for
+	 * @param entryType the data entry type
+	 * @param keySep a character to use as key separator
+	 * @param target the target with encoding translation information
+	 * @param appName name of the calling application
+	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
+	 */
+	public static <E extends DataEntry> DataSet<E> loadDataSet(String directory, Class<E> type, DataEntryType entryType, char keySep, DataTarget target, String appName){
+		return loadDataSet(directory, type, entryType, keySep, target, appName, null);
 	}
 
-	public static <E extends DataEntry> DataSet<E> loadDataSet(String directory, Class<E> type, FileExtensions extension, char keySep, DataTarget target, String appName, boolean verbose, Map<String, Pair<String, String>> refKeyMap){
+	/**
+	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
+	 * @param directory the directory that contains JSON files to load information from, the directory will be read recursively
+	 * @param type the class of the entry type to generate a data set for
+	 * @param entryType the data entry type
+	 * @param keySep a character to use as key separator
+	 * @param target the target with encoding translation information
+	 * @param appName name of the calling application
+	 * @param refKeyMap a map of de-referenced keys
+	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
+	 */
+	public static <E extends DataEntry> DataSet<E> loadDataSet(String directory, Class<E> type, DataEntryType entryType, char keySep, DataTarget target, String appName, Map<String, Pair<String, String>> refKeyMap){
 		IOFileFilter fileFilter = new WildcardFileFilter(new String[]{
-				"*." + extension.getFullExtension()
+				"*." + entryType.getFullInputFileExtension()
 		});
 		DirectoryLoader dl = new CommonsDirectoryWalker(directory, DirectoryFileFilter.INSTANCE, fileFilter);
 		if(dl.getLoadErrors().size()>0){
@@ -38,65 +75,27 @@ public abstract class Utilities {
 
 		DataSet<E> ds = new DataSet<>(type);
 		ds.setRefKeyMap(refKeyMap);
-		ds.load(dl, extension.getExtension(), keySep, target, appName);
+		ds.load(dl, entryType.getInputFileExtension(), keySep, target, appName);
 		return ds;
 	}
 
-	public static <E extends DataEntry> void writeStats(DataSet<E> ds, String type, String appName, boolean verbose){
-		if(verbose){
-			Skb_Console.conInfo("{}: parsed <{}> " + type + " from <{}> files", new Object[]{appName, ds.getEntries().size(), ds.getFileNumber()});
-		}
-	}
-
-	public static <E extends DataEntry> ST writeST(DataSet<E> ds, DataEntryType type, DataTarget target, String appName) {
-		StgFileLoader stgLoader = new StgFileLoader(target.getStgFileName(type));
-		if(stgLoader.getLoadErrors().size()>0){
-			Skb_Console.conError("{}: errors loading STG file <{}>\n{}", new Object[]{appName, target.getStgFileName(type), stgLoader.getLoadErrors().render()});
-			return null;
-		}
-
-		STGroup stg = stgLoader.load();
-		if(stg==null || stgLoader.getLoadErrors().size()>0){
-			Skb_Console.conError("{}: errors loading STG file <{}>\n{}", new Object[]{appName, target.getStgFileName(type), stgLoader.getLoadErrors().render()});
-			return null;
-		}
-		//TODO validate STG file
-		ST st = stg.getInstanceOf("build");
-		for(E entry : ds.getEntries()){
-				st.add("entry", entry);
-		}
-
-		return st;
-	}
-
-	public static <E extends DataEntry> ST addToST(DataSet<E> ds, ST st, String appName){
-		for(E entry2 : ds.getEntries()){
-			st.add("entry2", entry2);
-		}
-		return st;
-	}
-
-	public static int writeFile(ST st, FileTarget ft, String appName) {
-		if(ft!=null && ft.asFile()!=null){
-			try {
-				FileUtils.write(ft.asFile(), st.render());
-			}
-			catch (IOException e) {
-				Skb_Console.conError("{}: catched IO Exception <{}> -> {}", new Object[]{appName, e.getCause(), e.getMessage()});
-				return -7;
-			}
-		}
-		else{
-			System.out.println(st.render());
-			return 0;
-		}
-		return 0;
-	}
-
+	/**
+	 * Takes the given entry map and tries to generate a special data object from it.
+	 * @param key the key pointing to the map entry with object class information indicating which data object should be generated
+	 * @param entryMap the map with entries used to generate the data object
+	 * @return a new data object of specific type (as read from the map) on success, null on no success
+	 */
 	public static Object getDataObject(EntryKey key, Map<String, Object> entryMap){
 		return getDataObject(key, entryMap, null);
 	}
 
+	/**
+	 * Takes the given entry map and tries to generate a special data object from it.
+	 * @param key the key pointing to the map entry with object class information indicating which data object should be generated
+	 * @param entryMap the map with entries used to generate the data object
+	 * @param translator a translator for character encoding translations
+	 * @return a new data object of specific type (as read from the map) on success, null on no success
+	 */
 	public static Object getDataObject(EntryKey key, Map<String, Object> entryMap, Translator translator){
 		if(!entryMap.containsKey(key.getKey())){
 			return null;
