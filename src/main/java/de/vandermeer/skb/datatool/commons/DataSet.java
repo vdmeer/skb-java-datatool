@@ -137,7 +137,7 @@ public class DataSet<E extends DataEntry> {
 			try{
 				List<Map<String, Object>> jsonList = om.readValue(fs.asFile(), new TypeReference<ArrayList<HashMap<String, Object>>>(){});
 				for(Map<String, Object> entryMap : jsonList){
-					DataLoader dl = new DataLoader(keyStart, keySeparator, entryMap, translator, linkMap);
+					AbstractDataLoader dl = new AbstractDataLoader(keyStart, keySeparator, entryMap, translator, linkMap);
 					E entry = this.clazz.newInstance();
 					entry.load(dl);
 					if(entry.getKey().contains("#dummy")){

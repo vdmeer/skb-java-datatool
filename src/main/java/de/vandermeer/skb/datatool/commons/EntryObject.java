@@ -33,9 +33,11 @@ public interface EntryObject {
 	 * Loads an entry object from a given map with tests against expected keys.
 	 * @param loader a fully configured loader object
 	 * @throws URISyntaxException if creating a URI for an SKB link failed
+	 * @throws IllegalAccessException if an entry object could not be created due to a class error (type class)
+	 * @throws InstantiationException if an entry object could not be created due to a class error (type class)
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 */
-	void loadObject(DataLoader loader) throws URISyntaxException;
+	void loadObject(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException;
 
 	/**
 	 * Returns the schema for the entry object.
@@ -47,9 +49,11 @@ public interface EntryObject {
 	 * Loads an entry object from a given map with tests against expected keys.
 	 * @param loader a fully configured loader object
 	 * @throws URISyntaxException if creating a URI for an SKB link failed
+	 * @throws IllegalAccessException if an entry object could not be created due to a class error (type class)
+	 * @throws InstantiationException if an entry object could not be created due to a class error (type class)
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 */
-	default void load(DataLoader loader) throws URISyntaxException{
+	default void load(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException{
 		StrBuilder err = this.getSchema().testSchema(loader.getEntryMap());
 		if(err.size()>0){
 			throw new IllegalArgumentException(err.toString());

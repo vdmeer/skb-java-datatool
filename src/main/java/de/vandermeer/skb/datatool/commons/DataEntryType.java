@@ -17,6 +17,8 @@ package de.vandermeer.skb.datatool.commons;
 
 import java.util.Map;
 
+import de.vandermeer.skb.datatool.target.DataTarget;
+
 
 /**
  * A data entry type.

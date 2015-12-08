@@ -23,7 +23,7 @@ import org.apache.commons.lang3.text.StrBuilder;
 
 import de.vandermeer.execs.options.AbstractApplicationOption;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
-import de.vandermeer.skb.datatool.commons.DataTarget;
+import de.vandermeer.skb.datatool.target.DataTarget;
 
 /**
  * Application option "entry-type", sets the data entry type.

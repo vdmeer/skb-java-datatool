@@ -16,6 +16,7 @@
 package de.vandermeer.skb.datatool.commons;
 
 import de.vandermeer.skb.base.console.Skb_Console;
+import de.vandermeer.skb.datatool.target.DataTarget;
 
 /**
  * A loader for a data set.

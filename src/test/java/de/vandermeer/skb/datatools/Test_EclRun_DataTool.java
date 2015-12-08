@@ -37,8 +37,8 @@ public class Test_EclRun_DataTool {
 //					"entry-type",
 
 					"--entry-type",
-//					"acronyms",
-					"affiliations",
+					"acronyms",
+//					"affiliations",
 //					"affiliation-types",
 //					"people",
 //					"continents",
@@ -59,8 +59,8 @@ public class Test_EclRun_DataTool {
 
 					"--verbose",
 
-					"--output-file",
-					"target/2",
+//					"--output-file",
+//					"target/2",
 
 //					"--key-sep",
 //					"/"

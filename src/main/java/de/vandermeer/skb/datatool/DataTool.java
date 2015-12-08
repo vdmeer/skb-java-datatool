@@ -39,16 +39,16 @@ import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
 import de.vandermeer.skb.datatool.commons.DataSetLoader;
-import de.vandermeer.skb.datatool.commons.DataTarget;
-import de.vandermeer.skb.datatool.entries.AcronymEntryLoader;
-import de.vandermeer.skb.datatool.entries.AffiliationEntryLoader;
-import de.vandermeer.skb.datatool.entries.AffiliationtypeEntryLoader;
-import de.vandermeer.skb.datatool.entries.CityEntryLoader;
-import de.vandermeer.skb.datatool.entries.ContinentEntryLoader;
-import de.vandermeer.skb.datatool.entries.CountryEntryLoader;
-import de.vandermeer.skb.datatool.entries.EncodingEntryLoader;
-import de.vandermeer.skb.datatool.entries.HtmlentryLoader;
-import de.vandermeer.skb.datatool.entries.PeopleEntryLoader;
+import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntryLoader;
+import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntryLoader;
+import de.vandermeer.skb.datatool.entries.affiliations.AffiliationtypeEntryLoader;
+import de.vandermeer.skb.datatool.entries.encodings.EncodingEntryLoader;
+import de.vandermeer.skb.datatool.entries.encodings.HtmlentryLoader;
+import de.vandermeer.skb.datatool.entries.geo.cities.CityEntryLoader;
+import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntryLoader;
+import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntryLoader;
+import de.vandermeer.skb.datatool.entries.people.PeopleEntryLoader;
+import de.vandermeer.skb.datatool.target.DataTarget;
 
 /**
  * Tool to read all SKB data and cross reference if possible.

@@ -21,105 +21,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.vandermeer.skb.base.encodings.Translator;
 
 /**
- * Helper object for loading data, transforming them, and if required load complex data objects.
+ * Loads data.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public class DataLoader {
-
-	/** A string used to start a key. */
-	private String keyStart;
-
-	/** A character used to separate key elements. */
-	private char keySeparator;
-
-	/** A map of entries the load can process. */
-	private Map<String, Object> entryMap;
-
-	/** A translator the loader should use. */
-	private Translator translator;
-
-	/** A map of other entries the loader might use for further load operations. */
-	private Map<DataEntryType<?,?>, DataSet<?>> linkMap;
-
-	/**
-	 * Returns a new data loader.
-	 * @param keyStart the string preceding a key
-	 * @param keySeparator the character used to separate key elements
-	 * @param entryMap a map with key/value pairs to read data from
-	 * @throws IllegalArgumentException if any of the input arguments are illegal
-	 */
-	public DataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap){
-		this(keyStart, keySeparator, entryMap, null, null);
-	}
-
-	/**
-	 * Returns a new data loader.
-	 * @param keyStart the string preceding a key
-	 * @param keySeparator the character used to separate key elements
-	 * @param entryMap a map with key/value pairs to read data from
-	 * @param translator a character encoding and/or string translator (null if none required)
-	 * @throws IllegalArgumentException if any of the input arguments are illegal
-	 */
-	public DataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, Translator translator){
-		this(keyStart, keySeparator, entryMap, translator, null);
-	}
-
-	/**
-	 * Returns a new data loader.
-	 * @param keyStart the string preceding a key
-	 * @param keySeparator the character used to separate key elements
-	 * @param entryMap a map with key/value pairs to read data from
-	 * @param linkMap a map of other Data Entries (null if none required)
-	 * @throws IllegalArgumentException if any of the input arguments are illegal
-	 */
-	public DataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, Map<DataEntryType<?,?>, DataSet<?>> linkMap){
-		this(keyStart, keySeparator, entryMap, null, linkMap);
-	}
-
-	/**
-	 * Returns a new data loader.
-	 * @param keyStart the string preceding a key
-	 * @param keySeparator the character used to separate key elements
-	 * @param entryMap a map with key/value pairs to read data from
-	 * @param translator a character encoding and/or string translator (null if none required)
-	 * @param linkMap a map of other Data Entries (null if none required)
-	 * @throws IllegalArgumentException if any of the input arguments are illegal
-	 */
-	public DataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, Translator translator, Map<DataEntryType<?,?>, DataSet<?>> linkMap){
-		if(keyStart==null){
-			throw new IllegalArgumentException("no keyStart given");
-		}
-		else if(!StringUtils.endsWith(keyStart, Character.toString(keySeparator))){
-			throw new IllegalArgumentException("wrong end of keyStart");
-		}
-		this.keyStart = keyStart;
-		this.keySeparator = keySeparator;
-
-		this.entryMap = entryMap;
-		if(entryMap==null){
-			throw new IllegalArgumentException("entryMap is null");
-		}
-
-		this.translator = translator;
-		this.linkMap = linkMap;
-	}
+public interface DataLoader {
 
 	/**
 	 * Loads data if the given key points to a string, without any de-references or translation.
 	 * @param key the key pointing to the map entry
 	 * @return null on failure (key no in map, value not of type string), loaded string otherwise (can also be null or empty, no tests done here)
 	 */
-	public String loadDataString(EntryKey key){
-		Object data = this.entryMap.get(key.getKey());
+	default String loadDataString(EntryKey key){
+		Object data = this.getEntryMap().get(key.getKey());
 		if(data instanceof String){
 			return (String)data;
 		}
@@ -131,8 +52,10 @@ public class DataLoader {
 	 * @param schema the entry's schema for auto loading and testing
 	 * @return mapping of entry keys to objects loaded
 	 * @throws URISyntaxException if creating a URI for an SKB link failed
+	 * @throws IllegalAccessException if an entry object could not be created due to a class error (type class)
+	 * @throws InstantiationException if an entry object could not be created due to a class error (type class)
 	 */
-	public Map<EntryKey, Object> loadEntry(DataEntrySchema schema) throws URISyntaxException{
+	default Map<EntryKey, Object> loadEntry(DataEntrySchema schema) throws URISyntaxException, InstantiationException, IllegalAccessException{
 		Map<EntryKey, Object> ret = new HashMap<>();
 		for(Entry<EntryKey, Boolean> key : schema.getKeyMap().entrySet()){
 			Object obj = this.loadData(key.getKey());
@@ -149,20 +72,21 @@ public class DataLoader {
 	 * @return a new data object of specific type (as read from the map) on success, null on no success
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 * @throws URISyntaxException if creating a URI for an SKB link failed
+	 * @throws IllegalAccessException if an entry object could not be created due to a class error (type class)
+	 * @throws InstantiationException if an entry object could not be created due to a class error (type class)
 	 */
-	@SuppressWarnings("unchecked")
-	public Object loadData(EntryKey key) throws URISyntaxException{
-		if(!this.entryMap.containsKey(key.getKey())){
+	default Object loadData(EntryKey key) throws URISyntaxException, InstantiationException, IllegalAccessException{
+		if(!this.getEntryMap().containsKey(key.getKey())){
 			return null;
 		}
-		Object data = this.entryMap.get(key.getKey());
+		Object data = this.getEntryMap().get(key.getKey());
 		if(key.getSkbUri()!=null && data instanceof String){
 			return this.loadLink((String)data);
 		}
 
 		if(key.getType().equals(String.class) && data instanceof String){
-			if(key.useTranslator()==true && this.translator!=null){
-				return this.translator.translate((String)data);
+			if(key.useTranslator()==true && this.getTranslator()!=null){
+				return this.getTranslator().translate((String)data);
 			}
 			return data;
 		}
@@ -170,27 +94,13 @@ public class DataLoader {
 			return data;
 		}
 
-		if(ClassUtils.isAssignable(key.getType(), ObjectLinks.class)){
-			ObjectLinks olRet = new ObjectLinks();
-			if(data instanceof Map){
-				olRet.loadObject(new DataLoader(this.keyStart, keySeparator, (Map<String, Object>)data, null, linkMap));
-			}
-			return olRet;
-		}
-		if(ClassUtils.isAssignable(key.getType(), ObjectGeo.class)){
-			ObjectGeo ogRet = new ObjectGeo();
-			if(data instanceof Map){
-				ogRet.loadObject(new DataLoader(this.keyStart, keySeparator, (Map<String, Object>)data, null, linkMap));
-			}
-			return ogRet;
-		}
-		if(ClassUtils.isAssignable(key.getType(), ObjectAffiliations.class)){
-			ObjectAffiliations affRet = new ObjectAffiliations();
-			Map<String, Object> m = new HashMap<>();
-			m.put(StandardEntryKeys.OBJ_AFF_LINKS.getKey(), data);
-			affRet.loadObject(new DataLoader(this.keyStart, keySeparator, m, null, linkMap));
-			return affRet;
-		}
+//		if(ClassUtils.isAssignable(key.getType(), EntryObject.class)){
+//			EntryObject eo = (EntryObject)key.getType().newInstance();
+//			if(data instanceof Map){
+//				eo.loadObject(new AbstractDataLoader(this.keyStart, keySeparator, (Map<String, Object>)data, null, linkMap));
+//			}
+//			return eo;
+//		}
 		return null;
 	}
 
@@ -201,7 +111,7 @@ public class DataLoader {
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 * @throws URISyntaxException if creating a URI for an SKB link failed
 	 */
-	public Object loadLink(String skbLink) throws URISyntaxException{
+	default Object loadLink(String skbLink) throws URISyntaxException{
 		if(skbLink==null){
 			throw new IllegalArgumentException("skb link null");
 		}
@@ -213,7 +123,7 @@ public class DataLoader {
 
 		String uriReq = uri.getScheme() + "://" + uri.getAuthority();
 		DataEntryType<?,?> type = null;
-		for(DataEntryType<?, ?> det : this.linkMap.keySet()){
+		for(DataEntryType<?, ?> det : this.getLinkMap().keySet()){
 			if(uriReq.equals(det.getLinkUri())){
 				type = det;
 				break;
@@ -224,7 +134,7 @@ public class DataLoader {
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> map = (Map<String, Object>) this.linkMap.get(type).getMap();
+		Map<String, Object> map = (Map<String, Object>) this.getLinkMap().get(type).getMap();
 		if(map==null){
 			throw new IllegalArgumentException("no entry for type <" + type.getType() + "> in link map");
 		}
@@ -243,7 +153,7 @@ public class DataLoader {
 	 * @return a string with replaced characters (" " to "-", "." to "")
 	 * @throws IllegalArgumentException if any illegal characters are in the final key
 	 */
-	public String toKey(String input){
+	default String toKey(String input){
 		if(input==null){
 			return input;
 		}
@@ -263,31 +173,29 @@ public class DataLoader {
 	 * Returns the key-start string of the loader
 	 * @return key-start string
 	 */
-	public String getKeyStart(){
-		return this.keyStart;
-	}
+	String getKeyStart();
 
 	/**
 	 * Returns the link map of the loader
 	 * @return link map
 	 */
-	public Map<DataEntryType<?,?>, DataSet<?>> getLinkMap(){
-		return this.linkMap;
-	}
+	Map<DataEntryType<?,?>, DataSet<?>> getLinkMap();
 
 	/**
 	 * Returns the entry map of the loader
 	 * @return entry map
 	 */
-	public Map<String, Object> getEntryMap(){
-		return this.entryMap;
-	}
+	Map<String, Object> getEntryMap();
 
-//	/**
-//	 * Returns the key separator
-//	 * @return key separator
-//	 */
-//	public char getKeySeparator(){
-//		return this.keySeparator;
-//	}
+	/**
+	 * Returns the key separator
+	 * @return key separator
+	 */
+	char getKeySeparator();
+
+	/**
+	 * Returns the loaders translator.
+	 * @return translator, null if not set
+	 */
+	Translator getTranslator();
 }

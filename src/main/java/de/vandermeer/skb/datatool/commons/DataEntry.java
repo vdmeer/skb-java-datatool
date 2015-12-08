@@ -35,15 +35,15 @@ public interface DataEntry extends Comparable<DataEntry> {
 	 * @return key, should not be null
 	 */
 	default String getKey(){
-		return (String)this.getEntryMap().get(StandardEntryKeys.KEY);
+		return (String)this.getEntryMap().get(CommonConstants.EK_KEY);
 	}
 
 	/**
-	 * Sets an entry key, which usually means reading an existing key and doind consistency checks and character transformations.
+	 * Sets an entry key, which usually means reading an existing key and doing consistency checks and character transformations.
 	 * @param key new key
 	 */
 	default void setKey(String key){
-		this.getEntryMap().put(StandardEntryKeys.KEY, key);
+		this.getEntryMap().put(CommonConstants.EK_KEY, key);
 	}
 
 	/**
@@ -64,8 +64,10 @@ public interface DataEntry extends Comparable<DataEntry> {
 	 * @param loader a fully configured loader object
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 * @throws URISyntaxException if an SKB link is used to de-reference an entry and the URL is not formed well
+	 * @throws IllegalAccessException if an entry object could not be created due to a class error (type class)
+	 * @throws InstantiationException if an entry object could not be created due to a class error (type class)
 	 */
-	default void load(DataLoader loader) throws URISyntaxException{
+	default void load(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException{
 		StrBuilder err = this.getSchema().testSchema(loader.getEntryMap());
 		if(err.size()>0){
 			throw new IllegalArgumentException(err.toString());
@@ -79,8 +81,10 @@ public interface DataEntry extends Comparable<DataEntry> {
 	 * @param loader a fully configured loader object
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 * @throws URISyntaxException if an SKB link is used to de-reference an entry and the URL is not formed well
+	 * @throws IllegalAccessException if an entry object could not be created due to a class error (type class)
+	 * @throws InstantiationException if an entry object could not be created due to a class error (type class)
 	 */
-	void loadEntry(DataLoader loader) throws URISyntaxException;
+	void loadEntry(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException;
 
 	/**
 	 * Returns the schema for the data entry.

@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Sven van der Meer <vdmeer.sven@mykolab.com>
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-/*
- * build
+/**
+ * Everything to deal with cities.
+ * 
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.2 build 150910 (10-Sep-15) for Java 1.7
  */
-build(entry) ::= <<
-<entry:{a | <a.short> = <a.long><if(a.links.url)> -- <a.links.url><endif>}; separator="\n">
->>
+package de.vandermeer.skb.datatool.entries.geo.cities;

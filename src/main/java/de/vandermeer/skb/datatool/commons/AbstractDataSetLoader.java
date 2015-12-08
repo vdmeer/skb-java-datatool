@@ -16,6 +16,7 @@
 package de.vandermeer.skb.datatool.commons;
 
 import de.vandermeer.skb.base.encodings.TranslatorFactory;
+import de.vandermeer.skb.datatool.target.DataTarget;
 
 /**
  * Abstract implementation of a data set loader.
