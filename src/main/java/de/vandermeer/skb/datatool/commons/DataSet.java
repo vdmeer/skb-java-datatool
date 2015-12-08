@@ -16,6 +16,7 @@
 package de.vandermeer.skb.datatool.commons;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class DataSet<E extends DataEntry> {
 	Class<E> clazz;
 
 	/** Map of data entries that entries of this set can link to. */
-	final Map<DataEntryType, Map<String, Object>> linkMap;
+	final Map<DataEntryType<?,?>, DataSet<?>> linkMap;
 
 	/** Separator character for auto-generated keys. */
 	char keySeparator;
@@ -120,7 +121,7 @@ public class DataSet<E extends DataEntry> {
 	}
 
 	/**
-	 * Loads a data set from file system.
+	 * Loads a data set from file system, does many consistency checks as well.
 	 * @param fsl list of files to load data from
 	 * @param fileExt the file extension used (translated to "." + fileExt + ".json"), empty if none used
 	 * @return 0 on success, larger than zero on JSON parsing error (number of found errors)
@@ -136,14 +137,10 @@ public class DataSet<E extends DataEntry> {
 			try{
 				List<Map<String, Object>> jsonList = om.readValue(fs.asFile(), new TypeReference<ArrayList<HashMap<String, Object>>>(){});
 				for(Map<String, Object> entryMap : jsonList){
+					DataLoader dl = new DataLoader(keyStart, keySeparator, entryMap, translator, linkMap);
 					E entry = this.clazz.newInstance();
-					entry.load(entryMap, keyStart, this.keySeparator, this.translator, this.linkMap);
-
-					if(StringUtils.isEmpty(entry.getKey())){
-						Skb_Console.conError("{}: empty key found in file <{}>", new Object[]{this.appName, fs.getAbsoluteName()});
-						continue;
-					}
-					else if(entry.getKey().contains("#dummy")){
+					entry.load(dl);
+					if(entry.getKey().contains("#dummy")){
 						continue;
 					}
 
@@ -165,9 +162,15 @@ public class DataSet<E extends DataEntry> {
 			}
 			catch(IllegalArgumentException iaex){
 				Skb_Console.conError("{}: problem creating entry: <{}> in file <{}>", new Object[]{this.appName, iaex.getMessage(), fs.getAbsoluteName()});
+				ret++;
+			}
+			catch(URISyntaxException ue){
+				Skb_Console.conError("{}: problem creating a URI for a link: <{}> in file <{}>", new Object[]{this.appName, ue.getMessage(), fs.getAbsoluteName()});
+				ret++;
 			}
 			catch(NullPointerException npe){
 				npe.printStackTrace();
+				ret++;
 			}
 			catch(Exception ex){
 				Skb_Console.conError("reading acronym from JSON failed with exception <{}>, cause <{}> and message <{}> in file <{}>", new Object[]{ex.getClass().getSimpleName(), ex.getCause(), ex.getMessage(), fs.getAbsoluteName()});

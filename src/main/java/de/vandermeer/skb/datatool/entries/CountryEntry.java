@@ -19,15 +19,13 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.commons.lang3.text.StrBuilder;
-
-import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataEntryType;
+import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.LocalEntryKeys;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
-import de.vandermeer.skb.datatool.commons.Utilities;
 
 /**
  * A data entry for countries.
@@ -38,32 +36,8 @@ import de.vandermeer.skb.datatool.commons.Utilities;
  */
 public class CountryEntry implements DataEntry {
 
-	/** The key for the country. */
-	String key;
-
-	/** Country name. */
-	Object name;
-
-	/** Country's continent. */
-	Object continent;
-
-	/** A de-referenced continent entry. */
-	ContinentEntry continentEntry;
-
-	/** ISO 2 character code. */
-	Object isoA2;
-
-	/** ISO 3 character code. */
-	Object isoA3;
-
-	/** ISO numeric code. */
-	Object isoNumeric;
-
-	/** E.164 code. */
-	Object e164;
-
-	/** Top-level Domain. */
-	Object tld;
+	/** The local entry map. */
+	private Map<EntryKey, Object> entryMap;
 
 	/** Country schema. */
 	DataEntrySchema schema = StandardDataEntrySchemas.GEO_COUNTRIES;
@@ -73,23 +47,23 @@ public class CountryEntry implements DataEntry {
 	 * @return country name
 	 */
 	public String getName(){
-		return (String)this.name;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_NAME);
 	}
 
 	/**
 	 * Returns the country continent.
 	 * @return country continent
 	 */
-	public String getContinent(){
-		return (String)this.continent;
+	public ContinentEntry getContinent(){
+		return (ContinentEntry)this.entryMap.get(StandardEntryKeys.GEO_CONTINENT);
 	}
 
 	/**
-	 * Returns the country continent entry.
-	 * @return country continent entry
+	 * Returns the country continent link.
+	 * @return country continent link
 	 */
-	public ContinentEntry getContinentEntry(){
-		return this.continentEntry;
+	public String getContinentLink(){
+		return (String)this.entryMap.get(LocalEntryKeys.GEO_CONTINENT_LINK);
 	}
 
 	/**
@@ -97,7 +71,7 @@ public class CountryEntry implements DataEntry {
 	 * @return ISO 2 character code
 	 */
 	public String getIsoA2(){
-		return (String)this.isoA2;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_COUNTRY_A2);
 	}
 
 	/**
@@ -105,7 +79,7 @@ public class CountryEntry implements DataEntry {
 	 * @return ISO 3 character code
 	 */
 	public String getIsoA3(){
-		return (String)this.isoA3;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_COUNTRY_A3);
 	}
 
 	/**
@@ -113,7 +87,7 @@ public class CountryEntry implements DataEntry {
 	 * @return ISO numeric code
 	 */
 	public Integer getIsoNumeric(){
-		return (Integer)this.isoNumeric;
+		return (Integer)this.entryMap.get(StandardEntryKeys.GEO_COUNTRY_NU);
 	}
 
 	/**
@@ -121,17 +95,12 @@ public class CountryEntry implements DataEntry {
 	 * @return top-level domain
 	 */
 	public String getTld(){
-		return (String)this.tld;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_COUNTRY_TLD);
 	}
 
 	@Override
 	public DataEntrySchema getSchema(){
 		return this.schema;
-	}
-
-	@Override
-	public String getKey() {
-		return this.key;
 	}
 
 	@Override
@@ -141,41 +110,19 @@ public class CountryEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) throws URISyntaxException {
-		StrBuilder msg;
-		msg = this.schema.testSchema(entryMap);
-		if(msg.size()>0){
-			throw new IllegalArgumentException(msg.toString());
-		}
-	
-		msg = new StrBuilder(50);
-
-		this.name = Utilities.getDataObject(StandardEntryKeys.GEO_NAME, entryMap, translator, linkMap);
-
-		this.continent = Utilities.getDataObject(StandardEntryKeys.GEO_CONTINENT, entryMap, translator, linkMap);
-		Object obj = Utilities.getLinkObject(this.continent, linkMap);
-		if(obj instanceof ContinentEntry){
-			this.continentEntry = (ContinentEntry)obj;
-		}
-		else{
-			msg.appendSeparator(", ").append(obj);
-		}
-
-		this.isoA2 = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_A2, entryMap, linkMap);
-		this.isoA3 = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_A3, entryMap, linkMap);
-		this.isoNumeric = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_NU, entryMap, linkMap);
-		this.e164 = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_E164, entryMap, linkMap);
-		this.tld = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY_TLD, entryMap, linkMap);
-
-		this.key = (String)this.tld;
-
-		if(msg.size()>0){
-			throw new IllegalArgumentException(msg.toString());
-		}
+	public void loadEntry(DataLoader loader) throws URISyntaxException {
+		this.entryMap = loader.loadEntry(this.schema);
+		this.entryMap.put(LocalEntryKeys.GEO_CONTINENT_LINK, loader.loadDataString(StandardEntryKeys.GEO_CONTINENT));
+		this.entryMap.put(StandardEntryKeys.KEY, this.getTld());
 	}
 
 	@Override
 	public String getCompareString() {
-		return (String)this.tld;
+		return this.getTld();
+	}
+
+	@Override
+	public Map<EntryKey, Object> getEntryMap(){
+		return this.entryMap;
 	}
 }

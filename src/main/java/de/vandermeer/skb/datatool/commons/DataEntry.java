@@ -19,7 +19,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
-import de.vandermeer.skb.base.encodings.Translator;
+import org.apache.commons.lang3.text.StrBuilder;
 
 /**
  * Generic data entry for the data tools.
@@ -34,7 +34,17 @@ public interface DataEntry extends Comparable<DataEntry> {
 	 * Returns the key the entry is using.
 	 * @return key, should not be null
 	 */
-	String getKey();
+	default String getKey(){
+		return (String)this.getEntryMap().get(StandardEntryKeys.KEY);
+	}
+
+	/**
+	 * Sets an entry key, which usually means reading an existing key and doind consistency checks and character transformations.
+	 * @param key new key
+	 */
+	default void setKey(String key){
+		this.getEntryMap().put(StandardEntryKeys.KEY, key);
+	}
 
 	/**
 	 * Returns a compare string for natural sorting entries.
@@ -50,16 +60,27 @@ public interface DataEntry extends Comparable<DataEntry> {
 	String testDuplicate(Collection<DataEntry> set);
 
 	/**
-	 * Loads the entry content from the given map.
-	 * @param entryMap map with content for the entry
-	 * @param keyStart start of an entry key, if generated
-	 * @param keySeparator separator for the key
-	 * @param translator a text/encoding conversion translator, null if none applicable
+	 * Loads the entry content using a given loader.
+	 * @param loader a fully configured loader object
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
-	 * @param linkMap map of data entries that can be linked
 	 * @throws URISyntaxException if an SKB link is used to de-reference an entry and the URL is not formed well
 	 */
-	void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) throws URISyntaxException;
+	default void load(DataLoader loader) throws URISyntaxException{
+		StrBuilder err = this.getSchema().testSchema(loader.getEntryMap());
+		if(err.size()>0){
+			throw new IllegalArgumentException(err.toString());
+		}
+		this.loadEntry(loader);
+		this.setKey(loader.toKey(this.getKey()));
+	}
+
+	/**
+	 * Local (entry specific) load operation.
+	 * @param loader a fully configured loader object
+	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
+	 * @throws URISyntaxException if an SKB link is used to de-reference an entry and the URL is not formed well
+	 */
+	void loadEntry(DataLoader loader) throws URISyntaxException;
 
 	/**
 	 * Returns the schema for the data entry.
@@ -77,4 +98,10 @@ public interface DataEntry extends Comparable<DataEntry> {
 		}
 		return this.getCompareString().compareTo(o.getCompareString());
 	}
+
+	/**
+	 * Returns the local entry map.
+	 * @return local entry map
+	 */
+	Map<EntryKey, Object> getEntryMap();
 }

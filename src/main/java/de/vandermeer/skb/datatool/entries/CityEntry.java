@@ -19,17 +19,14 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrBuilder;
-
-import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataEntryType;
+import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.LocalEntryKeys;
 import de.vandermeer.skb.datatool.commons.ObjectLinks;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
-import de.vandermeer.skb.datatool.commons.Utilities;
 
 /**
  * A data entry for a city.
@@ -40,38 +37,8 @@ import de.vandermeer.skb.datatool.commons.Utilities;
  */
 public class CityEntry implements DataEntry {
 
-	/** The key for the city. */
-	String key;
-
-	/** City name. */
-	Object name;
-
-	/** City's country. */
-	Object country;
-
-	/** A de-referenced continent entry. */
-	CountryEntry countryEntry;
-
-	/** Links for the city. */
-	Object links;
-
-	/** IATA code of the city. */
-	Object iata;
-
-	/** ICAO code of the city. */
-	Object icao;
-
-	/** WAC code of the city. */
-	Object wac;
-
-	/** Region of the city. */
-	Object region;
-
-	/** State of the city. */
-	Object state;
-
-	/** County of the city. */
-	Object county;
+	/** The local entry map. */
+	private Map<EntryKey, Object> entryMap;
 
 	/** City schema. */
 	DataEntrySchema schema = StandardDataEntrySchemas.GEO_CITIES;
@@ -81,33 +48,28 @@ public class CityEntry implements DataEntry {
 		return this.schema;
 	}
 
-	@Override
-	public String getKey() {
-		return this.key;
-	}
-
 	/**
-	 * Returns the country name.
-	 * @return country name
+	 * Returns the city name.
+	 * @return city name
 	 */
 	public String getName(){
-		return (String)this.name;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_NAME);
 	}
 
 	/**
 	 * Returns the city's country.
 	 * @return ccity's country
 	 */
-	public String getCountry(){
-		return (String)this.country;
+	public CountryEntry getCountry(){
+		return (CountryEntry)this.entryMap.get(StandardEntryKeys.GEO_COUNTRY);
 	}
 
 	/**
-	 * Returns the city's country entry.
-	 * @return ccity's country entry
+	 * Returns the city's country link.
+	 * @return ccity's country link
 	 */
-	public CountryEntry getCountryEntry(){
-		return this.countryEntry;
+	public String getCountryLink(){
+		return (String)this.entryMap.get(LocalEntryKeys.GEO_COUNTRY_LINK);
 	}
 
 	/**
@@ -115,7 +77,7 @@ public class CityEntry implements DataEntry {
 	 * @return links, null if not set
 	 */
 	public ObjectLinks getLinks() {
-		return (ObjectLinks)this.links;
+		return (ObjectLinks)this.entryMap.get(StandardEntryKeys.OBJ_LINKS);
 	}
 
 	/**
@@ -123,7 +85,7 @@ public class CityEntry implements DataEntry {
 	 * @return city IATA code
 	 */
 	public String getIata(){
-		return (String)this.iata;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_CITY_IATA);
 	}
 
 	/**
@@ -131,7 +93,7 @@ public class CityEntry implements DataEntry {
 	 * @return city ICAO code
 	 */
 	public String getIcao(){
-		return (String)this.icao;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_CITY_ICAO);
 	}
 
 	/**
@@ -139,7 +101,7 @@ public class CityEntry implements DataEntry {
 	 * @return city WAC code
 	 */
 	public String getWac(){
-		return (String)this.wac;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_CITY_WAC);
 	}
 
 	/**
@@ -147,7 +109,7 @@ public class CityEntry implements DataEntry {
 	 * @return city region
 	 */
 	public String getRegion(){
-		return (String)this.region;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_CITY_REGION);
 	}
 
 	/**
@@ -155,7 +117,7 @@ public class CityEntry implements DataEntry {
 	 * @return city state
 	 */
 	public String getState(){
-		return (String)this.state;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_CITY_STATE);
 	}
 
 	/**
@@ -163,7 +125,7 @@ public class CityEntry implements DataEntry {
 	 * @return city county
 	 */
 	public String getCounty(){
-		return (String)this.county;
+		return (String)this.entryMap.get(StandardEntryKeys.GEO_CITY_COUNTY);
 	}
 
 	@Override
@@ -173,55 +135,28 @@ public class CityEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) throws URISyntaxException {
-		StrBuilder msg;
-		msg = this.schema.testSchema(entryMap);
-		if(msg.size()>0){
-			throw new IllegalArgumentException(msg.toString());
+	public void loadEntry(DataLoader loader) throws URISyntaxException {
+		this.entryMap = loader.loadEntry(this.schema);
+		this.entryMap.put(LocalEntryKeys.GEO_COUNTRY_LINK, loader.loadDataString(StandardEntryKeys.GEO_COUNTRY));
+
+		if(this.getKey()!=null){
+			this.entryMap.put(StandardEntryKeys.KEY, loader.getKeyStart() + this.getKey());
 		}
-	
-		msg = new StrBuilder(50);
-
-		this.name = Utilities.getDataObject(StandardEntryKeys.GEO_NAME, entryMap, translator, linkMap);
-
-		this.country = Utilities.getDataObject(StandardEntryKeys.GEO_COUNTRY, entryMap, linkMap);
-		Object obj = Utilities.getLinkObject(this.country, linkMap);
-		if(obj instanceof CountryEntry){
-			this.countryEntry = (CountryEntry)obj;
+		else if(this.getName()!=null){
+			this.entryMap.put(StandardEntryKeys.KEY, loader.getKeyStart() + loader.loadDataString(StandardEntryKeys.GEO_NAME));
 		}
 		else{
-			msg.appendSeparator(", ").append(obj);
-		}
-
-		this.iata = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_IATA, entryMap, translator, linkMap);
-		this.icao = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_ICAO, entryMap, translator, linkMap);
-		this.wac = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_WAC, entryMap, translator, linkMap);
-		this.county = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_COUNTY, entryMap, translator, linkMap);
-		this.region = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_REGION, entryMap, translator, linkMap);
-		this.state = Utilities.getDataObject(StandardEntryKeys.GEO_CITY_STATE, entryMap, translator, linkMap);
-
-		Object k = Utilities.getDataObject(StandardEntryKeys.KEY, entryMap, linkMap);
-		if(k!=null){
-			this.key = keyStart + k.toString().toLowerCase();
-			this.key = StringUtils.replaceChars(this.key, " ", "-");
-			this.key = StringUtils.replaceChars(this.key, ".", "");
-		}
-		else if(this.name!=null){
-			this.key = keyStart + this.name.toString().toLowerCase();
-			this.key = StringUtils.replaceChars(this.key, " ", "-");
-			this.key = StringUtils.replaceChars(this.key, ".", "");
-		}
-		else{
-			msg.appendSeparator(", ").append("could not generate key, no key or name given");
-		}
-
-		if(msg.size()>0){
-			throw new IllegalArgumentException(msg.toString());
+			throw new IllegalArgumentException("could not generate key, no key or name given");
 		}
 	}
 
 	@Override
 	public String getCompareString() {
-		return (String)this.name;
+		return this.getName();
+	}
+
+	@Override
+	public Map<EntryKey, Object> getEntryMap(){
+		return this.entryMap;
 	}
 }

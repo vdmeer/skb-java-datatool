@@ -15,20 +15,18 @@
 
 package de.vandermeer.skb.datatool.entries;
 
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrBuilder;
-
-import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataEntryType;
+import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.LocalEntryKeys;
 import de.vandermeer.skb.datatool.commons.ObjectLinks;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
-import de.vandermeer.skb.datatool.commons.Utilities;
 
 /**
  * A single acronym entry.
@@ -39,23 +37,8 @@ import de.vandermeer.skb.datatool.commons.Utilities;
  */
 public class AcronymEntry implements DataEntry {
 
-	/** The key for the acronym. */
-	String key;
-
-	/** Short form of the acronym. */
-	Object acShort;
-
-	/** Hack to calculate longest short version of an acronym. */
-	Object acShortOrig;
-
-	/** Long form of the acronym. */
-	Object acLong;
-
-	/** Links for the acronym. */
-	Object links;
-
-	/** Description for the acronym. */
-	Object description;
+	/** The local entry map. */
+	private Map<EntryKey, Object> entryMap;
 
 	/** Acronym schema. */
 	DataEntrySchema schema = StandardDataEntrySchemas.ACRONYMS;
@@ -83,51 +66,16 @@ public class AcronymEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) {
-		StrBuilder msg;
-		msg = this.schema.testSchema(entryMap);
-		if(msg.size()>0){
-			throw new IllegalArgumentException(msg.toString());
-		}
+	public void loadEntry(DataLoader loader) throws URISyntaxException {
+		this.entryMap = loader.loadEntry(this.schema);
+		this.entryMap.put(LocalEntryKeys.ACRONYM_SHORT_ORIG, loader.loadDataString(StandardEntryKeys.ACR_SHORT));
 
-		msg = new StrBuilder(50);
-
-		this.acShort = Utilities.getDataObject(StandardEntryKeys.ACR_SHORT, entryMap, translator, linkMap);
-		this.acShortOrig = Utilities.getDataObject(StandardEntryKeys.ACR_SHORT, entryMap, linkMap);
-		this.acLong = Utilities.getDataObject(StandardEntryKeys.ACR_LONG, entryMap, translator, linkMap);
-
-		if(keyStart==null){
-			msg.appendSeparator(", ");
-			msg.append("no keyStart given");
-		}
-		else if(!StringUtils.endsWith(keyStart, Character.toString(keySeparator))){
-			msg.appendSeparator(", ");
-			msg.append("wrong end of keyStart");
+		if(this.entryMap.get(StandardEntryKeys.KEY)!=null){
+			this.entryMap.put(StandardEntryKeys.KEY, loader.getKeyStart() + this.entryMap.get(StandardEntryKeys.KEY));
 		}
 		else{
-			if(entryMap.containsKey(StandardEntryKeys.KEY.getKey())){
-				this.key = keyStart + entryMap.get(StandardEntryKeys.KEY.getKey());
-			}
-			else{
-				this.key = keyStart + this.acShort;
-			}
+			this.entryMap.put(StandardEntryKeys.KEY, loader.getKeyStart() + this.entryMap.get(LocalEntryKeys.ACRONYM_SHORT_ORIG));
 		}
-
-		if(this.key.contains(" ")){
-			msg.appendSeparator(", ");
-			msg.appendSeparator("acronym <" + this.key + "> contains illegal characters in key");
-		}
-//		if(StringUtils.containsAny(this.acLong, ",%'")){
-//			msg.appendSeparator(", ");
-//			msg.appendSeparator("acronym <" + this.key + "> contains illegal characters in long form");
-//		}
-
-		if(msg.size()>0){
-			throw new IllegalArgumentException(msg.toString());
-		}
-
-		this.description = Utilities.getDataObject(StandardEntryKeys.DESCR, entryMap, translator, linkMap);
-		this.links = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS, entryMap, linkMap);
 	}
 
 	/**
@@ -135,7 +83,15 @@ public class AcronymEntry implements DataEntry {
 	 * @return acronym short form
 	 */
 	public String getShort() {
-		return (String)this.acShort;
+		return (String)this.entryMap.get(StandardEntryKeys.ACR_SHORT);
+	}
+
+	/**
+	 * Returns the short form of the acronym, not translated.
+	 * @return acronym short form, not translated
+	 */
+	public String getShortOrig() {
+		return (String)this.entryMap.get(LocalEntryKeys.ACRONYM_SHORT_ORIG);
 	}
 
 	/**
@@ -143,12 +99,7 @@ public class AcronymEntry implements DataEntry {
 	 * @return acronym long form
 	 */
 	public String getLong() {
-		return (String)this.acLong;
-	}
-
-	@Override
-	public String getKey() {
-		return this.key;
+		return (String)this.entryMap.get(StandardEntryKeys.ACR_LONG);
 	}
 
 	/**
@@ -156,7 +107,7 @@ public class AcronymEntry implements DataEntry {
 	 * @return links, null if not set
 	 */
 	public ObjectLinks getLinks() {
-		return (ObjectLinks)this.links;
+		return (ObjectLinks)this.entryMap.get(StandardEntryKeys.OBJ_LINKS);
 	}
 
 	/**
@@ -164,12 +115,12 @@ public class AcronymEntry implements DataEntry {
 	 * @return acronym description, null if not set
 	 */
 	public String getDescription() {
-		return (String)this.description;
+		return (String)this.entryMap.get(StandardEntryKeys.DESCR);
 	}
 
 	@Override
 	public String getCompareString() {
-		return (String)this.acShort;
+		return (String)this.entryMap.get(StandardEntryKeys.ACR_SHORT);
 	}
 
 	/**
@@ -185,5 +136,10 @@ public class AcronymEntry implements DataEntry {
 	 */
 	public String getLongestAcr(){
 		return this.longestAcr;
+	}
+
+	@Override
+	public Map<EntryKey, Object> getEntryMap(){
+		return this.entryMap;
 	}
 }

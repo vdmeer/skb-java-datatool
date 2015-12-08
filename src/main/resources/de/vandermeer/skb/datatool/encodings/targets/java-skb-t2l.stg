@@ -59,7 +59,7 @@ public class Text2Latex implements Translator {
 
 	/** Array of replacements for searchable HTML entity strings. */
 	protected String[] replacementListHE = new String[]{
-		<entry2:{h | "<h.htmlEntityRepl>"}; separator=", ">
+		<entry2:{h | "<h.htmlEntityReplacement>"}; separator=", ">
 	};
 
 	/** Array of LaTeX replacements for replacements of HTML entity strings. */

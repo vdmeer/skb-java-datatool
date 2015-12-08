@@ -15,6 +15,10 @@
 
 package de.vandermeer.skb.datatool;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.cli.Option;
@@ -22,7 +26,6 @@ import org.apache.commons.lang3.text.StrBuilder;
 
 import de.vandermeer.execs.options.AbstractApplicationOption;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
-import de.vandermeer.skb.datatool.commons.StandardDataTargets;
 
 /**
  * Application option "target", sets the data target.
@@ -33,13 +36,17 @@ import de.vandermeer.skb.datatool.commons.StandardDataTargets;
  */
 public class AO_DataTarget extends AbstractApplicationOption<String> {
 
+	/** The entry types supported by an application for long description. */
+	private Set<DataEntryType<?, ?>> entryTypes;
+
 	/**
 	 * Returns the new option.
 	 * @param required true if option is required, false of it is optional
+	 * @param entryTypes entry types supported by an application for long description
 	 * @throws NullPointerException - if description parameter is null
 	 * @throws IllegalArgumentException - if description parameter is empty
 	 */
-	public AO_DataTarget(boolean required){
+	public AO_DataTarget(boolean required, Set<DataEntryType<?, ?>> entryTypes){
 		super("specifies a target for output generation and character conversion", "###");
 
 		Option.Builder builder = Option.builder("t");
@@ -47,6 +54,8 @@ public class AO_DataTarget extends AbstractApplicationOption<String> {
 		builder.hasArg().argName("TARGET");
 		builder.required(required);
 		this.setCliOption(builder.build());
+
+		this.entryTypes = entryTypes;
 	}
 
 	@Override
@@ -73,17 +82,26 @@ public class AO_DataTarget extends AbstractApplicationOption<String> {
 		ret.appendNewLine();
 
 		ret.append("Available targets are: ");
-		for(StandardDataTargets target : StandardDataTargets.values()){
-			ret.append(" - ").append(target.getTargetName());
-			ret.append(" -> supporting types: ");
-			TreeSet<String> st = new TreeSet<>();
-			for(DataEntryType type : target.getSupportedTypes()){
-				st.add(type.getType());
+		ret.appendNewLine();
+		Map<String, TreeSet<String>> map = new TreeMap<>();
+		for(DataEntryType<?, ?> type : this.entryTypes){
+			for(String tn : type.getSupportedTargets().keySet()){
+				if(!map.containsKey(tn)){
+					TreeSet<String> ts = new TreeSet<>();
+					ts.add(type.getType());
+					map.put(tn, ts);
+				}
+				else{
+					map.get(tn).add(type.getType());
+				}
 			}
-			ret.appendWithSeparators(st, ", ");
+		}
+		for(Entry<String, TreeSet<String>> entry : map.entrySet()){
+			ret.append(" - ").append(entry.getKey());
+			ret.append(" -> supporting types: ");
+			ret.appendWithSeparators(entry.getValue(), ", ");
 			ret.appendNewLine();
 		}
-
 		ret.appendNewLine();
 		return ret.toString();
 	}

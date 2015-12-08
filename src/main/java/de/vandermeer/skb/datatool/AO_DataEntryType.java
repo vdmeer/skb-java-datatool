@@ -15,14 +15,15 @@
 
 package de.vandermeer.skb.datatool;
 
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.lang3.text.StrBuilder;
 
 import de.vandermeer.execs.options.AbstractApplicationOption;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataTarget;
-import de.vandermeer.skb.datatool.commons.StandardDataEntryTypes;
 
 /**
  * Application option "entry-type", sets the data entry type.
@@ -33,12 +34,16 @@ import de.vandermeer.skb.datatool.commons.StandardDataEntryTypes;
  */
 public class AO_DataEntryType extends AbstractApplicationOption<String> {
 
+	/** The entry types supported by an application for long description. */
+	private Set<DataEntryType<?, ?>> entryTypes;
+
 	/**
 	 * Returns the new option.
+	 * @param entryTypes entry types supported by an application for long description
 	 * @throws NullPointerException - if description parameter is null
 	 * @throws IllegalArgumentException - if description parameter is empty
 	 */
-	public AO_DataEntryType(){
+	public AO_DataEntryType(Set<DataEntryType<?, ?>> entryTypes){
 		super("specifies the type the tool should process", "###");
 
 		Option.Builder builder = Option.builder("e");
@@ -46,6 +51,8 @@ public class AO_DataEntryType extends AbstractApplicationOption<String> {
 		builder.required(true);
 		builder.hasArg().argName("TYPE");
 		this.setCliOption(builder.build());
+
+		this.entryTypes = entryTypes;
 	}
 
 	@Override
@@ -68,12 +75,12 @@ public class AO_DataEntryType extends AbstractApplicationOption<String> {
 		ret.appendNewLine();
 
 		ret.append("Available types are: ");
-		for(StandardDataEntryTypes type : StandardDataEntryTypes.values()){
+		for(DataEntryType<?, ?> type : this.entryTypes){
 			ret.append(" - ").append(type.getType());
 			ret.append(" -> supporting targets: ");
 			TreeSet<String> st = new TreeSet<>();
-			for(DataTarget target : type.getSupportedTargets()){
-				st.add(target.getTargetName());
+			for(DataTarget target : type.getSupportedTargets().values()){
+				st.add(target.getDefinition().getTargetName());
 			}
 			ret.appendWithSeparators(st, ", ");
 			ret.appendNewLine();

@@ -15,9 +15,8 @@
 
 package de.vandermeer.skb.datatool.commons;
 
+import java.net.URISyntaxException;
 import java.util.Map;
-
-import org.apache.commons.lang3.text.StrBuilder;
 
 /**
  * A special data objects for links (URLs and the like).
@@ -31,24 +30,12 @@ public class ObjectLinks implements EntryObject {
 	/** Links schema. */
 	DataEntrySchema schema = StandardDataEntrySchemas.OBJECT_LINKS;
 
-	/** A URL as link. */
-	Object url;
-
-	/** A link to a Wikipedia page. */
-	Object wikipedia;
+	/** The local entry map. */
+	private Map<EntryKey, Object> entryMap;
 
 	@Override
-	public String load(Map<String, Object> entryMap, Map<DataEntryType, Map<String, Object>> linkMap) {
-		StrBuilder msg;
-		msg = this.schema.testSchema(entryMap);
-		if(msg.size()>0){
-			return msg.toString();
-		}
-
-		this.url = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS_U, entryMap, linkMap);
-		this.wikipedia = Utilities.getDataObject(StandardEntryKeys.OBJ_LINKS_W, entryMap, linkMap);
-
-		return null;
+	public void loadObject(DataLoader loader) throws URISyntaxException {
+		this.entryMap = loader.loadEntry(this.schema);
 	}
 
 	/**
@@ -56,7 +43,7 @@ public class ObjectLinks implements EntryObject {
 	 * @return URL link, null if none set
 	 */
 	public String getUrl(){
-		return (String)this.url;
+		return (String)this.entryMap.get(StandardEntryKeys.OBJ_LINKS_U);
 	}
 
 	/**
@@ -64,7 +51,7 @@ public class ObjectLinks implements EntryObject {
 	 * @return Wikipedia link, null if none set
 	 */
 	public String getWikipedia(){
-		return (String)this.wikipedia;
+		return (String)this.entryMap.get(StandardEntryKeys.OBJ_LINKS_W);
 	}
 
 	@Override
@@ -72,4 +59,8 @@ public class ObjectLinks implements EntryObject {
 		return this.schema;
 	}
 
+	@Override
+	public Map<EntryKey, Object> getEntryMap(){
+		return this.entryMap;
+	}
 }

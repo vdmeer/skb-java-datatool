@@ -35,7 +35,7 @@ import de.vandermeer.skb.base.info.FileSourceList;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public class DataSetBuilder {
+public class DataSetBuilder<E extends DataEntry> {
 
 	/** Separator character for auto-generated keys. */
 	char keySeparator = ':';
@@ -50,7 +50,7 @@ public class DataSetBuilder {
 	String directory;
 
 	/** Map with linkeable data entries from other sets. */
-	final Map<DataEntryType, Map<String, Object>> linkMap;
+	Map<DataEntryType<?,?>, DataSet<?>> linkMap;
 
 	/**
 	 * Returns a new data set builder.
@@ -60,11 +60,22 @@ public class DataSetBuilder {
 	}
 
 	/**
+	 * Returns a new data set builder with a link map.
+	 * @param linkMap link map for the builder
+	 */
+	public DataSetBuilder(Map<DataEntryType<?,?>, DataSet<?>> linkMap){
+		this();
+		if(linkMap!=null){
+			this.linkMap = linkMap;
+		}
+	}
+
+	/**
 	 * Sets the key separator.
 	 * @param sep new key separator
 	 * @return self to allow chaining
 	 */
-	public DataSetBuilder setKeySeparator(char sep){
+	public DataSetBuilder<E> setKeySeparator(char sep){
 		this.keySeparator = sep;
 		return this;
 	}
@@ -74,7 +85,7 @@ public class DataSetBuilder {
 	 * @param translator new character / string translator
 	 * @return self to allow chaining
 	 */
-	public DataSetBuilder setTranslator(Translator translator){
+	public DataSetBuilder<E> setTranslator(Translator translator){
 		this.translator = translator;
 		return this;
 	}
@@ -84,7 +95,7 @@ public class DataSetBuilder {
 	 * @param appName application name
 	 * @return self to allow chaining
 	 */
-	public DataSetBuilder setAppName(String appName){
+	public DataSetBuilder<E> setAppName(String appName){
 		this.appName = appName;
 		return this;
 	}
@@ -94,7 +105,7 @@ public class DataSetBuilder {
 	 * @param directory read directory
 	 * @return self to allow chaining
 	 */
-	public DataSetBuilder setDirectory(String directory){
+	public DataSetBuilder<E> setDirectory(String directory){
 		this.directory = directory;
 		return this;
 	}
@@ -102,12 +113,11 @@ public class DataSetBuilder {
 	/**
 	 * Puts a new link map into the builders overall link map.
 	 * @param type data entry type (used as key)
-	 * @param links actual map
+	 * @param ds the data set as map value
 	 */
-	@SuppressWarnings("unchecked")
-	public void putLinkMap(DataEntryType type, DataSet<?> ds){
+	public void putLinkMap(DataEntryType<?,?> type, DataSet<?> ds){
 		if(ds!=null){
-			this.linkMap.put(type, (Map<String, Object>) ds.getMap());
+			this.linkMap.put(type, ds);
 		}
 	}
 
@@ -116,7 +126,7 @@ public class DataSetBuilder {
 	 * @param type key to test for
 	 * @return true if the key exists, false otherwise
 	 */
-	public boolean linkMapContainsKey(DataEntryType type){
+	public boolean linkMapContainsKey(DataEntryType<?,?> type){
 		return this.linkMap.containsKey(type);
 	}
 
@@ -126,7 +136,7 @@ public class DataSetBuilder {
 	 * @param entryType the data entry type
 	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
 	 */
-	public <E extends DataEntry> DataSet<E> build(DataEntryType entryType){
+	public DataSet<E> build(DataEntryType<E,?> entryType){
 		return this.build(entryType, null);
 	}
 
@@ -137,7 +147,7 @@ public class DataSetBuilder {
 	 * @param excluded a set of characters excluded from translations, null or empty if not applicable
 	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
 	 */
-	public <E extends DataEntry> DataSet<E> build(DataEntryType entryType, String[] excluded){
+	public DataSet<E> build(DataEntryType<E, ?> entryType, String[] excluded){
 		IOFileFilter fileFilter = new WildcardFileFilter(new String[]{
 				"*." + entryType.getInputFileExtension() + ".json"
 		});
@@ -158,6 +168,14 @@ public class DataSetBuilder {
 		ds.load(fsl.getSource(), entryType.getInputFileExtension());
 
 		return ds;
+	}
+
+	/**
+	 * Returns the builder's link map
+	 * @return link map
+	 */
+	public Map<DataEntryType<?,?>, DataSet<?>> getLinkMap(){
+		return this.linkMap;
 	}
 
 	/**

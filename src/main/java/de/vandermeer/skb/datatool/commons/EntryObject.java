@@ -15,7 +15,10 @@
 
 package de.vandermeer.skb.datatool.commons;
 
+import java.net.URISyntaxException;
 import java.util.Map;
+
+import org.apache.commons.lang3.text.StrBuilder;
 
 /**
  * Base of the special data objects.
@@ -27,16 +30,36 @@ import java.util.Map;
 public interface EntryObject {
 
 	/**
-	 * Loads an entry object from a given map with tests against expected keys
-	 * @param entryMap map of entries to load from
-	 * @param linkMap map of data entries that can be linked
-	 * @return empty string on success, string with error description otherwise
+	 * Loads an entry object from a given map with tests against expected keys.
+	 * @param loader a fully configured loader object
+	 * @throws URISyntaxException if creating a URI for an SKB link failed
+	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 */
-	String load(Map<String, Object> entryMap, Map<DataEntryType, Map<String, Object>> linkMap);
+	void loadObject(DataLoader loader) throws URISyntaxException;
 
 	/**
 	 * Returns the schema for the entry object.
 	 * @return entry object schema
 	 */
 	DataEntrySchema getSchema();
+
+	/**
+	 * Loads an entry object from a given map with tests against expected keys.
+	 * @param loader a fully configured loader object
+	 * @throws URISyntaxException if creating a URI for an SKB link failed
+	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
+	 */
+	default void load(DataLoader loader) throws URISyntaxException{
+		StrBuilder err = this.getSchema().testSchema(loader.getEntryMap());
+		if(err.size()>0){
+			throw new IllegalArgumentException(err.toString());
+		}
+		this.loadObject(loader);
+	}
+
+	/**
+	 * Returns the local entry map.
+	 * @return local entry map
+	 */
+	Map<EntryKey, Object> getEntryMap();
 }

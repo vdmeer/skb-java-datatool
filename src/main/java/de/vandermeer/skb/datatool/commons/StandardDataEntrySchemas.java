@@ -47,10 +47,28 @@ public enum StandardDataEntrySchemas implements DataEntrySchema {
 				put(StandardEntryKeys.KEY, false);
 				put(StandardEntryKeys.AFF_LONG, false);
 				put(StandardEntryKeys.AFF_SHORT, false);
-				put(StandardEntryKeys.ACR, false);
+				put(StandardEntryKeys.ACRONYM, false);
 				put(StandardEntryKeys.AFF_ADDR, false);
 				put(StandardEntryKeys.OBJ_GEO, false);
 				put(StandardEntryKeys.OBJ_LINKS, false);
+			}}
+	),
+
+	/** Schema keys for affiliation types. */
+	AFFILIATION_TYPES(
+			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
+				put(StandardEntryKeys.AFF_LONG, false);
+				put(StandardEntryKeys.AFF_SHORT, false);
+			}}
+	),
+
+	/** Schema keys for affiliations. */
+	PEOPLE(
+			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
+				put(StandardEntryKeys.PEOPLE_FIRST, true);
+				put(StandardEntryKeys.PEOPLE_MIDDLE, false);
+				put(StandardEntryKeys.PEOPLE_LAST, true);
+				put(StandardEntryKeys.OBJ_AFF_LINKS, false);
 			}}
 	),
 
@@ -118,9 +136,9 @@ public enum StandardDataEntrySchemas implements DataEntrySchema {
 	/** Schema keys for a data object geo. */
 	OBJECT_GEO(
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-				put(StandardEntryKeys.OBJ_GEO_CITY, false);
+				put(StandardEntryKeys.OBJ_GEO_CITY_NAME, false);
 				put(StandardEntryKeys.OBJ_GEO_CITY_LINK, false);
-				put(StandardEntryKeys.OBJ_GEO_COUNTRY, false);
+				put(StandardEntryKeys.OBJ_GEO_COUNTRY_NAME, false);
 				put(StandardEntryKeys.OBJ_GEO_COUNTRY_LINK, false);
 			}}
 	),

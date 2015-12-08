@@ -16,41 +16,38 @@
 package de.vandermeer.skb.datatool.commons;
 
 /**
- * A key in a data entry.
+ * Abstract implementation of a data target.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
+ * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
  * @since      v0.0.1
  */
-public interface EntryKey {
+public class AbstractDataTarget implements DataTarget {
+
+	/** Target definition. */
+	DataTargetDefinition definition;
+
+	/** STG file name. */
+	String stgFileName;
 
 	/**
-	 * Returns the key.
-	 * @return key
+	 * Creates a new data target.
+	 * @param definition the target definition
+	 * @param stgFileName STG file name
 	 */
-	String getKey();
+	public AbstractDataTarget(DataTargetDefinition definition, String stgFileName) {
+		this.definition = definition;
+		this.stgFileName = stgFileName;
+	}
 
-	/**
-	 * Returns the key's description
-	 * @return key description
-	 */
-	String getDescription();
+	@Override
+	public String getStgFileName() {
+		return this.stgFileName;
+	}
 
-	/**
-	 * Returns the type of the key.
-	 * @return key type
-	 */
-	Class<?> getType();
+	@Override
+	public DataTargetDefinition getDefinition() {
+		return this.definition;
+	}
 
-	/**
-	 * Flag for using a given translator on processing key values, for instance when reading from file
-	 * @return true if translator should be used, false otherwise
-	 */
-	boolean useTranslator();
-
-	/**
-	 * Returns a URI used for an SKB link.
-	 * @return SKB URI, null if none supported
-	 */
-	String getSkbUri();
 }

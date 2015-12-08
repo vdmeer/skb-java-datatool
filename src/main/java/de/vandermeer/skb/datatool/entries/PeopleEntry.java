@@ -1,4 +1,4 @@
-/* Copyright 2014 Sven van der Meer <vdmeer.sven@mykolab.com>
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,35 +23,60 @@ import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataLoader;
 import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.ObjectAffiliations;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
 
 /**
- * A data entry for continents.
+ * A single people entry.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public class ContinentEntry implements DataEntry {
+public class PeopleEntry implements DataEntry {
 
 	/** The local entry map. */
 	private Map<EntryKey, Object> entryMap;
 
-	/** Continent schema. */
-	DataEntrySchema schema = StandardDataEntrySchemas.GEO_CONTINENTS;
+	/** Affiliation schema. */
+	DataEntrySchema schema = StandardDataEntrySchemas.PEOPLE;
 
-	@Override
-	public DataEntrySchema getSchema(){
-		return this.schema;
+	/**
+	 * Returns the first name of the person.
+	 * @return person first name
+	 */
+	public String getFirstName(){
+		return (String)this.entryMap.get(StandardEntryKeys.PEOPLE_FIRST);
 	}
 
 	/**
-	 * Returns the continent name.
-	 * @return continent name
+	 * Return the middle name of the person.
+	 * @return person middle name
 	 */
-	public String getName(){
-		return (String)this.entryMap.get(StandardEntryKeys.GEO_NAME);
+	public String getMiddleName(){
+		return (String)this.entryMap.get(StandardEntryKeys.PEOPLE_MIDDLE);
+	}
+
+	/**
+	 * Return the last name of the person.
+	 * @return person last name
+	 */
+	public String getLastName(){
+		return (String)this.entryMap.get(StandardEntryKeys.PEOPLE_LAST);
+	}
+
+	/**
+	 * Return the last affiliation entries for the person.
+	 * @return person last name
+	 */
+	public Map<String, AffiliationEntry> getAffiliations(){
+		return ((ObjectAffiliations)this.entryMap.get(StandardEntryKeys.OBJ_AFF_LINKS)).getAffiliationMap();
+	}
+
+	@Override
+	public String getCompareString() {
+		return this.getLastName();
 	}
 
 	@Override
@@ -61,13 +86,14 @@ public class ContinentEntry implements DataEntry {
 	}
 
 	@Override
-	public void loadEntry(DataLoader loader) throws URISyntaxException {
-		this.entryMap = loader.loadEntry(this.schema);
+	public DataEntrySchema getSchema(){
+		return this.schema;
 	}
 
 	@Override
-	public String getCompareString() {
-		return this.getName();
+	public void loadEntry(DataLoader loader) throws URISyntaxException {
+		this.entryMap = loader.loadEntry(this.schema);
+		this.entryMap.put(StandardEntryKeys.KEY, loader.getKeyStart() + this.getLastName() + "-" + this.getFirstName());
 	}
 
 	@Override

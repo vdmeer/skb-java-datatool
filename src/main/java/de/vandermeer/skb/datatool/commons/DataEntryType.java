@@ -15,7 +15,8 @@
 
 package de.vandermeer.skb.datatool.commons;
 
-import java.util.Set;
+import java.util.Map;
+
 
 /**
  * A data entry type.
@@ -24,7 +25,7 @@ import java.util.Set;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public interface DataEntryType {
+public interface DataEntryType<E extends DataEntry, L extends DataSetLoader<E>> {
 
 	/**
 	 * Returns the name of the type
@@ -42,17 +43,31 @@ public interface DataEntryType {
 	 * Returns the class used for initialization of a data set with this data entry.
 	 * @return the class
 	 */
-	<E extends DataEntry> Class<E> getTypeClass();
-
-//	/**
-//	 * Returns the full file extension (type plus JOSN).
-//	 * @return full type extension
-//	 */
-//	String getFullInputFileExtension();
+	Class<E> getTypeClass();
 
 	/**
-	 * Returns the target the type supports
-	 * @return supported targets, empty if none
+	 * Returns the type's loader class.
+	 * @return the class for the type
 	 */
-	Set<DataTarget> getSupportedTargets();
+	Class<L> getLoaderClass();
+
+	/**
+	 * Returns an SKB URI for the data entry type.
+	 * @return SKB URI
+	 */
+	default String getLinkUri(){
+		return "skb://" + this.getType();
+	}
+
+	/**
+	 * Returns the types required to be loaded for link expansions.
+	 * @return required types
+	 */
+	DataEntryType<?,?>[] getRequiredTypes();
+
+	/**
+	 * Returns the targets supported by this entry type.
+	 * @return targets as a mapping of target name (identifier) to actual target
+	 */
+	Map<String, DataTarget> getSupportedTargets();
 }

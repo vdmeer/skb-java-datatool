@@ -15,8 +15,14 @@
 
 package de.vandermeer.skb.datatool;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 import de.vandermeer.execs.ExecS_Application;
 import de.vandermeer.execs.options.AO_DirectoryIn;
@@ -28,10 +34,21 @@ import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
 import de.vandermeer.skb.base.info.DirectoryLoader;
 import de.vandermeer.skb.base.info.FileTarget;
+import de.vandermeer.skb.base.info.StgFileLoader;
+import de.vandermeer.skb.datatool.commons.DataEntry;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
+import de.vandermeer.skb.datatool.commons.DataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataTarget;
-import de.vandermeer.skb.datatool.commons.StandardDataEntryTypes;
-import de.vandermeer.skb.datatool.commons.StandardDataTargets;
+import de.vandermeer.skb.datatool.entries.AcronymEntryLoader;
+import de.vandermeer.skb.datatool.entries.AffiliationEntryLoader;
+import de.vandermeer.skb.datatool.entries.AffiliationtypeEntryLoader;
+import de.vandermeer.skb.datatool.entries.CityEntryLoader;
+import de.vandermeer.skb.datatool.entries.ContinentEntryLoader;
+import de.vandermeer.skb.datatool.entries.CountryEntryLoader;
+import de.vandermeer.skb.datatool.entries.EncodingEntryLoader;
+import de.vandermeer.skb.datatool.entries.HtmlentryLoader;
+import de.vandermeer.skb.datatool.entries.PeopleEntryLoader;
 
 /**
  * Tool to read all SKB data and cross reference if possible.
@@ -58,10 +75,10 @@ public class DataTool implements ExecS_Application {
 	protected ExecS_CliParser cli;
 
 	/** The option for the data entry type. */
-	protected AO_DataEntryType optionType = new AO_DataEntryType();
+	protected AO_DataEntryType optionType;
 
 	/** The option for the target. */
-	protected AO_DataTarget optionTarget = new AO_DataTarget(false);
+	protected AO_DataTarget optionTarget;
 
 	/** The option for the input directory. */
 	protected AO_DirectoryIn optionDirIn = new AO_DirectoryIn(true, "The top level directory with JSON files for the selected type.");
@@ -78,6 +95,9 @@ public class DataTool implements ExecS_Application {
 	/** Flag for verbose mode, true means on, false means off. */
 	boolean verbose;
 
+	/** Set of supported entry types. */
+	final Set<DataEntryType<?, ?>> entryTypes;
+
 	/**
 	 * Returns a new integrated tool.
 	 * The object uses CLI arguments for input directory and target name.
@@ -86,14 +106,28 @@ public class DataTool implements ExecS_Application {
 	public DataTool() {
 		this.verbose = false;
 		Skb_Console.USE_CONSOLE = true;
-		this.cli = new ExecS_CliParser();
 
-		this.cli.addOption(this.optionType);
-		this.cli.addOption(this.optionTarget);
+		this.cli = new ExecS_CliParser();
 		this.cli.addOption(this.optionDirIn);
 		this.cli.addOption(this.optionFileOut);
 		this.cli.addOption(this.optionVerbose);
 		this.cli.addOption(this.optionKeySep);
+
+		this.entryTypes = new HashSet<>();
+		this.entryTypes.add(AcronymEntryLoader.ENTRY_TYPE);
+		this.entryTypes.add(AffiliationtypeEntryLoader.ENTRY_TYPE);
+		this.entryTypes.add(AffiliationEntryLoader.ENTRY_TYPE);
+		this.entryTypes.add(CityEntryLoader.ENTRY_TYPE);
+		this.entryTypes.add(CountryEntryLoader.ENTRY_TYPE);
+		this.entryTypes.add(ContinentEntryLoader.ENTRY_TYPE);
+		this.entryTypes.add(EncodingEntryLoader.ENTRY_TYPE);
+		this.entryTypes.add(HtmlentryLoader.ENTRY_TYPE);
+		this.entryTypes.add(PeopleEntryLoader.ENTRY_TYPE);
+
+		this.optionType = new AO_DataEntryType(this.entryTypes);
+		this.cli.addOption(this.optionType);
+		this.optionTarget = new AO_DataTarget(false, this.entryTypes);
+		this.cli.addOption(this.optionTarget);
 	}
 
 	@Override
@@ -113,34 +147,37 @@ public class DataTool implements ExecS_Application {
 			Skb_Console.conError("{}: requires a type, try '--help entry-type' for details", this.getAppName());
 			return -1;
 		}
-		StandardDataEntryTypes type = null;
-		for(StandardDataEntryTypes sdet : StandardDataEntryTypes.values()){
+
+		DataEntryType<?,?> type = null;
+		for(DataEntryType<?,?> sdet : this.entryTypes){
 			if(sdet.getType().equals(typeCli)){
 				type = sdet;
 				break;
 			}
 		}
 		if(type==null){
-			Skb_Console.conError("{}: unknown type <{}>", new Object[]{this.getAppName(), typeCli});
+			Skb_Console.conError("{}: unsupported type <{}>", new Object[]{this.getAppName(), typeCli});
 			return -1;
 		}
 
-		String targetCli = this.optionTarget.getValue();
 		DataTarget target = null;
-		for(StandardDataTargets sdt : StandardDataTargets.values()){
-			if(sdt.getTargetName().equals(targetCli)){
-				target = sdt;
-				break;
-			}
-		}
-		if(target==null){
+		if(this.optionTarget.getValue()==null){
 			if(this.verbose){
 				Skb_Console.conInfo("{}: no target given, will not generate output", new Object[]{this.getAppName()});
 			}
 		}
-		if(target!=null && !type.getSupportedTargets().contains(target)){
-			Skb_Console.conError("{}: target <{}> does not support type <{}>", new Object[]{this.getAppName(), targetCli, typeCli});
-			return -1;
+		else{
+			String targetCli = this.optionTarget.getValue();
+			for(String targetName : type.getSupportedTargets().keySet()){
+				if(targetName.equals(targetCli)){
+					target = type.getSupportedTargets().get(targetName);
+					break;
+				}
+			}
+			if(target==null){
+				Skb_Console.conError("{}: type <{}> does not support target <{}>", new Object[]{this.getAppName(), typeCli, targetCli});
+				return -1;
+			}
 		}
 
 		DirectoryLoader dl = new CommonsDirectoryWalker(this.optionDirIn.getValue(), DirectoryFileFilter.INSTANCE, DirectoryFileFilter.INSTANCE);
@@ -156,7 +193,7 @@ public class DataTool implements ExecS_Application {
 		}
 		FileTarget ft = null;
 		if(target!=null && this.optionFileOut.getValue()!=null){
-			String fn = this.optionFileOut.getValue() + "." + target.getExtension();
+			String fn = this.optionFileOut.getValue() + "." + target.getDefinition().getExtension();
 			FileTarget.createFile(fn);
 			if(this.optionFileOut.getValue()!=null){
 				ft = new FileTarget(fn);
@@ -172,58 +209,36 @@ public class DataTool implements ExecS_Application {
 				Skb_Console.conInfo("{}: processing {} without output generation", new Object[]{this.getAppName(), type.getType()});
 			}
 			else if(target!=null && ft==null){
-				Skb_Console.conInfo("{}: processing {} for target <{}> writing to STDOUT", new Object[]{this.getAppName(), type.getType(), target.getTargetName()});
+				Skb_Console.conInfo("{}: processing {} for target <{}> writing to STDOUT", new Object[]{this.getAppName(), type.getType(), target.getDefinition().getTargetName()});
 			}
 			else if(target!=null && ft!=null){
-				Skb_Console.conInfo("{}: processing {} for target <{}> writing to <{}>", new Object[]{this.getAppName(), type.getType(), target.getTargetName(), (ft==null)?"standard out":ft.getAbsoluteName()});
+				Skb_Console.conInfo("{}: processing {} for target <{}> writing to <{}>", new Object[]{this.getAppName(), type.getType(), target.getDefinition().getTargetName(), (ft==null)?"standard out":ft.getAbsoluteName()});
 			}
 		}
 
-		String[] excluded = null;
-		if(target!=null){
-			excluded = target.getExcluded();
+		DataSetLoader<?> dsl = null;
+		try {
+			dsl = type.getLoaderClass().newInstance();
+			dsl.setInitial(this.getAppName(), this.optionKeySep.getValue(), this.optionDirIn.getValue(), target, verbose);
+			dsl.load();
 		}
-		DataLoader loader = new DataLoader(this.getAppName(), this.optionKeySep.getValue(), this.optionDirIn.getValue(), target, verbose);
-		DataSet<?> entries1 = null;
-		DataSet<?> entries2 = null;
-
-		switch(type){
-			case ACRONYMS:
-				entries1 = loader.loadAcronyms();
-				break;
-			case AFFILIATIONS:
-				entries1 = loader.loadAffiliations();
-				break;
-			case CONTINENTS:
-				entries1 = loader.loadContinents();
-				break;
-			case COUNTRIES:
-				entries1 = loader.loadCountries();
-				break;
-			case CITIES:
-				entries1 = loader.loadCities();
-				break;
-			case HTML_ENTITIES:
-				entries1 = loader.loadHtmlEntyties(excluded);
-				break;
-			case ENCODINGS:
-				entries1 = loader.loadEncodings(excluded);
-				entries2 = loader.loadHtmlEntyties(excluded);
-				break;
-			default:
-				break;
+		catch (InstantiationException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		DataSet<?> entries1 = dsl.getMainDataSet();
+		DataSet<?> entries2 = dsl.getDataSet2();
 
 		if(entries1==null){
 			return -4;
 		}
 
 		if(target!=null){
-			ST st = ToolUtils.writeST(entries1, type, target, this.getAppName());
+			ST st = this.writeST(entries1, target);
 			if(entries2!=null){
-				st = ToolUtils.addToST(entries2, st, this.getAppName());
+				st = this.addToST(entries2, st);
 			}
-			ret = ToolUtils.writeOutput(st, ft, this.getAppName());
+			ret = this.writeOutput(st, ft);
 		}
 
 		if(this.verbose){
@@ -267,5 +282,75 @@ public class DataTool implements ExecS_Application {
 	@Override
 	public ExecS_CliParser getCli(){
 		return this.cli;
+	}
+
+	/**
+	 * Writes output to a file or to STDOUT.
+	 * @param st the template with generated output
+	 * @param ft a file target pointing to a file to write output to, will use STDOUT if null
+	 * @return a negative integer if file was given but not writable, 0 on success
+	 */
+	public int writeOutput(ST st, FileTarget ft) {
+		if(ft!=null && ft.asFile()!=null){
+			try {
+				FileUtils.write(ft.asFile(), st.render());
+			}
+			catch (IOException e) {
+				Skb_Console.conError("{}: catched IO Exception <{}> -> {}", new Object[]{this.getAppName(), e.getCause(), e.getMessage()});
+				return -7;
+			}
+		}
+		else{
+			System.out.println(st.render());
+			return 0;
+		}
+		return 0;
+	}
+
+	/**
+	 * Adds to an existing template.
+	 * Adding means that all entries of the given data set will be added to an attribute "entry2" of the template. 
+	 * @param ds data set with entries to write to the template
+	 * @param st the template, must have an argument "entry2"
+	 * @param <E> type of the data entry
+	 * @return the template on success, null on error (errors are logged)
+	 */
+	public <E extends DataEntry> ST addToST(DataSet<E> ds, ST st) {
+		if(st==null){
+			Skb_Console.conError("{}: cannot add to ST, give ST is null", new Object[]{this.getAppName()});
+			return null;
+		}
+		for(E entry2 : ds.getEntries()){
+			st.add("entry2", entry2);
+		}
+		return st;
+	}
+
+	/**
+	 * Writes a data set to a string template.
+	 * @param ds the data set with entries
+	 * @param target the target with information about the template file
+	 * @param <E> type of the data entry
+	 * @return a new template on success, null on error (errors are logged)
+	 */
+	public <E extends DataEntry> ST writeST(DataSet<E> ds, DataTarget target) {
+		StgFileLoader stgLoader = new StgFileLoader(target.getStgFileName());
+		if(stgLoader.getLoadErrors().size()>0){
+			Skb_Console.conError("{}: errors loading STG file <{}>\n{}", new Object[]{this.getAppName(), target.getStgFileName(), stgLoader.getLoadErrors().render()});
+			return null;
+		}
+
+		STGroup stg = stgLoader.load();
+		if(stg==null || stgLoader.getLoadErrors().size()>0){
+			Skb_Console.conError("{}: errors loading STG file <{}>\n{}", new Object[]{this.getAppName(), target.getStgFileName(), stgLoader.getLoadErrors().render()});
+			return null;
+		}
+		//TODO validate STG file
+		ST st = stg.getInstanceOf("build");
+		for(E entry : ds.getEntries()){
+				st.add("entry", entry);
+		}
+
+		return st;
 	}
 }

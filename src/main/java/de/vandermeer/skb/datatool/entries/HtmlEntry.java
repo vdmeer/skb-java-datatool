@@ -15,19 +15,19 @@
 
 package de.vandermeer.skb.datatool.entries;
 
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrBuilder;
 
-import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataEntryType;
+import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.LocalEntryKeys;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
-import de.vandermeer.skb.datatool.commons.Utilities;
 
 /**
  * A data entry for HTML entities (used for instance in encoding translations).
@@ -36,22 +36,10 @@ import de.vandermeer.skb.datatool.commons.Utilities;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public class HtmlEntry implements DataEntry {
+public class Htmlentry implements DataEntry {
 
-	/** HTML entity. */
-	Object htmlEntity;
-
-	/** HTML entity replacement string. */
-	String htmlEntityRepl;
-
-	/** Description for the entity. */
-	Object description;
-
-	/** LaTeX representation of the encoding. */
-	Object latex;
-
-	/** AsciiDoc representation of the encoding. */
-	Object ad;
+	/** The local entry map. */
+	private Map<EntryKey, Object> entryMap;
 
 	/** HTML entity schema. */
 	DataEntrySchema schema = StandardDataEntrySchemas.HTML_ENTITIES;
@@ -63,13 +51,8 @@ public class HtmlEntry implements DataEntry {
 	static final String REPLACEMENT_PATTERN_END = ")))";
 
 	@Override
-	public String getKey() {
-		return (String)this.htmlEntity;
-	}
-
-	@Override
 	public String getCompareString() {
-		return (String)this.htmlEntity;
+		return this.getHtmlEntity();
 	}
 
 	@Override
@@ -84,27 +67,29 @@ public class HtmlEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) {
-		StrBuilder msg;
-		msg = this.schema.testSchema(entryMap);
-		if(msg.size()>0){
-			throw new IllegalArgumentException(msg.toString());
-		}
+	public void loadEntry(DataLoader loader) throws URISyntaxException {
+		this.entryMap = loader.loadEntry(this.schema);
+		this.entryMap.put(StandardEntryKeys.KEY, this.getHtmlEntity());
 
-		this.htmlEntity = Utilities.getDataObject(StandardEntryKeys.HTML_ENTITY, entryMap, linkMap);
-		this.htmlEntityRepl = StringUtils.replace(StringUtils.replace((String)this.htmlEntity, "<", REPLACEMENT_PATTERN_START), ">", REPLACEMENT_PATTERN_END);
+		this.entryMap.put(LocalEntryKeys.HTML_REPLACEMENT, StringUtils.replace(StringUtils.replace(this.getHtmlEntity(), "<", REPLACEMENT_PATTERN_START), ">", REPLACEMENT_PATTERN_END));
+//		this.htmlEntityRepl = StringUtils.replace(StringUtils.replace(this.getHtmlEntity(), "<", REPLACEMENT_PATTERN_START), ">", REPLACEMENT_PATTERN_END);
 
-		this.latex = Utilities.getDataObject(StandardEntryKeys.LATEX, entryMap, linkMap);
-		if(this.latex!=null){
-			this.latex = StringUtils.replaceEach(
-					(String)this.latex,
+		if(this.getLatex()!=null){
+			this.entryMap.put(StandardEntryKeys.LATEX, StringUtils.replaceEach(
+					this.getLatex(),
 					new String[]{"\"", "\\"},
 					new String[]{"\\\"", "\\\\"}
-			);
+			));
 		}
 
-		this.ad = Utilities.getDataObject(StandardEntryKeys.ASCII_DOC, entryMap, linkMap);
-		this.description = Utilities.getDataObject(StandardEntryKeys.DESCR, entryMap, linkMap);
+//		if(this.latex!=null){
+//			this.latex = StringUtils.replaceEach(
+//					(String)this.latex,
+//					new String[]{"\"", "\\"},
+//					new String[]{"\\\"", "\\\\"}
+//			);
+//		}
+
 	}
 
 	/**
@@ -112,15 +97,15 @@ public class HtmlEntry implements DataEntry {
 	 * @return the HTML entity
 	 */
 	public String getHtmlEntity(){
-		return (String)this.htmlEntity;
+		return (String)this.entryMap.get(StandardEntryKeys.HTML_ENTITY);
 	}
 
 	/**
 	 * Returns the HTML entity replacement string.
 	 * @return the HTML entity replacement string
 	 */
-	public String getHtmlEntityRepl(){
-		return this.htmlEntityRepl;
+	public String getHtmlEntityReplacement(){
+		return (String)this.entryMap.get(LocalEntryKeys.HTML_REPLACEMENT);
 	}
 
 	/**
@@ -128,7 +113,7 @@ public class HtmlEntry implements DataEntry {
 	 * @return LaTeX representation, null if not set
 	 */
 	public String getLatex(){
-		return (String)this.latex;
+		return (String)this.entryMap.get(StandardEntryKeys.LATEX);
 	}
 
 	/**
@@ -136,7 +121,7 @@ public class HtmlEntry implements DataEntry {
 	 * @return AsciiDoc representation, null if not set
 	 */
 	public String getAd(){
-		return (String)this.ad;
+		return (String)this.entryMap.get(StandardEntryKeys.ASCII_DOC);
 	}
 
 	/**
@@ -144,6 +129,12 @@ public class HtmlEntry implements DataEntry {
 	 * @return encoding description, null if not set
 	 */
 	public String getDescription(){
-		return (String)this.description;
+		return (String)this.entryMap.get(StandardEntryKeys.DESCR);
 	}
+
+	@Override
+	public Map<EntryKey, Object> getEntryMap(){
+		return this.entryMap;
+	}
+
 }

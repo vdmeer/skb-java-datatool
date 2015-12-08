@@ -1,4 +1,4 @@
-/* Copyright 2014 Sven van der Meer <vdmeer.sven@mykolab.com>
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,31 +27,39 @@ import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
 
 /**
- * A data entry for continents.
+ * A single affiliation type entry.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public class ContinentEntry implements DataEntry {
+public class AffiliationtypeEntry implements DataEntry {
 
 	/** The local entry map. */
 	private Map<EntryKey, Object> entryMap;
 
-	/** Continent schema. */
-	DataEntrySchema schema = StandardDataEntrySchemas.GEO_CONTINENTS;
+	/** Affiliation schema. */
+	DataEntrySchema schema = StandardDataEntrySchemas.AFFILIATION_TYPES;
 
-	@Override
-	public DataEntrySchema getSchema(){
-		return this.schema;
+	/**
+	 * Returns the long name of the affiliation type.
+	 * @return affiliation type long name
+	 */
+	public String getLong(){
+		return (String)this.entryMap.get(StandardEntryKeys.AFF_LONG);
 	}
 
 	/**
-	 * Returns the continent name.
-	 * @return continent name
+	 * Return the short name of the affiliation type.
+	 * @return affiliation type short name
 	 */
-	public String getName(){
-		return (String)this.entryMap.get(StandardEntryKeys.GEO_NAME);
+	public String getShort(){
+		return (String)this.entryMap.get(StandardEntryKeys.AFF_SHORT);
+	}
+
+	@Override
+	public String getCompareString() {
+		return this.getShort();
 	}
 
 	@Override
@@ -63,11 +71,12 @@ public class ContinentEntry implements DataEntry {
 	@Override
 	public void loadEntry(DataLoader loader) throws URISyntaxException {
 		this.entryMap = loader.loadEntry(this.schema);
+		this.entryMap.put(StandardEntryKeys.KEY, loader.loadDataString(StandardEntryKeys.AFF_SHORT));
 	}
 
 	@Override
-	public String getCompareString() {
-		return this.getName();
+	public DataEntrySchema getSchema(){
+		return this.schema;
 	}
 
 	@Override

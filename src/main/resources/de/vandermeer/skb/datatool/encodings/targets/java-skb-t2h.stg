@@ -59,7 +59,7 @@ public class Text2Html implements Translator {
 
 	/** Array of replacements for searchable HTML entity strings. */
 	protected String[] replacementListHE = new String[]{
-		<entry2:{h | "<h.htmlEntityRepl>"}; separator=", ">
+		<entry2:{h | "<h.htmlEntityReplacement>"}; separator=", ">
 	};
 
 	@Override

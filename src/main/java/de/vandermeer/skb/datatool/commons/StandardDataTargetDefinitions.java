@@ -15,10 +15,6 @@
 
 package de.vandermeer.skb.datatool.commons;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import de.vandermeer.skb.base.encodings.TranslatorFactory;
 
 /**
@@ -28,62 +24,44 @@ import de.vandermeer.skb.base.encodings.TranslatorFactory;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public enum StandardDataTargets implements DataTarget {
+public enum StandardDataTargetDefinitions implements DataTargetDefinition {
 
 	/** LaTeX: list of acronyms using the "acronym" environment. */
-	latexAcr(
+	LATEX_ACRONYMS(
 			"latex-acr",
 			"tex",
-			new HashMap<DataEntryType, String>() {private static final long serialVersionUID = 1L;{
-				put(StandardDataEntryTypes.ACRONYMS, "de/vandermeer/skb/datatool/acronyms/targets/latex-acronym.stg");
-			}},
 			TranslatorFactory.Target.Text2LaTeX,
 			"LaTeX for acronym package"
 	),
 
 	/** LaTeX: a simple table of data entries. */
-	latexTab(
+	LATEX_TABLE(
 			"latex-tab",
 			"tex",
-			new HashMap<DataEntryType, String>() {private static final long serialVersionUID = 1L;{
-				put(StandardDataEntryTypes.ACRONYMS, "de/vandermeer/skb/datatool/acronyms/targets/latex-table.stg");
-			}},
 			TranslatorFactory.Target.Text2LaTeX,
 			"LaTeX for tabular environment"
 	),
 
 	/** HTML: a simple table of data entries. */
-	htmlTable(
+	HTML_TABLE(
 			"html-tab",
 			"html",
-			new HashMap<DataEntryType, String>() {private static final long serialVersionUID = 1L;{
-				put(StandardDataEntryTypes.ACRONYMS, "de/vandermeer/skb/datatool/acronyms/targets/html-table.stg");
-				put(StandardDataEntryTypes.CONTINENTS, "de/vandermeer/skb/datatool/continents/targets/html-table.stg");
-				put(StandardDataEntryTypes.CITIES, "de/vandermeer/skb/datatool/cities/targets/html-table.stg");
-			}},
 			TranslatorFactory.Target.Text2HTML,
 			"Simple HTML table"
 	),
 
 	/** SQL: commands to create a table for the data entries and then fill it with all entries. */
-	sqlSimple(
+	SQL_SIMPLE(
 			"sql-simple",
 			"sql",
-			new HashMap<DataEntryType, String>() {private static final long serialVersionUID = 1L;{
-				put(StandardDataEntryTypes.ACRONYMS, "de/vandermeer/skb/datatool/acronyms/targets/sql-simple.stg");
-			}},
 			(TranslatorFactory.Target)null,//TODO
 			"SQL commands for a table of given type"
 	),
 
 	/** Text: simple text output, very simple formatting. */
-	textPlain(
+	TEXT_PLAIN(
 			"text-plain",
 			"txt",
-			new HashMap<DataEntryType, String>() {private static final long serialVersionUID = 1L;{
-				put(StandardDataEntryTypes.ACRONYMS, "de/vandermeer/skb/datatool/acronyms/targets/text-plain.stg");
-				put(StandardDataEntryTypes.AFFILIATIONS, "de/vandermeer/skb/datatool/affiliations/targets/text-plain.stg");
-			}},
 			(TranslatorFactory.Target)null, //TODO
 			"Plain text without any formatting"
 	),
@@ -92,9 +70,6 @@ public enum StandardDataTargets implements DataTarget {
 	JAVA_SKB_T2L(
 			"java-skb-t2l",
 			"java",
-			new HashMap<DataEntryType, String>() {private static final long serialVersionUID = 1L;{
-				put(StandardDataEntryTypes.ENCODINGS, "de/vandermeer/skb/datatool/encodings/targets/java-skb-t2l.stg");
-			}},
 			new String[]{},
 			"An SKB JAVA translator implementation from text to LaTeX"
 	),
@@ -103,9 +78,6 @@ public enum StandardDataTargets implements DataTarget {
 	JAVA_SKB_H2L(
 			"java-skb-h2l",
 			"java",
-			new HashMap<DataEntryType, String>() {private static final long serialVersionUID = 1L;{
-				put(StandardDataEntryTypes.ENCODINGS, "de/vandermeer/skb/datatool/encodings/targets/java-skb-h2l.stg");
-			}},
 			new String[]{
 					"&", "#", ";"
 			},
@@ -116,9 +88,6 @@ public enum StandardDataTargets implements DataTarget {
 	JAVA_SKB_T2H(
 			"java-skb-t2h",
 			"java",
-			new HashMap<DataEntryType, String>() {private static final long serialVersionUID = 1L;{
-				put(StandardDataEntryTypes.ENCODINGS, "de/vandermeer/skb/datatool/encodings/targets/java-skb-t2h.stg");
-			}},
 			new String[]{
 					"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X","Y", "Z",
 					"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
@@ -136,9 +105,6 @@ public enum StandardDataTargets implements DataTarget {
 	/** File extension. */
 	String extension;
 
-	/** A map of data entry types to STG files. */
-	Map<DataEntryType, String> stgFileMap;
-
 	/** Characters that should be excluded from any code generation. */
 	String[] excluded;
 
@@ -152,14 +118,12 @@ public enum StandardDataTargets implements DataTarget {
 	 * Creates a new standard data target.
 	 * @param targetName the target name
 	 * @param extension the file extension for output files
-	 * @param stgFileMap a map of ST files with supported types
 	 * @param excluded a set of characters that have to be excluded from any character translation
 	 * @param description a description
 	 */
-	StandardDataTargets(String targetName, String extension, Map<DataEntryType, String> stgFileMap, String[] excluded, String description){
+	StandardDataTargetDefinitions(String targetName, String extension, String[] excluded, String description){
 		this.targetName = targetName;
 		this.extension = extension;
-		this.stgFileMap = stgFileMap;
 		this.excluded = excluded;
 		this.description = description;
 	}
@@ -168,14 +132,12 @@ public enum StandardDataTargets implements DataTarget {
 	 * Creates a new standard data target.
 	 * @param targetName the target name
 	 * @param extension the file extension for output files
-	 * @param stgFileMap a map of ST files with supported types
 	 * @param translationTarget a target for character translation
 	 * @param description a description
 	 */
-	StandardDataTargets(String targetName, String extension, Map<DataEntryType, String> stgFileMap, TranslatorFactory.Target translationTarget, String description){
+	StandardDataTargetDefinitions(String targetName, String extension, TranslatorFactory.Target translationTarget, String description){
 		this.targetName = targetName;
 		this.extension = extension;
-		this.stgFileMap = stgFileMap;
 		this.translationTarget = translationTarget;
 		this.description = description;
 	}
@@ -201,18 +163,8 @@ public enum StandardDataTargets implements DataTarget {
 	}
 
 	@Override
-	public String getStgFileName(DataEntryType type){
-		return this.stgFileMap.get(type);
-	}
-
-	@Override
 	public String getDescription(){
 		return this.description;
-	}
-
-	@Override
-	public Set<DataEntryType> getSupportedTypes() {
-		return this.stgFileMap.keySet();
 	}
 
 }

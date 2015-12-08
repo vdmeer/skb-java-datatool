@@ -15,11 +15,6 @@
 
 package de.vandermeer.skb.datatool.entries;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.tuple.Pair;
-
 import de.vandermeer.skb.datatool.commons.DataSet;
 
 /**
@@ -32,19 +27,6 @@ import de.vandermeer.skb.datatool.commons.DataSet;
 public abstract class AcronymUtilities {
 
 	/**
-	 * Converts a data set of acronyms into a de-referenced key map.
-	 * @param ds the data set with acronym entries
-	 * @return a map of string to short/long pairs of all acronyms found, empty map if none found
-	 */
-	public final static Map<String, Pair<String, String>> toREfKeyMap(DataSet<AcronymEntry> ds){
-		Map<String, Pair<String, String>> ret = new HashMap<>();
-		for(AcronymEntry entry : ds.getEntries()){
-			ret.put(entry.getKey(), Pair.of(entry.getShort(), entry.getLong()));
-		}
-		return ret;
-	}
-
-	/**
 	 * Sets the longest acronym (plain text) in a set of acronyms.
 	 * @param ds data set of acronyms
 	 */
@@ -52,7 +34,7 @@ public abstract class AcronymUtilities {
 		String maxShort = "";
 		String key = null;
 		for(AcronymEntry entry : ds.getEntries()){
-			if(((String)entry.acShortOrig).length()>maxShort.length()){
+			if(entry.getShortOrig().length()>maxShort.length()){
 				maxShort = entry.getShort();
 				key = entry.getKey();
 			}

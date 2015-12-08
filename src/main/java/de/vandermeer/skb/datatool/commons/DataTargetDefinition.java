@@ -15,24 +15,44 @@
 
 package de.vandermeer.skb.datatool.commons;
 
+import de.vandermeer.skb.base.encodings.TranslatorFactory;
+
 /**
- * Generic data target for the data tools.
+ * Definitions for a data target, for instance name (identifier) and file extension.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
  * @since      v0.0.1
  */
-public interface DataTarget {
+public interface DataTargetDefinition {
 
 	/**
-	 * Returns the file name of the STG template for the target.
-	 * @return the name of the STG file
+	 * Returns the entries to be excluded from processing.
+	 * @return excluded characters, empty if none set
 	 */
-	String getStgFileName();
+	String[] getExcluded();
 
 	/**
-	 * Returns the target definition.
-	 * @return target definition
+	 * Returns the name of the target, as it should be used in the CLI.
+	 * @return target name
 	 */
-	DataTargetDefinition getDefinition();
+	String getTargetName();
+
+	/**
+	 * Returns the required translation target.
+	 * @return translation target, null if none required
+	 */
+	TranslatorFactory.Target getTranslationTarget();
+
+	/**
+	 * Returns the file extension used for this target.
+	 * @return file extension
+	 */
+	String getExtension();
+
+	/**
+	 * Returns the description of the target.
+	 * @return description
+	 */
+	String getDescription();
 }

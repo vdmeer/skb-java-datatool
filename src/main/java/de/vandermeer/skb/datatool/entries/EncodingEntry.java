@@ -15,19 +15,19 @@
 
 package de.vandermeer.skb.datatool.entries;
 
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrBuilder;
 
-import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataEntryType;
+import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.LocalEntryKeys;
 import de.vandermeer.skb.datatool.commons.StandardDataEntrySchemas;
 import de.vandermeer.skb.datatool.commons.StandardEntryKeys;
-import de.vandermeer.skb.datatool.commons.Utilities;
 
 /**
  * A single encoding entry.
@@ -38,43 +38,11 @@ import de.vandermeer.skb.datatool.commons.Utilities;
  */
 public class EncodingEntry implements DataEntry {
 
-	/** Decimal number of the encoding. */
-	Object dec;
-
-	/** Textual representation of the encoding. */
-	Object text;
-
-	/** HTML code for the encoding. */
-	String htmlCode;
-
-	/** HTML entity of the encoding. */
-	Object htmlEntity;
-
-	/** Unicode number. */
-	String ucNumber;
-
-	/** Unicode block of the encoding. */
-	Object ucBlock;
-
-	/** Unicode set of the encoding. */
-	Object ucSet;
-
-	/** Description for the encoding. */
-	Object description;
-
-	/** LaTeX representation of the encoding. */
-	Object latex;
-
-	/** AsciiDoc representation of the encoding. */
-	Object ad;
+	/** The local entry map. */
+	private Map<EntryKey, Object> entryMap;
 
 	/** Encoding schema. */
 	DataEntrySchema schema = StandardDataEntrySchemas.CHAR_ENCODINGS;
-
-	@Override
-	public String getKey() {
-		return Integer.toString((Integer)this.dec);
-	}
 
 	@Override
 	public String testDuplicate(Collection<DataEntry> set) {
@@ -88,46 +56,51 @@ public class EncodingEntry implements DataEntry {
 	}
 
 	@Override
-	public void load(Map<String, Object> entryMap, String keyStart, char keySeparator, Translator translator, Map<DataEntryType, Map<String, Object>> linkMap) {
-		StrBuilder msg;
-		msg = this.schema.testSchema(entryMap);
-		if(msg.size()>0){
-			throw new IllegalArgumentException(msg.toString());
-		}
-		msg = new StrBuilder(50);
+	public void loadEntry(DataLoader loader) throws URISyntaxException {
+		this.entryMap = loader.loadEntry(this.schema);
+		this.entryMap.put(StandardEntryKeys.KEY, Integer.toString(this.getDec()));
 
-		this.dec = Utilities.getDataObject(StandardEntryKeys.ENC_DEC, entryMap, linkMap);
-		this.text = Utilities.getDataObject(StandardEntryKeys.ENC_CHAR, entryMap, linkMap);
-		this.text = StringUtils.replaceEach(
-				(String)this.text,
-				new String[]{"\"", "\\"},
-				new String[]{"\\\"", "\\\\"}
-		);
-
-		this.htmlCode = String.format("&#%d;", (Integer)this.dec);
-		this.ucNumber = String.format("U+%4H", (Integer)this.dec);
-
-		this.htmlEntity = Utilities.getDataObject(StandardEntryKeys.HTML_ENTITY, entryMap, linkMap);
-
-		this.latex = Utilities.getDataObject(StandardEntryKeys.LATEX, entryMap, linkMap);
-		if(this.latex!=null){
-			this.latex = StringUtils.replaceEach(
-					(String)this.latex,
+		if(this.getText()!=null){
+			this.entryMap.put(StandardEntryKeys.ENC_CHAR, StringUtils.replaceEach(
+					this.getText(),
 					new String[]{"\"", "\\"},
 					new String[]{"\\\"", "\\\\"}
-			);
+			));
 		}
 
-		this.ad = Utilities.getDataObject(StandardEntryKeys.ASCII_DOC, entryMap, linkMap);
-		this.description = Utilities.getDataObject(StandardEntryKeys.DESCR, entryMap, linkMap);
+//		this.text = StringUtils.replaceEach(
+//				(String)this.text,
+//				new String[]{"\"", "\\"},
+//				new String[]{"\\\"", "\\\\"}
+//		);
 
-		this.ucBlock = Utilities.getDataObject(StandardEntryKeys.UNICODE_BLOCK, entryMap, linkMap);
-		this.ucSet = Utilities.getDataObject(StandardEntryKeys.UNICODE_SET, entryMap, linkMap);
+		this.entryMap.put(LocalEntryKeys.HTML_CODE, String.format("&#%d;", this.getDec()));
+		this.entryMap.put(LocalEntryKeys.ENCODING_UC_NUMBER, String.format("U+%4H", this.getDec()));
+
+//		this.htmlCode = String.format("&#%d;", this.getDec());
+//		this.ucNumber = String.format("U+%4H", this.getDec());
+
+		if(this.getLatex()!=null){
+			this.entryMap.put(StandardEntryKeys.LATEX, StringUtils.replaceEach(
+					this.getLatex(),
+					new String[]{"\"", "\\"},
+					new String[]{"\\\"", "\\\\"}
+			));
+		}
+
+//		if(this.latex!=null){
+//			this.latex = StringUtils.replaceEach(
+//					(String)this.latex,
+//					new String[]{"\"", "\\"},
+//					new String[]{"\\\"", "\\\\"}
+//			);
+//		}
+
 	}
 
 	@Override
 	public String getCompareString() {
-		return (String)this.text;
+		return this.getText();
 	}
 
 	/**
@@ -135,7 +108,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return decimal number of the encoding
 	 */
 	public int getDec(){
-		return (Integer)this.dec;
+		return (Integer)this.entryMap.get(StandardEntryKeys.ENC_DEC);
 	}
 
 	/**
@@ -143,7 +116,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return textual representation of the encoding, null if not set
 	 */
 	public String getText(){
-		return (String)this.text;
+		return (String)this.entryMap.get(StandardEntryKeys.ENC_CHAR);
 	}
 
 	/**
@@ -151,7 +124,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return the HTML code set of the encoding, null if not set
 	 */
 	public String getHtmlCode(){
-		return this.htmlCode;
+		return (String)this.entryMap.get(LocalEntryKeys.HTML_CODE);
 	}
 
 	/**
@@ -159,7 +132,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return the HTML entity set of the encoding, null if not set
 	 */
 	public String getHtmlEntity(){
-		return (String)this.htmlEntity;
+		return (String)this.entryMap.get(StandardEntryKeys.HTML_ENTITY);
 	}
 
 	/**
@@ -167,7 +140,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return the Unicode number of the encoding, null if not set
 	 */
 	public String getUcNumber(){
-		return this.ucNumber;
+		return (String)this.entryMap.get(LocalEntryKeys.ENCODING_UC_NUMBER);
 	}
 
 	/**
@@ -175,7 +148,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return the Unicode block of the encoding, null if not set
 	 */
 	public String getUcBlock(){
-		return (String)this.ucBlock;
+		return (String)this.entryMap.get(StandardEntryKeys.UNICODE_BLOCK);
 	}
 
 	/**
@@ -183,7 +156,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return the Unicode set of the encoding, null if not set
 	 */
 	public String getUcSet(){
-		return (String)this.ucSet;
+		return (String)this.entryMap.get(StandardEntryKeys.UNICODE_SET);
 	}
 
 	/**
@@ -191,7 +164,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return LaTeX representation of the encoding, null if not set
 	 */
 	public String getLatex(){
-		return (String)this.latex;
+		return (String)this.entryMap.get(StandardEntryKeys.LATEX);
 	}
 
 	/**
@@ -199,7 +172,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return AsciiDoc representation of the encoding, null if not set
 	 */
 	public String getAd(){
-		return (String)this.ad;
+		return (String)this.entryMap.get(StandardEntryKeys.ASCII_DOC);
 	}
 
 	/**
@@ -207,6 +180,12 @@ public class EncodingEntry implements DataEntry {
 	 * @return encoding description, null if not set
 	 */
 	public String getDescription(){
-		return (String)this.description;
+		return (String)this.entryMap.get(StandardEntryKeys.DESCR);
 	}
+
+	@Override
+	public Map<EntryKey, Object> getEntryMap(){
+		return this.entryMap;
+	}
+
 }
