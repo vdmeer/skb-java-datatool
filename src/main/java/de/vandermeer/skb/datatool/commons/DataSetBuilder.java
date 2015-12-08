@@ -15,7 +15,6 @@
 
 package de.vandermeer.skb.datatool.commons;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -50,24 +49,33 @@ public class DataSetBuilder<E extends DataEntry> {
 	String directory;
 
 	/** Map with linkeable data entries from other sets. */
-	Map<DataEntryType<?,?>, DataSet<?>> linkMap;
+	LoadedTypeMap loadedTypes;
+
+	/** Types supported by the loader. */
+	Map<DataEntryType, DataSetLoader<?>> supportedTypes;
 
 	/**
 	 * Returns a new data set builder.
 	 */
 	public DataSetBuilder(){
-		this.linkMap = new HashMap<>();
+		this.loadedTypes = new LoadedTypeMap();
 	}
 
 	/**
 	 * Returns a new data set builder with a link map.
-	 * @param linkMap link map for the builder
+	 * @param loadedTypes loaded map for the builder
 	 */
-	public DataSetBuilder(Map<DataEntryType<?,?>, DataSet<?>> linkMap){
+	public DataSetBuilder(LoadedTypeMap loadedTypes){
 		this();
-		if(linkMap!=null){
-			this.linkMap = linkMap;
+		if(loadedTypes!=null){
+			this.loadedTypes = loadedTypes;
 		}
+	}
+
+	//TODO JDOC
+	public DataSetBuilder<E> setSupportedTypes(Map<DataEntryType, DataSetLoader<?>> supportedTypes){
+		this.supportedTypes = supportedTypes;
+		return this;
 	}
 
 	/**
@@ -115,9 +123,9 @@ public class DataSetBuilder<E extends DataEntry> {
 	 * @param type data entry type (used as key)
 	 * @param ds the data set as map value
 	 */
-	public void putLinkMap(DataEntryType<?,?> type, DataSet<?> ds){
+	public void putLinkMap(DataEntryType type, DataSet<?> ds){
 		if(ds!=null){
-			this.linkMap.put(type, ds);
+			this.loadedTypes.put(type, ds);
 		}
 	}
 
@@ -126,8 +134,8 @@ public class DataSetBuilder<E extends DataEntry> {
 	 * @param type key to test for
 	 * @return true if the key exists, false otherwise
 	 */
-	public boolean linkMapContainsKey(DataEntryType<?,?> type){
-		return this.linkMap.containsKey(type);
+	public boolean linkMapContainsKey(DataEntryType type){
+		return this.loadedTypes.containsKey(type);
 	}
 
 	/**
@@ -136,7 +144,7 @@ public class DataSetBuilder<E extends DataEntry> {
 	 * @param entryType the data entry type
 	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
 	 */
-	public DataSet<E> build(DataEntryType<E,?> entryType){
+	public DataSet<E> build(DataEntryType entryType){
 		return this.build(entryType, null);
 	}
 
@@ -147,7 +155,7 @@ public class DataSetBuilder<E extends DataEntry> {
 	 * @param excluded a set of characters excluded from translations, null or empty if not applicable
 	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
 	 */
-	public DataSet<E> build(DataEntryType<E, ?> entryType, String[] excluded){
+	public DataSet<E> build(DataEntryType entryType, String[] excluded){
 		IOFileFilter fileFilter = new WildcardFileFilter(new String[]{
 				"*." + entryType.getInputFileExtension() + ".json"
 		});
@@ -157,13 +165,13 @@ public class DataSetBuilder<E extends DataEntry> {
 			return null;
 		}
 
-		DataSet<E> ds = new DataSet<>(entryType.getTypeClass());
+		@SuppressWarnings("unchecked")
+		DataSet<E> ds = (DataSet<E>) this.supportedTypes.get(entryType).newSetInstance();
 		ds.keySeparator = this.keySeparator;
 		ds.appName = this.appName;
 		ds.excluded = excluded;
 		ds.translator = this.translator;
-		ds.linkMap.putAll(this.linkMap);
-
+		ds.loadedTypes.putAll(this.loadedTypes);
 		FileSourceList fsl = dl.load();
 		ds.load(fsl.getSource(), entryType.getInputFileExtension());
 
@@ -174,14 +182,8 @@ public class DataSetBuilder<E extends DataEntry> {
 	 * Returns the builder's link map
 	 * @return link map
 	 */
-	public Map<DataEntryType<?,?>, DataSet<?>> getLinkMap(){
-		return this.linkMap;
+	public LoadedTypeMap getLoadedTypes(){
+		return this.loadedTypes;
 	}
 
-	/**
-	 * Clears the link map, removes all entries.
-	 */
-	public void cleanLinkMap(){
-		this.linkMap.clear();
-	}
 }

@@ -16,17 +16,12 @@
 package de.vandermeer.skb.datatool.entries.affiliations;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntryLoader;
-import de.vandermeer.skb.datatool.entries.geo.cities.CityEntryLoader;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
- * Loader and type definition for the affiliations.
+ * Loader for affiliations.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
@@ -34,21 +29,8 @@ import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
  */
 public class AffiliationEntryLoader extends AbstractDataSetLoader<AffiliationEntry> {
 
-	/** Affiliation entry type. */
-	public static DataEntryType<AffiliationEntry, AffiliationEntryLoader> ENTRY_TYPE =
-			new AbstractDataEntryType<>(
-					"affiliations", "aff", AffiliationEntry.class, AffiliationEntryLoader.class,
-					new DataEntryType[]{
-						AcronymEntryLoader.ENTRY_TYPE,
-						AffiliationtypeEntryLoader.ENTRY_TYPE,
-						CityEntryLoader.ENTRY_TYPE
-					}
-			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN, "de/vandermeer/skb/datatool/affiliations/targets/text-plain.stg"))
-	;
-
 	@Override
-	public void load() throws InstantiationException, IllegalAccessException {
+	public void load() {
 		super.load();
 		DataSet<AffiliationEntry> ds = this.getDataSetBuilder().build(this.getDataEntryType());
 		if(ds==null){
@@ -60,7 +42,12 @@ public class AffiliationEntryLoader extends AbstractDataSetLoader<AffiliationEnt
 	}
 
 	@Override
-	public DataEntryType<AffiliationEntry, AffiliationEntryLoader> getDataEntryType() {
-		return ENTRY_TYPE;
+	public DataEntryType getDataEntryType() {
+		return AffiliationEntry.ENTRY_TYPE;
+	}
+
+	@Override
+	public DataSet<AffiliationEntry> newSetInstance() {
+		return new DataSet<>(AffiliationEntry.class);
 	}
 }

@@ -16,16 +16,12 @@
 package de.vandermeer.skb.datatool.entries.geo.countries;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntryLoader;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
- * Loader and type definition for the countries.
+ * Loader for countries.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
@@ -33,19 +29,8 @@ import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
  */
 public class CountryEntryLoader extends AbstractDataSetLoader<CountryEntry> {
 
-	/** Country entry type. */
-	public static DataEntryType<CountryEntry, CountryEntryLoader> ENTRY_TYPE =
-			new AbstractDataEntryType<>(
-					"countries", "country", CountryEntry.class, CountryEntryLoader.class,
-					new DataEntryType[]{
-						ContinentEntryLoader.ENTRY_TYPE,
-					}
-			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/countries/targets/html-table.stg"))
-	;
-
 	@Override
-	public void load() throws InstantiationException, IllegalAccessException {
+	public void load() {
 		super.load();
 		DataSet<CountryEntry> ds = this.getDataSetBuilder().build(this.getDataEntryType());
 		if(ds==null){
@@ -57,8 +42,12 @@ public class CountryEntryLoader extends AbstractDataSetLoader<CountryEntry> {
 	}
 
 	@Override
-	public DataEntryType<CountryEntry, CountryEntryLoader> getDataEntryType() {
-		return ENTRY_TYPE;
+	public DataEntryType getDataEntryType() {
+		return CountryEntry.ENTRY_TYPE;
 	}
 
+	@Override
+	public DataSet<CountryEntry> newSetInstance() {
+		return new DataSet<>(CountryEntry.class);
+	}
 }

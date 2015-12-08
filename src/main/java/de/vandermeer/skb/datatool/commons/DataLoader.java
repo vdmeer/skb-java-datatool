@@ -93,14 +93,6 @@ public interface DataLoader {
 		if(key.getType().equals(Integer.class) && data instanceof Integer){
 			return data;
 		}
-
-//		if(ClassUtils.isAssignable(key.getType(), EntryObject.class)){
-//			EntryObject eo = (EntryObject)key.getType().newInstance();
-//			if(data instanceof Map){
-//				eo.loadObject(new AbstractDataLoader(this.keyStart, keySeparator, (Map<String, Object>)data, null, linkMap));
-//			}
-//			return eo;
-//		}
 		return null;
 	}
 
@@ -122,8 +114,8 @@ public interface DataLoader {
 		}
 
 		String uriReq = uri.getScheme() + "://" + uri.getAuthority();
-		DataEntryType<?,?> type = null;
-		for(DataEntryType<?, ?> det : this.getLinkMap().keySet()){
+		DataEntryType type = null;
+		for(DataEntryType det : this.getLoadedTypes().keySet()){
 			if(uriReq.equals(det.getLinkUri())){
 				type = det;
 				break;
@@ -134,7 +126,7 @@ public interface DataLoader {
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> map = (Map<String, Object>) this.getLinkMap().get(type).getMap();
+		Map<String, Object> map = (Map<String, Object>) this.getLoadedTypes().getTypeMap(type);
 		if(map==null){
 			throw new IllegalArgumentException("no entry for type <" + type.getType() + "> in link map");
 		}
@@ -179,7 +171,7 @@ public interface DataLoader {
 	 * Returns the link map of the loader
 	 * @return link map
 	 */
-	Map<DataEntryType<?,?>, DataSet<?>> getLinkMap();
+	LoadedTypeMap getLoadedTypes();
 
 	/**
 	 * Returns the entry map of the loader

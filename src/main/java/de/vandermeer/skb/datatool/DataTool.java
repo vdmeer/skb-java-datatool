@@ -16,8 +16,6 @@
 package de.vandermeer.skb.datatool;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -39,14 +37,24 @@ import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
 import de.vandermeer.skb.datatool.commons.DataSetLoader;
+import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
+import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntry;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntryLoader;
+import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntry;
 import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntryLoader;
+import de.vandermeer.skb.datatool.entries.affiliations.AffiliationtypeEntry;
 import de.vandermeer.skb.datatool.entries.affiliations.AffiliationtypeEntryLoader;
+import de.vandermeer.skb.datatool.entries.encodings.EncodingEntry;
 import de.vandermeer.skb.datatool.entries.encodings.EncodingEntryLoader;
+import de.vandermeer.skb.datatool.entries.encodings.Htmlentry;
 import de.vandermeer.skb.datatool.entries.encodings.HtmlentryLoader;
+import de.vandermeer.skb.datatool.entries.geo.cities.CityEntry;
 import de.vandermeer.skb.datatool.entries.geo.cities.CityEntryLoader;
+import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntry;
 import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntryLoader;
+import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntry;
 import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntryLoader;
+import de.vandermeer.skb.datatool.entries.people.PeopleEntry;
 import de.vandermeer.skb.datatool.entries.people.PeopleEntryLoader;
 import de.vandermeer.skb.datatool.target.DataTarget;
 
@@ -95,8 +103,8 @@ public class DataTool implements ExecS_Application {
 	/** Flag for verbose mode, true means on, false means off. */
 	boolean verbose;
 
-	/** Set of supported entry types. */
-	final Set<DataEntryType<?, ?>> entryTypes;
+	/** Map of supported entry types. */
+	final TypeLoaderMap tlMap;
 
 	/**
 	 * Returns a new integrated tool.
@@ -113,20 +121,20 @@ public class DataTool implements ExecS_Application {
 		this.cli.addOption(this.optionVerbose);
 		this.cli.addOption(this.optionKeySep);
 
-		this.entryTypes = new HashSet<>();
-		this.entryTypes.add(AcronymEntryLoader.ENTRY_TYPE);
-		this.entryTypes.add(AffiliationtypeEntryLoader.ENTRY_TYPE);
-		this.entryTypes.add(AffiliationEntryLoader.ENTRY_TYPE);
-		this.entryTypes.add(CityEntryLoader.ENTRY_TYPE);
-		this.entryTypes.add(CountryEntryLoader.ENTRY_TYPE);
-		this.entryTypes.add(ContinentEntryLoader.ENTRY_TYPE);
-		this.entryTypes.add(EncodingEntryLoader.ENTRY_TYPE);
-		this.entryTypes.add(HtmlentryLoader.ENTRY_TYPE);
-		this.entryTypes.add(PeopleEntryLoader.ENTRY_TYPE);
+		this.tlMap = new TypeLoaderMap();
+		this.tlMap.put(new AcronymEntryLoader());
+		this.tlMap.put(new AffiliationtypeEntryLoader());
+		this.tlMap.put(new AffiliationEntryLoader());
+		this.tlMap.put(new CityEntryLoader());
+		this.tlMap.put(new CountryEntryLoader());
+		this.tlMap.put(new ContinentEntryLoader());
+		this.tlMap.put(new EncodingEntryLoader());
+		this.tlMap.put(new HtmlentryLoader());
+		this.tlMap.put(new PeopleEntryLoader());
 
-		this.optionType = new AO_DataEntryType(this.entryTypes);
+		this.optionType = new AO_DataEntryType(this.tlMap);
 		this.cli.addOption(this.optionType);
-		this.optionTarget = new AO_DataTarget(false, this.entryTypes);
+		this.optionTarget = new AO_DataTarget(false, this.tlMap);
 		this.cli.addOption(this.optionTarget);
 	}
 
@@ -148,8 +156,8 @@ public class DataTool implements ExecS_Application {
 			return -1;
 		}
 
-		DataEntryType<?,?> type = null;
-		for(DataEntryType<?,?> sdet : this.entryTypes){
+		DataEntryType type = null;
+		for(DataEntryType sdet : this.tlMap.getMap().keySet()){
 			if(sdet.getType().equals(typeCli)){
 				type = sdet;
 				break;
@@ -216,16 +224,10 @@ public class DataTool implements ExecS_Application {
 			}
 		}
 
-		DataSetLoader<?> dsl = null;
-		try {
-			dsl = type.getLoaderClass().newInstance();
-			dsl.setInitial(this.getAppName(), this.optionKeySep.getValue(), this.optionDirIn.getValue(), target, verbose);
-			dsl.load();
-		}
-		catch (InstantiationException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		DataSetLoader<?> dsl = this.tlMap.getLoader(type);
+		dsl.setInitial(this.getAppName(), this.optionKeySep.getValue(), this.optionDirIn.getValue(), target, this.verbose, this.tlMap.getMap());
+		dsl.load();
+
 		DataSet<?> entries1 = dsl.getMainDataSet();
 		DataSet<?> entries2 = dsl.getDataSet2();
 

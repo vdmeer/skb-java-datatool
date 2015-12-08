@@ -21,13 +21,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
+import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataLoader;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.entries.geo.GeoConstants;
 import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntry;
+import de.vandermeer.skb.datatool.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A data entry for countries.
@@ -37,6 +41,17 @@ import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntry;
  * @since      v0.0.1
  */
 public class CountryEntry implements DataEntry {
+
+	/** Country entry type. */
+	public static DataEntryType ENTRY_TYPE =
+			new AbstractDataEntryType(
+					"countries", "country",
+					new DataEntryType[]{
+						ContinentEntry.ENTRY_TYPE
+					}
+			)
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/countries/targets/html-table.stg"))
+	;
 
 	/** Country schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(

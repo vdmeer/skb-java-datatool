@@ -15,6 +15,8 @@
 
 package de.vandermeer.skb.datatool.commons;
 
+import java.util.Map;
+
 import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.datatool.target.DataTarget;
 
@@ -40,7 +42,7 @@ public abstract class AbstractDataSetLoader<E extends DataEntry> implements Data
 	private DataTarget target;
 
 	@Override
-	public void setInitial(String appName, char keySep, String inputDir, DataTarget target, boolean verbose) {
+	public void setInitial(String appName, char keySep, String inputDir, DataTarget target, boolean verbose, Map<DataEntryType, DataSetLoader<?>> supportedTypes) {
 		if(appName==null){
 			throw new IllegalArgumentException("appName is null");
 		}
@@ -55,7 +57,10 @@ public abstract class AbstractDataSetLoader<E extends DataEntry> implements Data
 			.setAppName(appName)
 			.setKeySeparator(keySep)
 			.setDirectory(inputDir)
+			.setSupportedTypes(supportedTypes)
 		;
+
+//		this.supportedTypes = supportedTypes;
 
 		if(target!=null){
 			this.dsb.setTranslator(TranslatorFactory.getTranslator(target.getDefinition().getTranslationTarget()));
@@ -68,8 +73,8 @@ public abstract class AbstractDataSetLoader<E extends DataEntry> implements Data
 		if(originalLoader==null){
 			throw new IllegalArgumentException("originalLoader is null");
 		}
-		this.setInitial(originalLoader.getAppName(), originalLoader.getDataSetBuilder().keySeparator, originalLoader.getDataSetBuilder().directory, originalLoader.getTarget(), originalLoader.getVerboseFlag());
-		this.dsb.linkMap = originalLoader.getDataSetBuilder().linkMap;
+		this.setInitial(originalLoader.getAppName(), originalLoader.getDataSetBuilder().keySeparator, originalLoader.getDataSetBuilder().directory, originalLoader.getTarget(), originalLoader.getVerboseFlag(), originalLoader.getDataSetBuilder().supportedTypes);
+		this.dsb.loadedTypes = originalLoader.getDataSetBuilder().loadedTypes;
 	}
 
 	@Override

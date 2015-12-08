@@ -21,13 +21,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
+import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataLoader;
 import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntry;
 import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntry;
 import de.vandermeer.skb.datatool.entries.affiliations.object.ObjectAffiliations;
+import de.vandermeer.skb.datatool.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A single people entry.
@@ -37,6 +42,18 @@ import de.vandermeer.skb.datatool.entries.affiliations.object.ObjectAffiliations
  * @since      v0.0.1
  */
 public class PeopleEntry implements DataEntry {
+
+	/** People entry type. */
+	public static DataEntryType ENTRY_TYPE =
+			new AbstractDataEntryType(
+					"people", "people",
+					new DataEntryType[]{
+						AcronymEntry.ENTRY_TYPE
+					}
+			)
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/people/targets/html-table.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN, "de/vandermeer/skb/datatool/people/targets/text-plain.stg"))
+	;
 
 	/** People schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(

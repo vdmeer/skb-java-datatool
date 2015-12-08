@@ -16,15 +16,12 @@
 package de.vandermeer.skb.datatool.entries.encodings;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
- * Loader and type definition for the encodings.
+ * Loader for encodings.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
@@ -32,21 +29,8 @@ import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
  */
 public class EncodingEntryLoader extends AbstractDataSetLoader<EncodingEntry> {
 
-	/** Encoding entry type. */
-	public static DataEntryType<EncodingEntry, EncodingEntryLoader> ENTRY_TYPE =
-			new AbstractDataEntryType<>(
-					"encodings", "cmap", EncodingEntry.class, EncodingEntryLoader.class,
-					new DataEntryType[]{
-						HtmlentryLoader.ENTRY_TYPE
-					}
-			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_T2L, "de/vandermeer/skb/datatool/encodings/targets/java-skb-t2l.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_H2L, "de/vandermeer/skb/datatool/encodings/targets/java-skb-h2l.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_T2H, "de/vandermeer/skb/datatool/encodings/targets/java-skb-t2h.stg"))
-	;
-
 	@Override
-	public void load() throws InstantiationException, IllegalAccessException {
+	public void load() {
 		super.load();
 		DataSet<EncodingEntry> ds = this.getDataSetBuilder().build(this.getDataEntryType(), this.getTarget().getDefinition().getExcluded());
 		if(ds==null){
@@ -58,12 +42,17 @@ public class EncodingEntryLoader extends AbstractDataSetLoader<EncodingEntry> {
 	}
 
 	@Override
-	public DataEntryType<EncodingEntry, EncodingEntryLoader> getDataEntryType() {
-		return ENTRY_TYPE;
+	public DataEntryType getDataEntryType() {
+		return EncodingEntry.ENTRY_TYPE;
 	}
 
 	@Override
 	public DataSet<?> getDataSet2(){
-		return (DataSet<?>) this.getDataSetBuilder().getLinkMap().get(HtmlentryLoader.ENTRY_TYPE);
+		return (DataSet<?>) this.getDataSetBuilder().getLoadedTypes().get(Htmlentry.ENTRY_TYPE);
+	}
+
+	@Override
+	public DataSet<EncodingEntry> newSetInstance() {
+		return new DataSet<>(EncodingEntry.class);
 	}
 }

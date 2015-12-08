@@ -16,16 +16,12 @@
 package de.vandermeer.skb.datatool.entries.geo.cities;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntryLoader;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
- * Loader and type definition for the cities.
+ * Loader for cities.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
@@ -33,19 +29,8 @@ import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
  */
 public class CityEntryLoader extends AbstractDataSetLoader<CityEntry> {
 
-	/** City entry type. */
-	public static DataEntryType<CityEntry, CityEntryLoader> ENTRY_TYPE =
-			new AbstractDataEntryType<>(
-					"cities", "city", CityEntry.class, CityEntryLoader.class,
-					new DataEntryType[]{
-						CountryEntryLoader.ENTRY_TYPE,
-					}
-			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/cities/targets/html-table.st"))
-	;
-
 	@Override
-	public void load() throws InstantiationException, IllegalAccessException {
+	public void load() {
 		super.load();
 		DataSet<CityEntry> ds = this.getDataSetBuilder().build(this.getDataEntryType());
 		if(ds==null){
@@ -57,8 +42,12 @@ public class CityEntryLoader extends AbstractDataSetLoader<CityEntry> {
 	}
 
 	@Override
-	public DataEntryType<CityEntry, CityEntryLoader> getDataEntryType() {
-		return ENTRY_TYPE;
+	public DataEntryType getDataEntryType() {
+		return CityEntry.ENTRY_TYPE;
 	}
 
+	@Override
+	public DataSet<CityEntry> newSetInstance() {
+		return new DataSet<>(CityEntry.class);
+	}
 }

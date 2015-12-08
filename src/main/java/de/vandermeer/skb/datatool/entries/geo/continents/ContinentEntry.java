@@ -21,12 +21,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
+import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataLoader;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.entries.geo.GeoConstants;
+import de.vandermeer.skb.datatool.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A data entry for continents.
@@ -36,6 +40,14 @@ import de.vandermeer.skb.datatool.entries.geo.GeoConstants;
  * @since      v0.0.1
  */
 public class ContinentEntry implements DataEntry {
+
+	/** Continent entry type. */
+	public static DataEntryType ENTRY_TYPE =
+			new AbstractDataEntryType(
+					"continents", "cont"
+			)
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/continents/targets/html-table.stg"))
+	;
 
 	/** Continent schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(

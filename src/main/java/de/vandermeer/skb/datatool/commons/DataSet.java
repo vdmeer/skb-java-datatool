@@ -55,7 +55,7 @@ public class DataSet<E extends DataEntry> {
 	Class<E> clazz;
 
 	/** Map of data entries that entries of this set can link to. */
-	final Map<DataEntryType<?,?>, DataSet<?>> linkMap;
+	LoadedTypeMap loadedTypes;
 
 	/** Separator character for auto-generated keys. */
 	char keySeparator;
@@ -72,11 +72,11 @@ public class DataSet<E extends DataEntry> {
 	/**
 	 * Returns a new, empty data set.
 	 */
-	DataSet(Class<E> clazz){
+	public DataSet(Class<E> clazz){
 		this.entries = new HashMap<>();
 		this.files = 0;
 		this.clazz = clazz;
-		this.linkMap = new HashMap<>();
+		this.loadedTypes = new LoadedTypeMap();
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class DataSet<E extends DataEntry> {
 			try{
 				List<Map<String, Object>> jsonList = om.readValue(fs.asFile(), new TypeReference<ArrayList<HashMap<String, Object>>>(){});
 				for(Map<String, Object> entryMap : jsonList){
-					AbstractDataLoader dl = new AbstractDataLoader(keyStart, keySeparator, entryMap, translator, linkMap);
+					AbstractDataLoader dl = new AbstractDataLoader(keyStart, keySeparator, entryMap, translator, loadedTypes);
 					E entry = this.clazz.newInstance();
 					entry.load(dl);
 					if(entry.getKey().contains("#dummy")){

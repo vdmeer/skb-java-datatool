@@ -21,11 +21,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
+import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataLoader;
 import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A single affiliation type entry.
@@ -35,6 +39,14 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
  * @since      v0.0.1
  */
 public class AffiliationtypeEntry implements DataEntry {
+
+	/** Affiliation types entry type. */
+	public static DataEntryType ENTRY_TYPE =
+			new AbstractDataEntryType(
+					"affiliation-types", "aff-types"
+			)
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/affiliation-types/targets/html-table.stg"))
+	;
 
 	/** Affiliation types schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(

@@ -15,6 +15,8 @@
 
 package de.vandermeer.skb.datatool.commons;
 
+import java.util.Map;
+
 import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.target.DataTarget;
 
@@ -34,8 +36,9 @@ public interface DataSetLoader<E extends DataEntry> {
 	 * @param inputDir the input directory
 	 * @param target the target
 	 * @param verbose flag for verbose mode
+	 * @param supportedTypes types supported by the calling object
 	 */
-	void setInitial(String appName, char keySep, String inputDir, DataTarget target, boolean verbose);
+	void setInitial(String appName, char keySep, String inputDir, DataTarget target, boolean verbose, Map<DataEntryType, DataSetLoader<?>> supportedTypes);
 
 	/**
 	 * Sets the loader for loading required entries.
@@ -71,20 +74,23 @@ public interface DataSetLoader<E extends DataEntry> {
 	 * Returns the specific data entry type for the loader.
 	 * @return data entry type
 	 */
-	DataEntryType<?,?> getDataEntryType();
+	DataEntryType getDataEntryType();
 
 	/**
 	 * Loads a set of data entries.
-	 * @throws IllegalAccessException if loading the type specific data set loader fails (wrong class as loader class in entry type)
-	 * @throws InstantiationException if loading the type specific data set loader fails (wrong class as loader class in entry type)
 	 */
-	default void load() throws InstantiationException, IllegalAccessException {
+	default void load() {
 		if(this.getDataEntryType().getRequiredTypes()!=null){
-			for(DataEntryType<?,?> et : this.getDataEntryType().getRequiredTypes()){
-				DataSetLoader<?> dsl = (DataSetLoader<?>)et.getLoaderClass().newInstance();
-				dsl.setAsRequired(this);
-				if(!this.getDataSetBuilder().linkMapContainsKey(dsl.getDataEntryType())){
-					dsl.load();
+			for(DataEntryType dt : this.getDataEntryType().getRequiredTypes()){
+				DataSetLoader<?> dsl = this.getDataSetBuilder().supportedTypes.get(dt);
+				if(dsl==null){
+					Skb_Console.conError("{}: loading type <{}> requires <{}>, which is not supported in system", new Object[]{this.getAppName(), this.getDataEntryType().getType(), dt.getType()});
+				}
+				else{
+					dsl.setAsRequired(this);
+					if(!this.getDataSetBuilder().linkMapContainsKey(dsl.getDataEntryType())){
+						dsl.load();
+					}
 				}
 			}
 		}
@@ -95,7 +101,7 @@ public interface DataSetLoader<E extends DataEntry> {
 	 */
 	default void writeStats(){
 		if(this.getVerboseFlag()==true){
-			Skb_Console.conInfo("{}: parsed <{}> " + this.getDataEntryType().getType() + " from <{}> files", new Object[]{this.getAppName(), this.getDataSetBuilder().getLinkMap().get(this.getDataEntryType()).getEntries().size(), this.getDataSetBuilder().getLinkMap().get(this.getDataEntryType()).getFileNumber()});
+			Skb_Console.conInfo("{}: parsed <{}> {} from <{}> files", new Object[]{this.getAppName(), this.getDataSetBuilder().getLoadedTypes().getTypeEntrySize(this.getDataEntryType()), this.getDataEntryType().getType(), this.getDataSetBuilder().getLoadedTypes().get(this.getDataEntryType()).getFileNumber()});
 		}
 	}
 
@@ -104,7 +110,7 @@ public interface DataSetLoader<E extends DataEntry> {
 	 * @return main data set
 	 */
 	default DataSet<?> getMainDataSet(){
-		return this.getDataSetBuilder().getLinkMap().get(this.getDataEntryType());
+		return this.getDataSetBuilder().getLoadedTypes().get(this.getDataEntryType());
 	}
 
 	/**
@@ -114,4 +120,10 @@ public interface DataSetLoader<E extends DataEntry> {
 	default DataSet<?> getDataSet2(){
 		return null;
 	}
+
+	/**
+	 * Returns a new instance of the data entry type the loader supports.
+	 * @return new instance
+	 */
+	DataSet<E> newSetInstance();
 }

@@ -27,7 +27,7 @@ import de.vandermeer.skb.datatool.target.DataTarget;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
  * @since      v0.0.1
  */
-public class AbstractDataEntryType<E extends DataEntry, L extends DataSetLoader<E>> implements DataEntryType<E, L> {
+public class AbstractDataEntryType implements DataEntryType {
 
 	/** Name of the type .*/
 	String type;
@@ -35,17 +35,11 @@ public class AbstractDataEntryType<E extends DataEntry, L extends DataSetLoader<
 	/** File extension for the type, without ".json" .*/
 	String inputFileExtension;
 
-	/** The supported class of the type. */
-	Class<E> typeClass;
-
 	/** An SKB link that can be used to point to this entry type. */
 	String skbLink;
 
-	/** The loader class of the type. */
-	Class<L> loaderClass;
-
-	/** Array of entry types required to be loaded to process all entries (and links) of this type. */
-	DataEntryType<?, ?>[] requiredTypes;
+	/** Map of entry types required to be loaded to process all entries (and links) of this type. */
+	DataEntryType[] requiredTypes;
 
 	/** The supported targets. */
 	Map<String, DataTarget> targets;
@@ -54,26 +48,20 @@ public class AbstractDataEntryType<E extends DataEntry, L extends DataSetLoader<
 	 * Returns a new data entry type
 	 * @param type the type (name)
 	 * @param inputFileExtension the supported file extension
-	 * @param typeClass the class for the type
-	 * @param loaderClass the class for the loader
 	 */
-	public AbstractDataEntryType(String type, String inputFileExtension, Class<E> typeClass, Class<L> loaderClass) {
-		this(type, inputFileExtension, typeClass, loaderClass, new DataEntryType[0]);
+	public AbstractDataEntryType(String type, String inputFileExtension) {
+		this(type, inputFileExtension, new DataEntryType[0]);
 	}
 
 	/**
 	 * Returns a new data entry type
 	 * @param type the type (name)
 	 * @param inputFileExtension the supported file extension
-	 * @param typeClass the class for the type
-	 * @param loaderClass the class for the loader
 	 * @param requiredTypes set of entry types this type requires to be loaded to dereference SKB links
 	 */
-	public AbstractDataEntryType(String type, String inputFileExtension, Class<E> typeClass, Class<L> loaderClass, DataEntryType<?,?>[] requiredTypes) {
+	public AbstractDataEntryType(String type, String inputFileExtension, DataEntryType[] requiredTypes) {
 		this.type = type;
 		this.inputFileExtension = inputFileExtension;
-		this.typeClass = typeClass;
-		this.loaderClass = loaderClass;
 		this.requiredTypes = requiredTypes;
 		this.targets = new HashMap<>();
 	}
@@ -89,17 +77,7 @@ public class AbstractDataEntryType<E extends DataEntry, L extends DataSetLoader<
 	}
 
 	@Override
-	public Class<E> getTypeClass() {
-		return this.typeClass;
-	}
-
-	@Override
-	public Class<L> getLoaderClass() {
-		return this.loaderClass;
-	}
-
-	@Override
-	public DataEntryType<?, ?>[] getRequiredTypes() {
+	public DataEntryType[] getRequiredTypes() {
 		return this.requiredTypes;
 	}
 
@@ -108,7 +86,7 @@ public class AbstractDataEntryType<E extends DataEntry, L extends DataSetLoader<
 		return this.targets;
 	}
 
-	public AbstractDataEntryType<E, L> addTarget(DataTarget target){
+	public AbstractDataEntryType addTarget(DataTarget target){
 		this.targets.put(target.getDefinition().getTargetName(), target);
 		return this;
 	}

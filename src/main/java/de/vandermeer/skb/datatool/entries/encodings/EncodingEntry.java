@@ -23,12 +23,16 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
+import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataLoader;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.entries.EntryConstants;
+import de.vandermeer.skb.datatool.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A single encoding entry.
@@ -38,6 +42,19 @@ import de.vandermeer.skb.datatool.entries.EntryConstants;
  * @since      v0.0.1
  */
 public class EncodingEntry implements DataEntry {
+
+	/** Encoding entry type. */
+	public static DataEntryType ENTRY_TYPE =
+			new AbstractDataEntryType(
+					"encodings", "cmap",
+					new DataEntryType[]{
+						Htmlentry.ENTRY_TYPE
+					}
+			)
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_T2L, "de/vandermeer/skb/datatool/encodings/targets/java-skb-t2l.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_H2L, "de/vandermeer/skb/datatool/encodings/targets/java-skb-h2l.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_T2H, "de/vandermeer/skb/datatool/encodings/targets/java-skb-t2h.stg"))
+	;
 
 	/** Encoding schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(

@@ -17,5 +17,5 @@
  * build
  */
 build(entry) ::= <<
-<entry:{a | <a.key> - <a.name> - <a.shortName><if(a.geo.cityExp)> - <a.geo.cityExp><endif><if(a.geo.countryExp)> - <a.geo.countryExp><endif>}; separator="\n">
+<entry:{a | <a.key> - <a.name> - <a.shortName><if(a.geo.cityName)> - <a.geo.cityName><endif><if(a.geo.countryExp)> - <a.geo.countryExp><endif>}; separator="\n">
 >>

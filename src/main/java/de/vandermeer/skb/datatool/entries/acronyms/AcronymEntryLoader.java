@@ -16,15 +16,12 @@
 package de.vandermeer.skb.datatool.entries.acronyms;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
- * Loader and type definition for the acronyms.
+ * Loader for acronyms.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
@@ -32,20 +29,8 @@ import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
  */
 public class AcronymEntryLoader extends AbstractDataSetLoader<AcronymEntry> {
 
-	/** Acronym entry type. */
-	public static DataEntryType<AcronymEntry, AcronymEntryLoader> ENTRY_TYPE =
-			new AbstractDataEntryType<>(
-				"acronyms", "acr", AcronymEntry.class, AcronymEntryLoader.class
-			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.LATEX_TABLE, "de/vandermeer/skb/datatool/acronyms/targets/latex-table.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.LATEX_ACRONYMS, "de/vandermeer/skb/datatool/acronyms/targets/latex-acronym.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/acronyms/targets/html-table.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.SQL_SIMPLE, "de/vandermeer/skb/datatool/acronyms/targets/sql-simple.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN, "de/vandermeer/skb/datatool/acronyms/targets/text-plain.stg"))
-	;
-
 	@Override
-	public void load() throws InstantiationException, IllegalAccessException {
+	public void load() {
 		super.load();
 		DataSet<AcronymEntry> ds = this.getDataSetBuilder().build(this.getDataEntryType());
 		if(ds==null){
@@ -58,8 +43,13 @@ public class AcronymEntryLoader extends AbstractDataSetLoader<AcronymEntry> {
 	}
 
 	@Override
-	public DataEntryType<AcronymEntry, AcronymEntryLoader> getDataEntryType() {
-		return ENTRY_TYPE;
+	public DataEntryType getDataEntryType() {
+		return AcronymEntry.ENTRY_TYPE;
+	}
+
+	@Override
+	public DataSet<AcronymEntry> newSetInstance() {
+		return new DataSet<>(AcronymEntry.class);
 	}
 
 }

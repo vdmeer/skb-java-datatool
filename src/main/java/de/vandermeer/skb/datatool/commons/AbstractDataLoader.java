@@ -45,7 +45,7 @@ public class AbstractDataLoader implements DataLoader {
 	private Translator translator;
 
 	/** A map of other entries the loader might use for further load operations. */
-	private Map<DataEntryType<?,?>, DataSet<?>> linkMap;
+	LoadedTypeMap loadedTypes;
 
 	/**
 	 * Returns a new data loader.
@@ -75,11 +75,11 @@ public class AbstractDataLoader implements DataLoader {
 	 * @param keyStart the string preceding a key
 	 * @param keySeparator the character used to separate key elements
 	 * @param entryMap a map with key/value pairs to read data from
-	 * @param linkMap a map of other Data Entries (null if none required)
+	 * @param loadedTypes a map of other Data Entries (null if none required)
 	 * @throws IllegalArgumentException if any of the input arguments are illegal
 	 */
-	public AbstractDataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, Map<DataEntryType<?,?>, DataSet<?>> linkMap){
-		this(keyStart, keySeparator, entryMap, null, linkMap);
+	public AbstractDataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, LoadedTypeMap loadedTypes){
+		this(keyStart, keySeparator, entryMap, null, loadedTypes);
 	}
 
 	/**
@@ -88,10 +88,10 @@ public class AbstractDataLoader implements DataLoader {
 	 * @param keySeparator the character used to separate key elements
 	 * @param entryMap a map with key/value pairs to read data from
 	 * @param translator a character encoding and/or string translator (null if none required)
-	 * @param linkMap a map of other Data Entries (null if none required)
+	 * @param loadedTypes a map of other Data Entries (null if none required)
 	 * @throws IllegalArgumentException if any of the input arguments are illegal
 	 */
-	public AbstractDataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, Translator translator, Map<DataEntryType<?,?>, DataSet<?>> linkMap){
+	public AbstractDataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, Translator translator, LoadedTypeMap loadedTypes){
 		if(keyStart==null){
 			throw new IllegalArgumentException("no keyStart given");
 		}
@@ -107,7 +107,7 @@ public class AbstractDataLoader implements DataLoader {
 		}
 
 		this.translator = translator;
-		this.linkMap = linkMap;
+		this.loadedTypes = loadedTypes;
 	}
 
 	/**
@@ -130,24 +130,10 @@ public class AbstractDataLoader implements DataLoader {
 			return null;
 		}
 		Object data = this.entryMap.get(key.getKey());
-//		if(key.getSkbUri()!=null && data instanceof String){
-//			return this.loadLink((String)data);
-//		}
-//
-//		if(key.getType().equals(String.class) && data instanceof String){
-//			if(key.useTranslator()==true && this.translator!=null){
-//				return this.translator.translate((String)data);
-//			}
-//			return data;
-//		}
-//		if(key.getType().equals(Integer.class) && data instanceof Integer){
-//			return data;
-//		}
-
 		if(ClassUtils.isAssignable(key.getType(), EntryObject.class)){
 			EntryObject eo = (EntryObject)key.getType().newInstance();
 			if(data instanceof Map){
-				eo.loadObject(new AbstractDataLoader(this.keyStart, keySeparator, (Map<String, Object>)data, null, linkMap));
+				eo.loadObject(new AbstractDataLoader(this.keyStart, keySeparator, (Map<String, Object>)data, null, loadedTypes));
 			}
 			return eo;
 		}
@@ -166,8 +152,8 @@ public class AbstractDataLoader implements DataLoader {
 	 * Returns the link map of the loader
 	 * @return link map
 	 */
-	public Map<DataEntryType<?,?>, DataSet<?>> getLinkMap(){
-		return this.linkMap;
+	public LoadedTypeMap getLoadedTypes(){
+		return this.loadedTypes;
 	}
 
 	/**

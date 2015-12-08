@@ -21,13 +21,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
+import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataLoader;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.entries.EntryConstants;
 import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
+import de.vandermeer.skb.datatool.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A single acronym entry.
@@ -37,6 +41,18 @@ import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
  * @since      v0.0.1
  */
 public class AcronymEntry implements DataEntry {
+
+	/** Acronym entry type. */
+	public static DataEntryType ENTRY_TYPE =
+			new AbstractDataEntryType(
+				"acronyms", "acr"
+			)
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.LATEX_TABLE, "de/vandermeer/skb/datatool/acronyms/targets/latex-table.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.LATEX_ACRONYMS, "de/vandermeer/skb/datatool/acronyms/targets/latex-acronym.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/acronyms/targets/html-table.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.SQL_SIMPLE, "de/vandermeer/skb/datatool/acronyms/targets/sql-simple.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN, "de/vandermeer/skb/datatool/acronyms/targets/text-plain.stg"))
+	;
 
 	/** Acronym schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(

@@ -16,16 +16,12 @@
 package de.vandermeer.skb.datatool.entries.people;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntryLoader;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
- * Loader and type definition for the people.
+ * Loader for people.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
@@ -33,20 +29,8 @@ import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
  */
 public class PeopleEntryLoader extends AbstractDataSetLoader<PeopleEntry> {
 
-	/** People entry type. */
-	public static DataEntryType<PeopleEntry, PeopleEntryLoader> ENTRY_TYPE =
-			new AbstractDataEntryType<>(
-					"people", "people", PeopleEntry.class, PeopleEntryLoader.class,
-					new DataEntryType[]{
-						AcronymEntryLoader.ENTRY_TYPE
-					}
-			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/people/targets/html-table.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN, "de/vandermeer/skb/datatool/people/targets/text-plain.stg"))
-	;
-
 	@Override
-	public void load() throws InstantiationException, IllegalAccessException {
+	public void load() {
 		super.load();
 		DataSet<PeopleEntry> ds = this.getDataSetBuilder().build(this.getDataEntryType());
 		if(ds==null){
@@ -58,8 +42,12 @@ public class PeopleEntryLoader extends AbstractDataSetLoader<PeopleEntry> {
 	}
 
 	@Override
-	public DataEntryType<PeopleEntry, PeopleEntryLoader> getDataEntryType() {
-		return ENTRY_TYPE;
+	public DataEntryType getDataEntryType() {
+		return PeopleEntry.ENTRY_TYPE;
 	}
 
+	@Override
+	public DataSet<PeopleEntry> newSetInstance() {
+		return new DataSet<>(PeopleEntry.class);
+	}
 }

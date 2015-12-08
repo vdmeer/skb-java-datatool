@@ -19,7 +19,6 @@ import java.util.Map;
 
 import de.vandermeer.skb.datatool.target.DataTarget;
 
-
 /**
  * A data entry type.
  *
@@ -27,7 +26,7 @@ import de.vandermeer.skb.datatool.target.DataTarget;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public interface DataEntryType<E extends DataEntry, L extends DataSetLoader<E>> {
+public interface DataEntryType {
 
 	/**
 	 * Returns the name of the type
@@ -42,18 +41,6 @@ public interface DataEntryType<E extends DataEntry, L extends DataSetLoader<E>> 
 	String getInputFileExtension();
 
 	/**
-	 * Returns the class used for initialization of a data set with this data entry.
-	 * @return the class
-	 */
-	Class<E> getTypeClass();
-
-	/**
-	 * Returns the type's loader class.
-	 * @return the class for the type
-	 */
-	Class<L> getLoaderClass();
-
-	/**
 	 * Returns an SKB URI for the data entry type.
 	 * @return SKB URI
 	 */
@@ -65,7 +52,7 @@ public interface DataEntryType<E extends DataEntry, L extends DataSetLoader<E>> 
 	 * Returns the types required to be loaded for link expansions.
 	 * @return required types
 	 */
-	DataEntryType<?,?>[] getRequiredTypes();
+	DataEntryType[] getRequiredTypes();
 
 	/**
 	 * Returns the targets supported by this entry type.

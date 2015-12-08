@@ -16,13 +16,12 @@
 package de.vandermeer.skb.datatool.entries.encodings;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
 
 /**
- * Loader and type definition for the HTML entities.
+ * Loader for HTML entities.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
@@ -30,13 +29,8 @@ import de.vandermeer.skb.datatool.commons.DataSet;
  */
 public class HtmlentryLoader extends AbstractDataSetLoader<Htmlentry> {
 
-	/** HTML entity entry type. */
-	public static DataEntryType<Htmlentry, HtmlentryLoader> ENTRY_TYPE = new AbstractDataEntryType<>(
-			"html-entities", "hmap", Htmlentry.class, HtmlentryLoader.class
-	);
-
 	@Override
-	public void load() throws InstantiationException, IllegalAccessException {
+	public void load() {
 		super.load();
 		DataSet<Htmlentry> ds = this.getDataSetBuilder().build(this.getDataEntryType(), this.getTarget().getDefinition().getExcluded());
 		if(ds==null){
@@ -48,8 +42,12 @@ public class HtmlentryLoader extends AbstractDataSetLoader<Htmlentry> {
 	}
 
 	@Override
-	public DataEntryType<Htmlentry, HtmlentryLoader> getDataEntryType() {
-		return ENTRY_TYPE;
+	public DataEntryType getDataEntryType() {
+		return Htmlentry.ENTRY_TYPE;
 	}
 
+	@Override
+	public DataSet<Htmlentry> newSetInstance() {
+		return new DataSet<>(Htmlentry.class);
+	}
 }

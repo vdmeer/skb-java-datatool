@@ -23,9 +23,11 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
+import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
+import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataLoader;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.entries.EntryConstants;
@@ -38,6 +40,11 @@ import de.vandermeer.skb.datatool.entries.EntryConstants;
  * @since      v0.0.1
  */
 public class Htmlentry implements DataEntry {
+
+	/** HTML entity entry type. */
+	public static DataEntryType ENTRY_TYPE = new AbstractDataEntryType(
+			"html-entities", "hmap"
+	);
 
 	/** HTML entity schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(

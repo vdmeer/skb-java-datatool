@@ -16,15 +16,12 @@
 package de.vandermeer.skb.datatool.entries.geo.continents;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
- * Loader and type definition for the continents.
+ * Loader for continents.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
@@ -32,16 +29,8 @@ import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
  */
 public class ContinentEntryLoader extends AbstractDataSetLoader<ContinentEntry> {
 
-	/** Continent entry type. */
-	public static DataEntryType<ContinentEntry, ContinentEntryLoader> ENTRY_TYPE =
-			new AbstractDataEntryType<>(
-					"continents", "cont", ContinentEntry.class, ContinentEntryLoader.class
-			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/continents/targets/html-table.stg"))
-	;
-
 	@Override
-	public void load() throws InstantiationException, IllegalAccessException {
+	public void load() {
 		super.load();
 		DataSet<ContinentEntry> ds = this.getDataSetBuilder().build(this.getDataEntryType());
 		if(ds==null){
@@ -53,8 +42,12 @@ public class ContinentEntryLoader extends AbstractDataSetLoader<ContinentEntry> 
 	}
 
 	@Override
-	public DataEntryType<ContinentEntry, ContinentEntryLoader> getDataEntryType() {
-		return ENTRY_TYPE;
+	public DataEntryType getDataEntryType() {
+		return ContinentEntry.ENTRY_TYPE;
 	}
 
+	@Override
+	public DataSet<ContinentEntry> newSetInstance() {
+		return new DataSet<>(ContinentEntry.class);
+	}
 }
