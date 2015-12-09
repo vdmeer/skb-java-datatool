@@ -23,12 +23,8 @@ build(entry) ::= <<
 	<head></head>
 	<body>
 		<table>
-			$entry:{p | <tr><td>$p.key$</td><td>$p.firstName$</td><td>$p.middleName$</td><td>$p.lastName$</td><td>$affiliations(aff=p.affiliations)$</td></tr>}; separator="\n"$
+			$entry:{p | <tr><td>$p.key$</td><td>$p.firstName$</td><td>$p.middleName$</td><td>$p.lastName$</td></tr>}; separator="\n"$
 		</table>
 	</body>
 </html>
->>
-
-affiliations(aff) ::= <<
-$aff.keys, aff.values :{k,v | $k$ - $v.name$ - $v.shortName$}; separator="<br />"$
 >>

@@ -23,14 +23,15 @@ import java.util.Map;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
-import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
 import de.vandermeer.skb.datatool.entries.geo.GeoConstants;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A data entry for continents.
@@ -80,8 +81,8 @@ public class ContinentEntry implements DataEntry {
 	}
 
 	@Override
-	public void loadEntry(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException {
-		this.entryMap = loader.loadEntry(this.getSchema());
+	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
+		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, cs);
 	}
 
 	@Override

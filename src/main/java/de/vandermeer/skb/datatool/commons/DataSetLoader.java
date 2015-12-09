@@ -15,7 +15,16 @@
 
 package de.vandermeer.skb.datatool.commons;
 
+import java.util.Map;
+
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+
 import de.vandermeer.skb.base.console.Skb_Console;
+import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
+import de.vandermeer.skb.base.info.DirectoryLoader;
+import de.vandermeer.skb.base.info.FileSourceList;
 
 /**
  * A loader for a data set.
@@ -27,22 +36,53 @@ import de.vandermeer.skb.base.console.Skb_Console;
 public interface DataSetLoader<E extends DataEntry> {
 
 	/**
-	 * Sets the loader an initial loader.
-	 * @param cs core arguments for the loader
-	 */
-	void setInitial(CoreSettings cs);
-
-	/**
-	 * Sets the loader for loading required entries.
-	 * @param originalLoader the original loader with all relevant settings
-	 */
-	void setAsRequired(DataSetLoader<?> originalLoader);
-
-	/**
 	 * Returns the core settings.
 	 * @return core settings
 	 */
 	CoreSettings getCs();
+
+	/**
+	 * Sets core settings for the loader.
+	 * @param cs core settings
+	 */
+	void setCs(CoreSettings cs);
+
+	/**
+	 * Sets core settings for the loader.
+	 * @param loader another loader
+	 */
+	default void setCs(DataSetLoader<?> loader){
+		this.setCs(loader.getCs());
+	}
+
+	/**
+	 * Sets loaded types this loader produced or can use.
+	 * @param loadedTypes loaded data entry types
+	 */
+	void setLoadedTypes(LoadedTypeMap loadedTypes);
+
+	/**
+	 * Sets loaded types this loader produced or can use.
+	 * @param loader another loader
+	 */
+	default void setLoadedTypes(DataSetLoader<?> loader){
+		this.setLoadedTypes(loader.getLoadedTypes());
+	}
+
+	/**
+	 * Takes settings from a loader to set local settings.
+	 * @param loader another loader
+	 */
+	default void set(DataSetLoader<?> loader){
+		this.setCs(loader);
+		this.setLoadedTypes(loader);
+	}
+
+	/**
+	 * Returns the loaded types this loader has.
+	 * @return loaded data entry types
+	 */
+	LoadedTypeMap getLoadedTypes();
 
 	/**
 	 * Returns the specific data entry type for the loader.
@@ -52,21 +92,24 @@ public interface DataSetLoader<E extends DataEntry> {
 
 	/**
 	 * Loads a set of data entries.
+	 * @param supportedTypes the entry types that are supported for loading
+	 * @param loadedTypes types that have been already loaded
 	 */
-	default void load() {
+	default void load(Map<DataEntryType, DataSetLoader<?>> supportedTypes, LoadedTypeMap loadedTypes) {
 		if(this.getDataEntryType().getRequiredTypes()!=null){
 			for(DataEntryType dt : this.getDataEntryType().getRequiredTypes()){
-				DataSetLoader<?> dsl = this.getCs().getSupportedTypes().get(dt);
+				DataSetLoader<?> dsl = supportedTypes.get(dt);
 				if(dsl==null){
 					Skb_Console.conError("{}: loading type <{}> requires <{}>, which is not supported in system", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType(), dt.getType()});
 				}
 				else{
-					dsl.setAsRequired(this);
-					if(!this.getCs().getLoadedTypes().containsKey(dsl.getDataEntryType())){
-						dsl.load();
+					dsl.setCs(this);
+					if(!loadedTypes.containsKey(dsl.getDataEntryType())){
+						dsl.load(supportedTypes, loadedTypes);
 					}
 				}
 			}
+			this.setLoadedTypes(loadedTypes);
 		}
 	}
 
@@ -75,7 +118,7 @@ public interface DataSetLoader<E extends DataEntry> {
 	 */
 	default void writeStats(){
 		if(this.getCs().getVerbose()==true){
-			Skb_Console.conInfo("{}: parsed <{}> {} from <{}> files", new Object[]{this.getCs().getAppName(), this.getCs().getLoadedTypes().getTypeEntrySize(this.getDataEntryType()), this.getDataEntryType().getType(), this.getCs().getLoadedTypes().get(this.getDataEntryType()).getFileNumber()});
+			Skb_Console.conInfo("{}: parsed <{}> {} from <{}> files", new Object[]{this.getCs().getAppName(), this.getLoadedTypes().getTypeEntrySize(this.getDataEntryType()), this.getDataEntryType().getType(), getLoadedTypes().get(this.getDataEntryType()).getFileNumber()});
 		}
 	}
 
@@ -84,7 +127,7 @@ public interface DataSetLoader<E extends DataEntry> {
 	 * @return main data set
 	 */
 	default DataSet<?> getMainDataSet(){
-		return this.getCs().getLoadedTypes().get(this.getDataEntryType());
+		return this.getLoadedTypes().get(this.getDataEntryType());
 	}
 
 	/**
@@ -96,14 +139,47 @@ public interface DataSetLoader<E extends DataEntry> {
 	}
 
 	/**
+	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
+	 * The local link map will be cleared.
+	 * @param entryType the data entry type
+	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
+	 */
+	default DataSet<E> loadFiles(DataEntryType entryType){
+		return this.loadFiles(entryType, null);
+	}
+
+	/**
+	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
+	 * The local link map will be cleared.
+	 * @param entryType the data entry type
+	 * @param excluded a set of characters excluded from translations, null or empty if not applicable
+	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
+	 */
+	default DataSet<E> loadFiles(DataEntryType entryType, String[] excluded){
+		IOFileFilter fileFilter = new WildcardFileFilter(new String[]{
+				"*." + entryType.getInputFileExtension() + ".json"
+		});
+		DirectoryLoader dl = new CommonsDirectoryWalker(this.getCs().getInputDir(), DirectoryFileFilter.INSTANCE, fileFilter);
+		if(dl.getLoadErrors().size()>0){
+			Skb_Console.conError("{}: errors loading files from directory <{}>\n{}", new Object[]{this.getCs().getAppName(), this.getCs().getInputDir(), dl.getLoadErrors().render()});
+			return null;
+		}
+
+		DataSet<E> ds = this.newSetInstance();
+		FileSourceList fsl = dl.load();
+		ds.load(fsl.getSource(), entryType.getInputFileExtension());
+		return ds;
+	}
+
+	/**
 	 * Returns a new instance of the data set the loader supports.
 	 * @return new data set instance
 	 */
 	DataSet<E> newSetInstance();
 
 	/**
-	 * Returns a new instance of the data entry the loader supports.
-	 * @return new data entry instance
+	 * Returns a factory for creating data entries.
+	 * @return data entry factory
 	 */
-	DataEntry newEntryInstance();
+	DataEntryFactory<E> getEntryFactory();
 }

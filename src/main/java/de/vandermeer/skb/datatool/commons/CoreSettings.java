@@ -1,11 +1,9 @@
 package de.vandermeer.skb.datatool.commons;
 
-import java.util.Map;
-
 import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.base.encodings.TranslatorFactory.Target;
-import de.vandermeer.skb.datatool.target.DataTarget;
+import de.vandermeer.skb.datatool.commons.target.DataTarget;
 
 public class CoreSettings {
 
@@ -24,21 +22,12 @@ public class CoreSettings {
 	/** Loaders target. */
 	private DataTarget target;
 
-	/** Map with linkeable data entries from other sets. */
-	private LoadedTypeMap loadedTypes;
-
-	/** Types supported by the loader. */
-	private Map<DataEntryType, DataSetLoader<?>> supportedTypes;
-
-	public CoreSettings(char keySeparator, boolean verbose, String appName, String inputDir, DataTarget target, Map<DataEntryType, DataSetLoader<?>> supportedTypes){
+	public CoreSettings(char keySeparator, boolean verbose, String appName, String inputDir, DataTarget target){
 		this.keySeparator = keySeparator;
 		this.verbose = verbose;
 		this.appName = appName;
 		this.inputDir = inputDir;
 		this.target = target;
-		this.supportedTypes = supportedTypes;
-
-		this.loadedTypes = new LoadedTypeMap();
 	}
 
 	public char getKeySeparator(){
@@ -59,14 +48,6 @@ public class CoreSettings {
 
 	public DataTarget getTarget(){
 		return this.target;
-	}
-
-	public LoadedTypeMap getLoadedTypes(){
-		return this.loadedTypes;
-	}
-
-	public Map<DataEntryType, DataSetLoader<?>> getSupportedTypes(){
-		return this.supportedTypes;
 	}
 
 	public Translator getTranslator(){

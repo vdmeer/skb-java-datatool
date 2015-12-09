@@ -23,16 +23,14 @@ import java.util.Map;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
-import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
-import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntry;
-import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntry;
-import de.vandermeer.skb.datatool.entries.affiliations.object.ObjectAffiliations;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
+import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
 
 /**
  * A single people entry.
@@ -46,10 +44,7 @@ public class PeopleEntry implements DataEntry {
 	/** People entry type. */
 	public static DataEntryType ENTRY_TYPE =
 			new AbstractDataEntryType(
-					"people", "people",
-					new DataEntryType[]{
-						AcronymEntry.ENTRY_TYPE
-					}
+					"people", "people"
 			)
 			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/people/targets/html-table.stg"))
 			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN, "de/vandermeer/skb/datatool/people/targets/text-plain.stg"))
@@ -61,7 +56,6 @@ public class PeopleEntry implements DataEntry {
 				put(PeopleKeys.PEOPLE_FIRST, true);
 				put(PeopleKeys.PEOPLE_MIDDLE, false);
 				put(PeopleKeys.PEOPLE_LAST, true);
-				put(ObjectAffiliations.OBJ_AFF_LIST, false);
 			}}
 	);
 
@@ -92,14 +86,6 @@ public class PeopleEntry implements DataEntry {
 		return (String)this.entryMap.get(PeopleKeys.PEOPLE_LAST);
 	}
 
-	/**
-	 * Return the last affiliation entries for the person.
-	 * @return person last name
-	 */
-	public Map<String, AffiliationEntry> getAffiliations(){
-		return ((ObjectAffiliations)this.entryMap.get(ObjectAffiliations.OBJ_AFF_LIST)).getAffiliationMap();
-	}
-
 	@Override
 	public String getCompareString() {
 		return this.getLastName();
@@ -117,9 +103,9 @@ public class PeopleEntry implements DataEntry {
 	}
 
 	@Override
-	public void loadEntry(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException {
-		this.entryMap = loader.loadEntry(this.getSchema());
-		this.entryMap.put(CommonConstants.EK_KEY, loader.getKeyStart() + this.getLastName() + "-" + this.getFirstName());
+	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
+		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, cs);
+		this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.getLastName() + "-" + this.getFirstName());
 	}
 
 	@Override

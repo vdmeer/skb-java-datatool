@@ -23,15 +23,16 @@ import java.util.Map;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
-import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
 import de.vandermeer.skb.datatool.entries.EntryConstants;
 import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A single acronym entry.
@@ -91,15 +92,15 @@ public class AcronymEntry implements DataEntry {
 	}
 
 	@Override
-	public void loadEntry(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException {
-		this.entryMap = loader.loadEntry(this.getSchema());
-		this.entryMap.put(AcronymKeys.LOCAL_ACRONYM_SHORT_ORIG, loader.loadDataString(AcronymKeys.ACR_SHORT));
+	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
+		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, cs);
+		this.entryMap.put(AcronymKeys.LOCAL_ACRONYM_SHORT_ORIG, DataUtilities.loadDataString(AcronymKeys.ACR_SHORT, data));
 
 		if(this.entryMap.get(CommonConstants.EK_KEY)!=null){
-			this.entryMap.put(CommonConstants.EK_KEY, loader.getKeyStart() + this.entryMap.get(CommonConstants.EK_KEY));
+			this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.entryMap.get(CommonConstants.EK_KEY));
 		}
 		else{
-			this.entryMap.put(CommonConstants.EK_KEY, loader.getKeyStart() + this.entryMap.get(AcronymKeys.LOCAL_ACRONYM_SHORT_ORIG));
+			this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.entryMap.get(AcronymKeys.LOCAL_ACRONYM_SHORT_ORIG));
 		}
 	}
 

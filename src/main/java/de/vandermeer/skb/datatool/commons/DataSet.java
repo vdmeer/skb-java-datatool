@@ -26,9 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonParser;
@@ -36,10 +33,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
-import de.vandermeer.skb.base.info.DirectoryLoader;
 import de.vandermeer.skb.base.info.FileSource;
-import de.vandermeer.skb.base.info.FileSourceList;
 
 /**
  * Generic data set for the data tools.
@@ -56,8 +50,8 @@ public class DataSet<E extends DataEntry> {
 	/** Number of read files. */
 	int files;
 
-	/** The data entry type the loader supports. */
-	DataEntryType type;
+	/** Factory for data entries of this data set. */
+	DataEntryFactory<E> factory;
 
 	/** Core settings. */
 	private CoreSettings cs;
@@ -65,11 +59,15 @@ public class DataSet<E extends DataEntry> {
 	/** Characters excluded from translation. */
 	String[] excluded;
 
-	//TODO JDOC
-	public DataSet(CoreSettings cs, DataEntryType type){
+	/**
+	 * Returns a new data set.
+	 * @param cs the core settings
+	 * @param factory a factory that creates data entries
+	 */
+	public DataSet(CoreSettings cs, DataEntryFactory<E> factory){
 		this.entries = new HashMap<>();
 		this.files = 0;
-		this.type = type;
+		this.factory = factory;
 		this.cs = cs;
 	}
 
@@ -115,41 +113,6 @@ public class DataSet<E extends DataEntry> {
 	}
 
 	/**
-	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
-	 * The local link map will be cleared.
-	 * @param entryType the data entry type
-	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
-	 */
-	public DataSet<E> build(DataEntryType entryType){
-		return this.build(entryType, null);
-	}
-
-	/**
-	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
-	 * The local link map will be cleared.
-	 * @param entryType the data entry type
-	 * @param excluded a set of characters excluded from translations, null or empty if not applicable
-	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
-	 */
-	public DataSet<E> build(DataEntryType entryType, String[] excluded){
-		IOFileFilter fileFilter = new WildcardFileFilter(new String[]{
-				"*." + entryType.getInputFileExtension() + ".json"
-		});
-		DirectoryLoader dl = new CommonsDirectoryWalker(this.cs.getInputDir(), DirectoryFileFilter.INSTANCE, fileFilter);
-		if(dl.getLoadErrors().size()>0){
-			Skb_Console.conError("{}: errors loading files from directory <{}>\n{}", new Object[]{this.cs.getAppName(), this.cs.getInputDir(), dl.getLoadErrors().render()});
-			return null;
-		}
-
-		@SuppressWarnings("unchecked")
-		DataSet<E> ds = (DataSet<E>) this.cs.getSupportedTypes().get(entryType).newSetInstance();
-		ds.cs = this.cs;
-		FileSourceList fsl = dl.load();
-		ds.load(fsl.getSource(), entryType.getInputFileExtension());
-		return ds;
-	}
-
-	/**
 	 * Loads a data set from file system, does many consistency checks as well.
 	 * @param fsl list of files to load data from
 	 * @param fileExt the file extension used (translated to "." + fileExt + ".json"), empty if none used
@@ -167,10 +130,11 @@ public class DataSet<E extends DataEntry> {
 			try{
 				List<Map<String, Object>> jsonList = om.readValue(fs.asFile(), new TypeReference<ArrayList<HashMap<String, Object>>>(){});
 				for(Map<String, Object> entryMap : jsonList){
-					AbstractDataLoader dl = new AbstractDataLoader(keyStart, this.cs, entryMap);
-					DataSetLoader<?> dsl = this.cs.getSupportedTypes().get(this.type);
-					DataEntry entry = dsl.newEntryInstance();
-					entry.load(dl);
+//					AbstractDataLoader dl = new AbstractDataLoader(keyStart, this.cs, entryMap);
+//					DataSetLoader<?> dsl = this.cs.getSupportedTypes().get(this.type).newEntryInstance();
+//					DataEntry entry = this.cs.getSupportedTypes().get(this.type).newEntryInstance();
+//					entry.load(this.cs.getSupportedTypes().get(this.type).getDataLoader(keyStart, entryMap));
+					E entry = this.factory.newInstanceLoaded(keyStart, entryMap);
 					if(entry.getKey().contains("#dummy")){
 						continue;
 					}

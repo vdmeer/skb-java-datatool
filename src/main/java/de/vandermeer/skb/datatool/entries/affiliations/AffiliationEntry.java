@@ -25,18 +25,20 @@ import org.apache.commons.lang3.text.StrBuilder;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
-import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
+import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
 import de.vandermeer.skb.datatool.entries.EntryConstants;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntry;
 import de.vandermeer.skb.datatool.entries.geo.cities.CityEntry;
 import de.vandermeer.skb.datatool.entries.geo.object.ObjectGeo;
 import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A single affiliation entry.
@@ -76,6 +78,17 @@ public class AffiliationEntry implements DataEntry {
 
 	/** The local entry map. */
 	private Map<EntryKey, Object> entryMap;
+
+	/** Map with linkeable data entries from other sets. */
+	private LoadedTypeMap loadedTypes;
+
+	/**
+	 * Creates a new affiliation entry with loaded types.
+	 * @param loadedTypes loaded types
+	 */
+	AffiliationEntry(LoadedTypeMap loadedTypes){
+		this.loadedTypes = loadedTypes;
+	}
 
 	/**
 	 * Returns the long name of the affiliation.
@@ -167,11 +180,11 @@ public class AffiliationEntry implements DataEntry {
 	}
 
 	@Override
-	public void loadEntry(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException {
-		this.entryMap = loader.loadEntry(this.getSchema());
+	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
+		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, this.loadedTypes, cs);
 
-		this.entryMap.put(EntryConstants.EKLOCAL_ACRONYM_LINK, loader.loadDataString(EntryConstants.EK_ACRONYM));
-		this.entryMap.put(AffiliationKeys.LOCAL_AFF_TYPE_LINK, loader.loadDataString(AffiliationKeys.AFF_TYPE));
+		this.entryMap.put(EntryConstants.EKLOCAL_ACRONYM_LINK, DataUtilities.loadDataString(EntryConstants.EK_ACRONYM, data));
+		this.entryMap.put(AffiliationKeys.LOCAL_AFF_TYPE_LINK, DataUtilities.loadDataString(AffiliationKeys.AFF_TYPE, data));
 
 		StrBuilder msg = new StrBuilder(50);
 		if(this.getName()==null){
@@ -192,15 +205,15 @@ public class AffiliationEntry implements DataEntry {
 		}
 
 		if(this.getKey()!=null){
-			this.entryMap.put(CommonConstants.EK_KEY, loader.getKeyStart() + this.getKey());
+			this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.getKey());
 		}
 		else if(this.getShortName()!=null){
-			this.entryMap.put(CommonConstants.EK_KEY, loader.getKeyStart() + this.getShortName());
+			this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.getShortName());
 		}
 		else if(this.getAcronymLink()!=null){
 			this.entryMap.put(AffiliationKeys.AFF_LONG, this.getAcronym().getLong());
 			this.entryMap.put(AffiliationKeys.AFF_SHORT, this.getAcronym().getShort());
-			this.entryMap.put(CommonConstants.EK_KEY, loader.getKeyStart() + this.getShortName());
+			this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.getShortName());
 		}
 		else{
 			msg.appendSeparator(", ");

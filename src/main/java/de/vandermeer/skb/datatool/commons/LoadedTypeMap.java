@@ -52,16 +52,6 @@ public class LoadedTypeMap {
 	}
 
 	/**
-	 * Puts all entries of the given map.
-	 * @param map entries to put
-	 */
-	public void putAll(LoadedTypeMap map){
-		if(map!=null){
-			this.loadedTypes.putAll(map.loadedTypes);
-		}
-	}
-
-	/**
 	 * Tests if the given key exists in the map
 	 * @param key key to test
 	 * @return true if key exists, false otherwise

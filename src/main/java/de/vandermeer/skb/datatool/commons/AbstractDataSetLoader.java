@@ -28,21 +28,27 @@ public abstract class AbstractDataSetLoader<E extends DataEntry> implements Data
 	/** Core settings. */
 	private CoreSettings cs;
 
-	@Override
-	public void setInitial(CoreSettings cs) {
-		this.cs = cs;
-	}
+	/** Map with linkeable data entries from other sets. */
+	private LoadedTypeMap loadedTypes;
 
 	@Override
-	public void setAsRequired(DataSetLoader<?> originalLoader) {
-		if(originalLoader==null){
-			throw new IllegalArgumentException("originalLoader is null");
-		}
-		this.setInitial(originalLoader.getCs());
+	public void setCs(CoreSettings cs) {
+		this.cs = cs;
 	}
 
 	@Override
 	public CoreSettings getCs(){
 		return this.cs;
 	}
+
+	@Override
+	public void setLoadedTypes(LoadedTypeMap loadedTypes) {
+		this.loadedTypes = loadedTypes;
+	}
+
+	@Override
+	public LoadedTypeMap getLoadedTypes() {
+		return this.loadedTypes;
+	}
+
 }

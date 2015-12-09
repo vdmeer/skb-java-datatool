@@ -20,12 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
+import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.commons.EntryObject;
-import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntry;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 
 /**
  * A special data objects for affiliation lists as SKB links.
@@ -36,42 +38,49 @@ import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntry;
  */
 public class ObjectAffiliations implements EntryObject {
 
-	public static EntryKey OBJ_AFF_LIST = new AbstractEntryKey("list", "a list of SKB links to affiliations", ObjectAffiliations.class, false, "skb://affiliations");
+	public static EntryKey OBJ_AFF_LIST = new AbstractEntryKey("list", "a list of SKB links to affiliations", String.class, false, "skb://affiliations");
 
-	/** Map of keys to affiliation entries, the key is the original link the entry the expanded entry. */
-	final private Map<String, AffiliationEntry> affiliationMap;
+	/** Geo object schema. */
+	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(
+			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
+				put(OBJ_AFF_LIST, true);
+			}}
+	);
 
-	public ObjectAffiliations(){
-		this.affiliationMap = new HashMap<>();
-	}
+	/** The local entry map. */
+	private Map<EntryKey, Object> entryMap;
 
 	@Override
 	public DataEntrySchema getSchema(){
-		return null;//TODO
+		return SCHEMA;
 	}
 
 	@Override
-	public void loadObject(DataLoader loader) throws URISyntaxException {
-		Object obj = loader.getEntryMap().get(OBJ_AFF_LIST.getKey());
-		if(!(obj instanceof List)){
-			throw new IllegalArgumentException("expecting list, found <" + obj.getClass().getSimpleName() + ">");
+	public void loadObject(String keyStart, Object data, LoadedTypeMap loadedTypes, CoreSettings cs) throws URISyntaxException {
+		if(!(data instanceof Map)){
+			throw new IllegalArgumentException("object links - data must be a map");
 		}
+		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, (Map<?, ?>)data, loadedTypes, cs);
 
-		for(Object l : (List<?>)obj){
-			this.affiliationMap.put(l.toString(), (AffiliationEntry)loader.loadLink(l.toString()));
-		}
+//		Object obj = loader.getEntryMap().get(OBJ_AFF_LIST.getKey());
+//		if(!(obj instanceof List)){
+//			throw new IllegalArgumentException("expecting list, found <" + obj.getClass().getSimpleName() + ">");
+//		}
+//
+//		for(Object l : (List<?>)obj){
+//			if(l!=null){
+//				this.affiliationMap.put(l.toString(), (AffiliationEntry)DataUtilities.loadLink(l, loader.getCs()));
+//			}
+//		}
 	}
 
-	/**
-	 * Returns the created affiliation map.
-	 * @return affiliation map, empty if no entries have been produced
-	 */
-	public Map<String, AffiliationEntry> getAffiliationMap(){
-		return this.affiliationMap;
+	public List<?> getList(){
+System.err.println("@@: " + this.entryMap.get(OBJ_AFF_LIST));
+		return (List<?>)this.entryMap.get(OBJ_AFF_LIST);
 	}
 
 	@Override
 	public Map<EntryKey, Object> getEntryMap(){
-		return null;
+		return this.entryMap;
 	}
 }

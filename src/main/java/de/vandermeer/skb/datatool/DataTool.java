@@ -38,7 +38,9 @@ import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
 import de.vandermeer.skb.datatool.commons.DataSetLoader;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
+import de.vandermeer.skb.datatool.commons.target.DataTarget;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntryLoader;
 import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntryLoader;
 import de.vandermeer.skb.datatool.entries.affiliations.AffiliationtypeEntryLoader;
@@ -48,7 +50,6 @@ import de.vandermeer.skb.datatool.entries.geo.cities.CityEntryLoader;
 import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntryLoader;
 import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntryLoader;
 import de.vandermeer.skb.datatool.entries.people.PeopleEntryLoader;
-import de.vandermeer.skb.datatool.target.DataTarget;
 
 /**
  * Tool to read all SKB data and cross reference if possible.
@@ -201,11 +202,11 @@ public class DataTool implements ExecS_Application {
 			}
 		}
 
-		CoreSettings cs = new CoreSettings(this.optionKeySep.getValue(), this.verbose, this.getAppName(), this.optionDirIn.getValue(), target, this.tlMap.getMap());
+		CoreSettings cs = new CoreSettings(this.optionKeySep.getValue(), this.verbose, this.getAppName(), this.optionDirIn.getValue(), target);
 
 		DataSetLoader<?> dsl = this.tlMap.getLoader(type);
-		dsl.setInitial(cs);
-		dsl.load();
+		dsl.setCs(cs);
+		dsl.load(this.tlMap.getMap(), new LoadedTypeMap());
 
 		DataSet<?> entries1 = dsl.getMainDataSet();
 		DataSet<?> entries2 = dsl.getDataSet2();

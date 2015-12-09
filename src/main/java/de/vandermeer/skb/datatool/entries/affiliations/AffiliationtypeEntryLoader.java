@@ -15,11 +15,16 @@
 
 package de.vandermeer.skb.datatool.entries.affiliations;
 
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
-import de.vandermeer.skb.datatool.commons.DataEntry;
+import de.vandermeer.skb.datatool.commons.DataEntryFactory;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
+import de.vandermeer.skb.datatool.commons.DataSetLoader;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 
 /**
  * Loader for affiliation types.
@@ -31,14 +36,14 @@ import de.vandermeer.skb.datatool.commons.DataSet;
 public class AffiliationtypeEntryLoader extends AbstractDataSetLoader<AffiliationtypeEntry> {
 
 	@Override
-	public void load() {
-		super.load();
-		DataSet<AffiliationtypeEntry> ds = this.newSetInstance().build(this.getDataEntryType());
+	public void load(Map<DataEntryType, DataSetLoader<?>> supportedTypes, LoadedTypeMap loadedType) {
+		super.load(supportedTypes, loadedType);
+		DataSet<AffiliationtypeEntry> ds = this.loadFiles(this.getDataEntryType());
 		if(ds==null){
 			Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType()});
 			return;
 		}
-		this.getCs().getLoadedTypes().put(this.getDataEntryType(), ds);
+		loadedType.put(this.getDataEntryType(), ds);
 		this.writeStats();
 	}
 
@@ -49,11 +54,24 @@ public class AffiliationtypeEntryLoader extends AbstractDataSetLoader<Affiliatio
 
 	@Override
 	public DataSet<AffiliationtypeEntry> newSetInstance() {
-		return new DataSet<>(this.getCs(), this.getDataEntryType());
+		return new DataSet<>(this.getCs(), this.getEntryFactory());
 	}
 
 	@Override
-	public DataEntry newEntryInstance() {
-		return new AffiliationtypeEntry();
+	public DataEntryFactory<AffiliationtypeEntry> getEntryFactory() {
+		return new DataEntryFactory<AffiliationtypeEntry>() {
+			
+			@Override
+			public AffiliationtypeEntry newInstanceLoaded(String keyStart, Map<String, Object> data) throws URISyntaxException {
+				AffiliationtypeEntry ae = this.newInstance();
+				ae.load(keyStart, data, getCs());
+				return ae;
+			}
+			
+			@Override
+			public AffiliationtypeEntry newInstance() {
+				return new AffiliationtypeEntry();
+			}
+		};
 	}
 }

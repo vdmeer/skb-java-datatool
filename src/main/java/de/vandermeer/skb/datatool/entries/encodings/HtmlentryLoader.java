@@ -15,11 +15,16 @@
 
 package de.vandermeer.skb.datatool.entries.encodings;
 
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
-import de.vandermeer.skb.datatool.commons.DataEntry;
+import de.vandermeer.skb.datatool.commons.DataEntryFactory;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
+import de.vandermeer.skb.datatool.commons.DataSetLoader;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 
 /**
  * Loader for HTML entities.
@@ -31,14 +36,14 @@ import de.vandermeer.skb.datatool.commons.DataSet;
 public class HtmlentryLoader extends AbstractDataSetLoader<Htmlentry> {
 
 	@Override
-	public void load() {
-		super.load();
-		DataSet<Htmlentry> ds = this.newSetInstance().build(this.getDataEntryType(), this.getCs().getTarget().getDefinition().getExcluded());
+	public void load(Map<DataEntryType, DataSetLoader<?>> supportedTypes, LoadedTypeMap loadedType) {
+		super.load(supportedTypes, loadedType);
+		DataSet<Htmlentry> ds = this.loadFiles(this.getDataEntryType(), this.getCs().getTarget().getDefinition().getExcluded());
 		if(ds==null){
 			Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType()});
 			return;
 		}
-		this.getCs().getLoadedTypes().put(this.getDataEntryType(), ds);
+		loadedType.put(this.getDataEntryType(), ds);
 		this.writeStats();
 	}
 
@@ -49,11 +54,24 @@ public class HtmlentryLoader extends AbstractDataSetLoader<Htmlentry> {
 
 	@Override
 	public DataSet<Htmlentry> newSetInstance() {
-		return new DataSet<>(this.getCs(), this.getDataEntryType());
+		return new DataSet<>(this.getCs(), this.getEntryFactory());
 	}
 
 	@Override
-	public DataEntry newEntryInstance() {
-		return new Htmlentry();
+	public DataEntryFactory<Htmlentry> getEntryFactory() {
+		return new DataEntryFactory<Htmlentry>() {
+			
+			@Override
+			public Htmlentry newInstanceLoaded(String keyStart, Map<String, Object> data) throws URISyntaxException {
+				Htmlentry ae = this.newInstance();
+				ae.load(keyStart, data, getCs());
+				return ae;
+			}
+			
+			@Override
+			public Htmlentry newInstance() {
+				return new Htmlentry();
+			}
+		};
 	}
 }

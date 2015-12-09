@@ -38,18 +38,18 @@ public class Test_EclRun_DataTool {
 
 					"--entry-type",
 //					"acronyms",
-					"affiliations",
+//					"affiliations",
 //					"affiliation-types",
-//					"people",
+					"people",
 //					"continents",
 //					"countries",
 //					"cities",
 //					"encodings",
 
 					"--target",
-//					"html-tab",
+					"html-tab",
 //					"latex-acr",
-					"text-plain",
+//					"text-plain",
 //					"java-skb-h2l",
 //					"java-skb-t2h",
 //					"java-skb-t2l",
@@ -59,8 +59,8 @@ public class Test_EclRun_DataTool {
 
 					"--verbose",
 
-//					"--output-file",
-//					"target/2",
+					"--output-file",
+					"target/2",
 
 //					"--key-sep",
 //					"/"

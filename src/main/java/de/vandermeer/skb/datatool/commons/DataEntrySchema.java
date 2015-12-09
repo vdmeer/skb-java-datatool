@@ -46,22 +46,28 @@ public interface DataEntrySchema {
 
 	/**
 	 * Tests the map against the data entry schema (programmatic).
-	 * @param entryMap map for the entry
+	 * @param data original data, should be a mapping of strings to objects
 	 * @return empty on success, string builder with explanations on error
 	 */
-	default StrBuilder testSchema(Map<String, Object> entryMap){
+	default StrBuilder testSchema(Object data){
 		StrBuilder ret = new StrBuilder();
+		if(!(data instanceof Map)){
+			ret.append("test schema: input data not of type map, cannot test schema");
+			return ret;
+		}
+
+		Map<?, ?> map = (Map<?, ?>)data;
 		for(Entry<EntryKey, Boolean> e : this.getKeyMap().entrySet()){
-			if(e.getValue()==true && !entryMap.containsKey(e.getKey().getKey())){
+			if(e.getValue()==true && !map.containsKey(e.getKey().getKey())){
 				ret.append("missing mandatory entry key <").append(e.getKey().getKey()).append(">").appendNewLine();
 			}
-			else if(e.getValue()==true && StringUtils.isEmpty(entryMap.get(e.getKey().getKey()).toString())){
+			else if(e.getValue()==true && StringUtils.isEmpty(map.get(e.getKey().getKey()).toString())){
 				ret.append("empty mandatory entry key <").append(e.getKey().getKey()).append(">").appendNewLine();
 			}
 		}
-		for(String s : entryMap.keySet()){
-			if(!this.getKeySet().contains(s)){
-				ret.append("unknown entry key <").append(s).append(">").appendNewLine();
+		for(Object o : map.keySet()){
+			if(!this.getKeySet().contains(o.toString())){
+				ret.append("unknown entry key <").append(o).append(">").appendNewLine();
 			}
 		}
 		return ret;

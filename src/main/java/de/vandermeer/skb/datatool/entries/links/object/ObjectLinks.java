@@ -21,10 +21,12 @@ import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
+import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.commons.EntryObject;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 
 /**
  * A special data objects for links (URLs and the like).
@@ -51,8 +53,12 @@ public class ObjectLinks implements EntryObject {
 	private Map<EntryKey, Object> entryMap;
 
 	@Override
-	public void loadObject(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException {
-		this.entryMap = loader.loadEntry(this.getSchema());
+	public void loadObject(String keyStart, Object data, LoadedTypeMap loadedTypes, CoreSettings cs) throws URISyntaxException {
+		if(!(data instanceof Map)){
+			throw new IllegalArgumentException("object links - data must be a map");
+		}
+
+		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, (Map<?, ?>)data, loadedTypes, cs);
 	}
 
 	/**

@@ -15,48 +15,30 @@
 
 package de.vandermeer.skb.datatool.commons;
 
+import java.net.URISyntaxException;
 import java.util.Map;
 
-import de.vandermeer.skb.datatool.commons.target.DataTarget;
-
 /**
- * A data entry type.
+ * Factory to create data entries, provided by data set loaders.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public interface DataEntryType {
+public interface DataEntryFactory<E extends DataEntry> {
 
 	/**
-	 * Returns the name of the type
-	 * @return type name
+	 * Returns a new instance of a data entry.
+	 * @return new data entry instance
 	 */
-	String getType();
+	E newInstance();
 
 	/**
-	 * Returns the file extension the type is using.
-	 * @return file extension
+	 * Returns a new instance of a data entry that is loaded
+	 * @param keyStart start of a key as calculated
+	 * @param entryMap map with entries to load information from
+	 * @return new instance, loaded
+	 * @throws URISyntaxException if an SKB URI was not well-formed during the load process
 	 */
-	String getInputFileExtension();
-
-	/**
-	 * Returns an SKB URI for the data entry type.
-	 * @return SKB URI
-	 */
-	default String getLinkUri(){
-		return "skb://" + this.getType();
-	}
-
-	/**
-	 * Returns the types required to be loaded for link expansions.
-	 * @return required types
-	 */
-	DataEntryType[] getRequiredTypes();
-
-	/**
-	 * Returns the targets supported by this entry type.
-	 * @return targets as a mapping of target name (identifier) to actual target
-	 */
-	Map<String, DataTarget> getSupportedTargets();
+	E newInstanceLoaded(String keyStart, Map<String, Object> entryMap) throws URISyntaxException;
 }

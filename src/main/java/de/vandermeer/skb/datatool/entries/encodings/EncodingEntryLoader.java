@@ -15,11 +15,16 @@
 
 package de.vandermeer.skb.datatool.entries.encodings;
 
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
-import de.vandermeer.skb.datatool.commons.DataEntry;
+import de.vandermeer.skb.datatool.commons.DataEntryFactory;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
+import de.vandermeer.skb.datatool.commons.DataSetLoader;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 
 /**
  * Loader for encodings.
@@ -31,14 +36,14 @@ import de.vandermeer.skb.datatool.commons.DataSet;
 public class EncodingEntryLoader extends AbstractDataSetLoader<EncodingEntry> {
 
 	@Override
-	public void load() {
-		super.load();
-		DataSet<EncodingEntry> ds = this.newSetInstance().build(this.getDataEntryType(), this.getCs().getTarget().getDefinition().getExcluded());
+	public void load(Map<DataEntryType, DataSetLoader<?>> supportedTypes, LoadedTypeMap loadedType) {
+		super.load(supportedTypes, loadedType);
+		DataSet<EncodingEntry> ds = this.loadFiles(this.getDataEntryType(), this.getCs().getTarget().getDefinition().getExcluded());
 		if(ds==null){
 			Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType()});
 			return;
 		}
-		this.getCs().getLoadedTypes().put(this.getDataEntryType(), ds);
+		loadedType.put(this.getDataEntryType(), ds);
 		this.writeStats();
 	}
 
@@ -49,16 +54,29 @@ public class EncodingEntryLoader extends AbstractDataSetLoader<EncodingEntry> {
 
 	@Override
 	public DataSet<?> getDataSet2(){
-		return this.getCs().getLoadedTypes().get(Htmlentry.ENTRY_TYPE);
+		return this.getLoadedTypes().get(Htmlentry.ENTRY_TYPE);
 	}
 
 	@Override
 	public DataSet<EncodingEntry> newSetInstance() {
-		return new DataSet<EncodingEntry>(this.getCs(), this.getDataEntryType());
+		return new DataSet<EncodingEntry>(this.getCs(), this.getEntryFactory());
 	}
 
 	@Override
-	public DataEntry newEntryInstance() {
-		return new EncodingEntry();
+	public DataEntryFactory<EncodingEntry> getEntryFactory() {
+		return new DataEntryFactory<EncodingEntry>() {
+
+			@Override
+			public EncodingEntry newInstanceLoaded(String keyStart, Map<String, Object> data) throws URISyntaxException {
+				EncodingEntry ae = this.newInstance();
+				ae.load(keyStart, data, getCs());
+				return ae;
+			}
+
+			@Override
+			public EncodingEntry newInstance() {
+				return new EncodingEntry();
+			}
+		};
 	}
 }

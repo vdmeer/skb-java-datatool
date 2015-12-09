@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
 
 /**
@@ -61,27 +62,52 @@ public interface DataEntry extends Comparable<DataEntry> {
 
 	/**
 	 * Loads the entry content using a given loader.
-	 * @param loader a fully configured loader object
+	 * @param keyStart string used to start a key
+	 * @param data the data to load information from, usually a mapping of strings to objects
+	 * @param cs core settings required for loading data
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 * @throws URISyntaxException if an SKB link is used to de-reference an entry and the URL is not formed well
-	 * @throws InstantiationException 
 	 */
-	default void load(DataLoader loader) throws URISyntaxException, IllegalAccessException, InstantiationException{
-		StrBuilder err = this.getSchema().testSchema(loader.getEntryMap());
+	default void load(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
+		StrBuilder err = this.getSchema().testSchema(data);
 		if(err.size()>0){
 			throw new IllegalArgumentException(err.toString());
 		}
-		this.loadEntry(loader);
-		this.setKey(loader.toKey(this.getKey()));
+		this.loadEntry(keyStart, data, cs);
+		this.setKey(this.toKey(this.getKey()));
 	}
 
 	/**
 	 * Local (entry specific) load operation.
-	 * @param loader a fully configured loader object
+	 * @param keyStart string used to start a key
+	 * @param data the data to load information from, usually a mapping of strings to objects
+	 * @param cs core settings required for loading data
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 * @throws URISyntaxException if an SKB link is used to de-reference an entry and the URL is not formed well
 	 */
-	void loadEntry(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException;
+	void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException;
+
+	/**
+	 * Replaces several characters in a string to return a valid key element.
+	 * @param input the input string
+	 * @return a string with replaced characters (" " to "-", "." to "")
+	 * @throws IllegalArgumentException if any illegal characters are in the final key
+	 */
+	default String toKey(String input){
+		if(input==null){
+			return input;
+		}
+		String ret = input;
+
+		ret = StringUtils.replace(ret, " ", "-");
+		ret = StringUtils.replace(ret, ".", "");
+
+		if(ret.contains("%")){
+			throw new IllegalArgumentException("key contains '%'");
+		}
+
+		return ret.toLowerCase();
+	}
 
 	/**
 	 * Returns the schema for the data entry.

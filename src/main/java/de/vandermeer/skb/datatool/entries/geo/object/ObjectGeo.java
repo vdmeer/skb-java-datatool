@@ -23,10 +23,12 @@ import org.apache.commons.lang3.text.StrBuilder;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
+import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
-import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.commons.EntryObject;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 import de.vandermeer.skb.datatool.entries.geo.GeoConstants;
 import de.vandermeer.skb.datatool.entries.geo.cities.CityEntry;
 import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntry;
@@ -60,11 +62,15 @@ public class ObjectGeo implements EntryObject {
 	private Map<EntryKey, Object> entryMap;
 
 	@Override
-	public void loadObject(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException {
-		this.entryMap = loader.loadEntry(this.getSchema());
+	public void loadObject(String keyStart, Object data, LoadedTypeMap loadedTypes, CoreSettings cs) throws URISyntaxException {
+		if(!(data instanceof Map)){
+			throw new IllegalArgumentException("object links - data must be a map");
+		}
 
-		this.entryMap.put(GeoConstants.EKLOCAL_GEO_CITY_LINK, loader.loadDataString(OBJ_GEO_CITY_LINK));
-		this.entryMap.put(GeoConstants.EKLOCAL_GEO_COUNTRY_LINK, loader.loadDataString(OBJ_GEO_COUNTRY_LINK));
+		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, (Map<?, ?>)data, loadedTypes, cs);
+
+		this.entryMap.put(GeoConstants.EKLOCAL_GEO_CITY_LINK, DataUtilities.loadDataString(OBJ_GEO_CITY_LINK, (Map<?, ?>)data));
+		this.entryMap.put(GeoConstants.EKLOCAL_GEO_COUNTRY_LINK, DataUtilities.loadDataString(OBJ_GEO_COUNTRY_LINK, (Map<?, ?>)data));
 
 		StrBuilder msg = new StrBuilder(50);
 

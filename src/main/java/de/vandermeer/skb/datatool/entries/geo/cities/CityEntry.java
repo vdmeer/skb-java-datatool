@@ -23,16 +23,18 @@ import java.util.Map;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
 import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
-import de.vandermeer.skb.datatool.commons.DataLoader;
+import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
+import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
+import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
 import de.vandermeer.skb.datatool.entries.geo.GeoConstants;
 import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntry;
 import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
-import de.vandermeer.skb.datatool.target.AbstractDataTarget;
-import de.vandermeer.skb.datatool.target.StandardDataTargetDefinitions;
 
 /**
  * A data entry for a city.
@@ -72,6 +74,17 @@ public class CityEntry implements DataEntry {
 
 	/** The local entry map. */
 	private Map<EntryKey, Object> entryMap;
+
+	/** Map with linkeable data entries from other sets. */
+	private LoadedTypeMap loadedTypes;
+
+	/**
+	 * Creates a new affiliation entry with loaded types.
+	 * @param loadedTypes loaded types
+	 */
+	CityEntry(LoadedTypeMap loadedTypes){
+		this.loadedTypes = loadedTypes;
+	}
 
 	@Override
 	public DataEntrySchema getSchema(){
@@ -165,15 +178,15 @@ public class CityEntry implements DataEntry {
 	}
 
 	@Override
-	public void loadEntry(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException {
-		this.entryMap = loader.loadEntry(this.getSchema());
-		this.entryMap.put(GeoConstants.EKLOCAL_GEO_COUNTRY_LINK, loader.loadDataString(GeoConstants.EK_GEO_COUNTRY));
+	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
+		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, this.loadedTypes, cs);
+		this.entryMap.put(GeoConstants.EKLOCAL_GEO_COUNTRY_LINK, DataUtilities.loadDataString(GeoConstants.EK_GEO_COUNTRY, data));
 
 		if(this.getKey()!=null){
-			this.entryMap.put(CommonConstants.EK_KEY, loader.getKeyStart() + this.getKey());
+			this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.getKey());
 		}
 		else if(this.getName()!=null){
-			this.entryMap.put(CommonConstants.EK_KEY, loader.getKeyStart() + loader.loadDataString(GeoConstants.EK_GEO_NAME));
+			this.entryMap.put(CommonConstants.EK_KEY, keyStart + DataUtilities.loadDataString(GeoConstants.EK_GEO_NAME, data));
 		}
 		else{
 			throw new IllegalArgumentException("could not generate key, no key or name given");

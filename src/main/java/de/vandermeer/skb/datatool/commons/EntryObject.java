@@ -31,13 +31,14 @@ public interface EntryObject {
 
 	/**
 	 * Loads an entry object from a given map with tests against expected keys.
-	 * @param loader a fully configured loader object
+	 * @param keyStart string used to start a key
+	 * @param data the data to load information from, usually a mapping of strings to objects
+	 * @param loadedTypes loaded types as lookup for links
+	 * @param cs core settings required for loading data
 	 * @throws URISyntaxException if creating a URI for an SKB link failed
-	 * @throws IllegalAccessException if an entry object could not be created due to a class error (type class)
-	 * @throws InstantiationException if an entry object could not be created due to a class error (type class)
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 */
-	void loadObject(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException;
+	void loadObject(String keyStart, Object data, LoadedTypeMap loadedTypes, CoreSettings cs) throws URISyntaxException;
 
 	/**
 	 * Returns the schema for the entry object.
@@ -47,18 +48,19 @@ public interface EntryObject {
 
 	/**
 	 * Loads an entry object from a given map with tests against expected keys.
-	 * @param loader a fully configured loader object
+	 * @param keyStart string used to start a key
+	 * @param data the data to load information from, usually a mapping of strings to objects
+	 * @param loadedTypes loaded types as lookup for links
+	 * @param cs core settings required for loading data
 	 * @throws URISyntaxException if creating a URI for an SKB link failed
-	 * @throws IllegalAccessException if an entry object could not be created due to a class error (type class)
-	 * @throws InstantiationException if an entry object could not be created due to a class error (type class)
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 */
-	default void load(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException{
-		StrBuilder err = this.getSchema().testSchema(loader.getEntryMap());
+	default void load(String keyStart, Object data, LoadedTypeMap loadedTypes, CoreSettings cs) throws URISyntaxException {
+		StrBuilder err = this.getSchema().testSchema(data);
 		if(err.size()>0){
 			throw new IllegalArgumentException(err.toString());
 		}
-		this.loadObject(loader);
+		this.loadObject(keyStart, data, loadedTypes, cs);
 	}
 
 	/**
