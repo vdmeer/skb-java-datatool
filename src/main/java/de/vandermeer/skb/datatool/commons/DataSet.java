@@ -142,7 +142,7 @@ public class DataSet<E extends DataEntry> {
 		}
 
 		@SuppressWarnings("unchecked")
-		DataSet<E> ds = (DataSet<E>) this.cs.getSupportedTypes().getMap().get(entryType).newSetInstance();
+		DataSet<E> ds = (DataSet<E>) this.cs.getSupportedTypes().get(entryType).newSetInstance();
 		ds.cs = this.cs;
 		FileSourceList fsl = dl.load();
 		ds.load(fsl.getSource(), entryType.getInputFileExtension());
@@ -168,7 +168,7 @@ public class DataSet<E extends DataEntry> {
 				List<Map<String, Object>> jsonList = om.readValue(fs.asFile(), new TypeReference<ArrayList<HashMap<String, Object>>>(){});
 				for(Map<String, Object> entryMap : jsonList){
 					AbstractDataLoader dl = new AbstractDataLoader(keyStart, this.cs, entryMap);
-					DataSetLoader<?> dsl = this.cs.getSupportedTypes().getLoader(this.type);
+					DataSetLoader<?> dsl = this.cs.getSupportedTypes().get(this.type);
 					DataEntry entry = dsl.newEntryInstance();
 					entry.load(dl);
 					if(entry.getKey().contains("#dummy")){

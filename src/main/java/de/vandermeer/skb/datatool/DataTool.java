@@ -201,7 +201,7 @@ public class DataTool implements ExecS_Application {
 			}
 		}
 
-		CoreSettings cs = new CoreSettings(this.optionKeySep.getValue(), this.verbose, this.getAppName(), this.optionDirIn.getValue(), target, this.tlMap);
+		CoreSettings cs = new CoreSettings(this.optionKeySep.getValue(), this.verbose, this.getAppName(), this.optionDirIn.getValue(), target, this.tlMap.getMap());
 
 		DataSetLoader<?> dsl = this.tlMap.getLoader(type);
 		dsl.setInitial(cs);

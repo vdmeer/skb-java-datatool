@@ -1,5 +1,7 @@
 package de.vandermeer.skb.datatool.commons;
 
+import java.util.Map;
+
 import de.vandermeer.skb.base.encodings.Translator;
 import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.base.encodings.TranslatorFactory.Target;
@@ -26,9 +28,9 @@ public class CoreSettings {
 	private LoadedTypeMap loadedTypes;
 
 	/** Types supported by the loader. */
-	private TypeLoaderMap supportedTypes;
+	private Map<DataEntryType, DataSetLoader<?>> supportedTypes;
 
-	public CoreSettings(char keySeparator, boolean verbose, String appName, String inputDir, DataTarget target, TypeLoaderMap supportedTypes){
+	public CoreSettings(char keySeparator, boolean verbose, String appName, String inputDir, DataTarget target, Map<DataEntryType, DataSetLoader<?>> supportedTypes){
 		this.keySeparator = keySeparator;
 		this.verbose = verbose;
 		this.appName = appName;
@@ -63,7 +65,7 @@ public class CoreSettings {
 		return this.loadedTypes;
 	}
 
-	public TypeLoaderMap getSupportedTypes(){
+	public Map<DataEntryType, DataSetLoader<?>> getSupportedTypes(){
 		return this.supportedTypes;
 	}
 

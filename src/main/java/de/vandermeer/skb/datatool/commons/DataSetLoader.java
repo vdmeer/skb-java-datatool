@@ -56,7 +56,7 @@ public interface DataSetLoader<E extends DataEntry> {
 	default void load() {
 		if(this.getDataEntryType().getRequiredTypes()!=null){
 			for(DataEntryType dt : this.getDataEntryType().getRequiredTypes()){
-				DataSetLoader<?> dsl = this.getCs().getSupportedTypes().getMap().get(dt);
+				DataSetLoader<?> dsl = this.getCs().getSupportedTypes().get(dt);
 				if(dsl==null){
 					Skb_Console.conError("{}: loading type <{}> requires <{}>, which is not supported in system", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType(), dt.getType()});
 				}
