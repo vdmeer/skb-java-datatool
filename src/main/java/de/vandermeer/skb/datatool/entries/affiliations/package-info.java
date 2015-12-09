@@ -17,6 +17,6 @@
  * Everything to deal with affiliations.
  * 
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2 build 150910 (10-Sep-15) for Java 1.7
+ * @version    v0.0.1 build 151209 (09-Dec-15) for Java 1.8
  */
 package de.vandermeer.skb.datatool.entries.affiliations;
