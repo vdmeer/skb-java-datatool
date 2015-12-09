@@ -13,7 +13,19 @@
  * limitations under the License.
  */
 
+/**
+ * STG for generating JAVA code that realizes a text to HTML translator for the SKB-Java.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.1 build 151209 (09-Dec-15)
+ *
+ */
 
+/*
+ * Builds the text output
+ * entry - list of data entries
+ * entry2 - another list of data entries, of a different type
+ */
 build(entry, entry2) ::= <<
 /* Copyright 2015 Sven van der Meer \<vdmeer.sven@mykolab.com\>
  *

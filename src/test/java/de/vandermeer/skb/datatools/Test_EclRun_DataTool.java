@@ -43,10 +43,10 @@ public class Test_EclRun_DataTool {
 //					"people",
 //					"continents",
 //					"countries",
-//					"cities",
+					"cities",
 //					"encodings",
 //					"months",
-					"day-of-week",
+//					"day-of-week",
 
 					"--target",
 					"html-tab",

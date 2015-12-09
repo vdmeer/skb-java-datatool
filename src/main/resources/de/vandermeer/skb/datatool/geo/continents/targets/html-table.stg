@@ -14,9 +14,19 @@
  */
 
 delimiters "$", "$"
+/**
+ * STG for generating a simple HTML table for continent data entries.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.1 build 151209 (09-Dec-15)
+ *
+ */
+
+delimiters "$", "$"
 
 /*
- * build
+ * Builds the HTML table
+ * entry - list of data entries
  */
 build(entry) ::= <<
 <html>
