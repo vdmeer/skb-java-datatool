@@ -27,9 +27,12 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
  */
 public abstract class AcronymKeys {
 
+	/** Key for the short version of the acronym. */
 	public static EntryKey ACR_SHORT = new AbstractEntryKey("short", "short version of an acronym", String.class, true, null);
 
+	/** Key for the long version of the acronym. */
 	public static EntryKey ACR_LONG = new AbstractEntryKey("long", "long version of an acronym", String.class, true, null);
 
+	/** Key (local) for the short version of the acronym without any translations. */
 	public static EntryKey LOCAL_ACRONYM_SHORT_ORIG = new AbstractEntryKey("short", "orignal string of short version of an acronym", String.class, false, null);
 }

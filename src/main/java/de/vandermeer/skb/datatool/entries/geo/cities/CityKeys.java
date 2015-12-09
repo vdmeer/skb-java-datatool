@@ -27,10 +27,21 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
  */
 public abstract class CityKeys {
 
+	/** Key for the WAC code of a city. */
 	public static EntryKey GEO_CITY_WAC = new AbstractEntryKey("wac", "WAC code for a city", String.class, false, null);
+
+	/** Key for the IATA code of a city. */
 	public static EntryKey GEO_CITY_IATA = new AbstractEntryKey("iata", "IATA code for a city", String.class, false, null);
+
+	/** Key for the ICAO code of a city. */
 	public static EntryKey GEO_CITY_ICAO = new AbstractEntryKey("icao", "ICAO code for a city", String.class, false, null);
+
+	/** Key for the state of a city. */
 	public static EntryKey GEO_CITY_STATE = new AbstractEntryKey("s", "a state the city is in", String.class, true, null);
+
+	/** Key for the region of a city. */
 	public static EntryKey GEO_CITY_REGION = new AbstractEntryKey("r", "a region the city is in", String.class, true, null);
+
+	/** Key for the county of a city. */
 	public static EntryKey GEO_CITY_COUNTY = new AbstractEntryKey("y", "county the city is in", String.class, true, null);
 }

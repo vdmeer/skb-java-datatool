@@ -1,4 +1,4 @@
-/* Copyright 2014 Sven van der Meer <vdmeer.sven@mykolab.com>
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package de.vandermeer.skb.datatool.entries.geo.continents;
+package de.vandermeer.skb.datatool.entries.date.dow;
 
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -29,37 +29,45 @@ import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
+import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
 import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
-import de.vandermeer.skb.datatool.entries.geo.GeoKeys;
+import de.vandermeer.skb.datatool.entries.EntryKeys;
+import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntry;
 
 /**
- * A data entry for continents.
+ * A single day-of-week entry.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.6 build 150812 (12-Aug-15) for Java 1.8
  * @since      v0.0.1
  */
-public class ContinentEntry implements DataEntry {
+public class DayofweekEntry implements DataEntry {
 
-	/** Continent entry type. */
+	/** Day-of-week entry type. */
 	public static DataEntryType ENTRY_TYPE =
 			new AbstractDataEntryType(
-					"continents", "cont"
+					"day-of-week", "dow",
+					new DataEntryType[]{
+							AcronymEntry.ENTRY_TYPE
+					}
 			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/geo/continents/targets/html-table.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/date/dow/targets/html-table.stg"))
 	;
 
-	/** Continent schema. */
+	/** Day-of-week schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-				put(CommonKeys.KEY, true);
-				put(GeoKeys.GEO_NAME, true);
+				put(EntryKeys.ACRONYM, true);
+				put(DayofweekKeys.NUMBER, true);
 			}}
 	);
 
 	/** The local entry map. */
 	private Map<EntryKey, Object> entryMap;
+
+	/** Map with linkeable data entries from other sets. */
+	private LoadedTypeMap loadedTypes;
 
 	@Override
 	public DataEntrySchema getSchema(){
@@ -67,27 +75,69 @@ public class ContinentEntry implements DataEntry {
 	}
 
 	/**
-	 * Returns the continent name.
-	 * @return continent name
+	 * Creates a new month entry with loaded types.
+	 * @param loadedTypes loaded types
 	 */
-	public String getName(){
-		return (String)this.entryMap.get(GeoKeys.GEO_NAME);
+	DayofweekEntry(LoadedTypeMap loadedTypes){
+		this.loadedTypes = loadedTypes;
 	}
 
 	@Override
 	public String testDuplicate(Collection<DataEntry> set) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
-		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, cs);
+		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, this.loadedTypes, cs);
+
+		this.entryMap.put(EntryKeys.LOCAL_ACRONYM_LINK, DataUtilities.loadDataString(EntryKeys.ACRONYM, data));
+		this.entryMap.put(CommonKeys.KEY, this.getAcronym().getShort());
+	}
+
+	/**
+	 * Returns the long name of the dow.
+	 * @return dow long name
+	 */
+	public String getName(){
+		return this.getAcronym().getLong();
+	}
+
+	/**
+	 * Returns the number of the dow.
+	 * @return dow number
+	 */
+	public int getNumber(){
+		return (Integer)this.entryMap.get(DayofweekKeys.NUMBER);
+	}
+
+	/**
+	 * Return the short name of the dow.
+	 * @return dow short name
+	 */
+	public String getShortName(){
+		return this.getAcronym().getShort();
+	}
+
+	/**
+	 * Returns dow acronym link.
+	 * @return dow acronym link
+	 */
+	public String getAcronymLink(){
+		return (String)this.entryMap.get(EntryKeys.LOCAL_ACRONYM_LINK);
+	}
+
+	/**
+	 * Returns the expanded acronym.
+	 * @return expanded acronym
+	 */
+	public AcronymEntry getAcronym(){
+		return (AcronymEntry)this.entryMap.get(EntryKeys.ACRONYM);
 	}
 
 	@Override
 	public String getCompareString() {
-		return this.getName();
+		return this.getAcronym().getShort();
 	}
 
 	@Override

@@ -13,10 +13,19 @@
  * limitations under the License.
  */
 
+package de.vandermeer.skb.datatool.commons;
+
+import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
+import de.vandermeer.skb.datatool.commons.EntryKey;
+
 /**
- * Data tool application and options.
- * 
+ * Common keys.
+ *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.1 build 150910 (10-Sep-15) for Java 1.7
+ * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
+ * @since      v0.0.1
  */
-package de.vandermeer.skb.datatool;
+public abstract class CommonKeys {
+
+	public static EntryKey KEY = new AbstractEntryKey("key", "a manually set key, overwriting any auto-generated key", String.class, false, null);
+}

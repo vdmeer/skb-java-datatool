@@ -27,12 +27,21 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
  */
 public abstract class EncodingKeys {
 
+	/** Key for the decimal of an encoding. */
 	public static EntryKey ENC_DEC = new AbstractEntryKey("d", "decimal value of a character encoding", Integer.class, false, null);
+
+	/** Key for the chatacter (text) of an encoding. */
 	public static EntryKey ENC_CHAR = new AbstractEntryKey("c", "character representation of an encoding", String.class, false, null);
 
+	/** Key for the Unicode bloc of an encoding. */
 	public static EntryKey UNICODE_BLOCK = new AbstractEntryKey("b", "a Unicode block", String.class, false, null);
+
+	/** Key for the Unicode set of an encoding. */
 	public static EntryKey UNICODE_SET = new AbstractEntryKey("s", "a Unicode set", String.class, false, null);
 
+	/** Key (local) for the Unicode number of an encoding. */
 	public static EntryKey LOCAL_ENCODING_UC_NUMBER = new AbstractEntryKey("unicode-number", "Unicode number of an encoding", String.class, false, null);
+
+	/** Key (local) for the HTML code of an encoding. */
 	public static EntryKey LOCAL_HTML_CODE = new AbstractEntryKey("html-code", "HTML code for an encoding", String.class, false, null);
 }

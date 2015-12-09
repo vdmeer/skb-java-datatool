@@ -22,14 +22,13 @@ import java.util.Map;
 import org.apache.commons.lang3.text.StrBuilder;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
-import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.commons.EntryObject;
 import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
-import de.vandermeer.skb.datatool.entries.geo.GeoConstants;
+import de.vandermeer.skb.datatool.entries.geo.GeoKeys;
 import de.vandermeer.skb.datatool.entries.geo.cities.CityEntry;
 import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntry;
 
@@ -42,19 +41,13 @@ import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntry;
  */
 public class ObjectGeo implements EntryObject {
 
-	public static EntryKey OBJ_GEO = new AbstractEntryKey("geo", "geographic information, e.g. city or country", ObjectGeo.class, false, null);
-	public static EntryKey OBJ_GEO_CITY_NAME = new AbstractEntryKey("city-name", "name of a city", String.class, true, null);
-	public static EntryKey OBJ_GEO_CITY_LINK = new AbstractEntryKey("city", "SKB link to a city entry", CityEntry.class, false, "skb://cities");
-	public static EntryKey OBJ_GEO_COUNTRY_NAME = new AbstractEntryKey("country-name", "name of a country", String.class, true, null);
-	public static EntryKey OBJ_GEO_COUNTRY_LINK = new AbstractEntryKey("country", "SKB link to a country entry", CountryEntry.class, false, "skb://countries");
-
 	/** Geo object schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-				put(OBJ_GEO_CITY_NAME, false);
-				put(OBJ_GEO_CITY_LINK, false);
-				put(OBJ_GEO_COUNTRY_NAME, false);
-				put(OBJ_GEO_COUNTRY_LINK, false);
+				put(ObjectGeoKeys.OBJ_GEO_CITY_NAME, false);
+				put(ObjectGeoKeys.OBJ_GEO_CITY_LINK, false);
+				put(ObjectGeoKeys.OBJ_GEO_COUNTRY_NAME, false);
+				put(ObjectGeoKeys.OBJ_GEO_COUNTRY_LINK, false);
 			}}
 	);
 
@@ -69,8 +62,8 @@ public class ObjectGeo implements EntryObject {
 
 		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, (Map<?, ?>)data, loadedTypes, cs);
 
-		this.entryMap.put(GeoConstants.EKLOCAL_GEO_CITY_LINK, DataUtilities.loadDataString(OBJ_GEO_CITY_LINK, (Map<?, ?>)data));
-		this.entryMap.put(GeoConstants.EKLOCAL_GEO_COUNTRY_LINK, DataUtilities.loadDataString(OBJ_GEO_COUNTRY_LINK, (Map<?, ?>)data));
+		this.entryMap.put(GeoKeys.LOCAL_GEO_CITY_LINK, DataUtilities.loadDataString(ObjectGeoKeys.OBJ_GEO_CITY_LINK, (Map<?, ?>)data));
+		this.entryMap.put(GeoKeys.LOCAL_GEO_COUNTRY_LINK, DataUtilities.loadDataString(ObjectGeoKeys.OBJ_GEO_COUNTRY_LINK, (Map<?, ?>)data));
 
 		StrBuilder msg = new StrBuilder(50);
 
@@ -127,7 +120,7 @@ public class ObjectGeo implements EntryObject {
 	 * @return city name
 	 */
 	public String getCityName(){
-		return (String)this.entryMap.get(OBJ_GEO_CITY_NAME);
+		return (String)this.entryMap.get(ObjectGeoKeys.OBJ_GEO_CITY_NAME);
 	}
 
 	/**
@@ -135,7 +128,7 @@ public class ObjectGeo implements EntryObject {
 	 * @return city entry
 	 */
 	public CityEntry getCity(){
-		return (CityEntry)this.entryMap.get(OBJ_GEO_CITY_LINK);
+		return (CityEntry)this.entryMap.get(ObjectGeoKeys.OBJ_GEO_CITY_LINK);
 	}
 
 	/**
@@ -143,7 +136,7 @@ public class ObjectGeo implements EntryObject {
 	 * @return country name
 	 */
 	public String getCountryName(){
-		return (String)this.entryMap.get(OBJ_GEO_COUNTRY_NAME);
+		return (String)this.entryMap.get(ObjectGeoKeys.OBJ_GEO_COUNTRY_NAME);
 	}
 
 	/**
@@ -151,7 +144,7 @@ public class ObjectGeo implements EntryObject {
 	 * @return country entry
 	 */
 	public CountryEntry getCountry(){
-		return (CountryEntry)this.entryMap.get(OBJ_GEO_COUNTRY_LINK);
+		return (CountryEntry)this.entryMap.get(ObjectGeoKeys.OBJ_GEO_COUNTRY_LINK);
 	}
 
 	/**
@@ -159,7 +152,7 @@ public class ObjectGeo implements EntryObject {
 	 * @return city SKB link
 	 */
 	public String getCityLink(){
-		return (String)this.entryMap.get(GeoConstants.EKLOCAL_GEO_CITY_LINK);
+		return (String)this.entryMap.get(GeoKeys.LOCAL_GEO_CITY_LINK);
 	}
 
 	/**
@@ -167,7 +160,7 @@ public class ObjectGeo implements EntryObject {
 	 * @return country SKB link
 	 */
 	public String getCountryLink(){
-		return (String)this.entryMap.get(GeoConstants.EKLOCAL_GEO_COUNTRY_LINK);
+		return (String)this.entryMap.get(GeoKeys.LOCAL_GEO_COUNTRY_LINK);
 	}
 
 	@Override

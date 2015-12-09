@@ -22,7 +22,7 @@ import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
-import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CommonKeys;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
@@ -32,7 +32,7 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
 import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
-import de.vandermeer.skb.datatool.entries.geo.GeoConstants;
+import de.vandermeer.skb.datatool.entries.geo.GeoKeys;
 import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntry;
 
 /**
@@ -52,14 +52,14 @@ public class CountryEntry implements DataEntry {
 						ContinentEntry.ENTRY_TYPE
 					}
 			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/countries/targets/html-table.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/geo/countries/targets/html-table.stg"))
 	;
 
 	/** Country schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-				put(GeoConstants.EK_GEO_NAME, true);
-				put(GeoConstants.EK_GEO_CONTINENT, true);
+				put(GeoKeys.GEO_NAME, true);
+				put(GeoKeys.GEO_CONTINENT, true);
 				put(CountryKeys.GEO_COUNTRY_A2, true);
 				put(CountryKeys.GEO_COUNTRY_A3, false);
 				put(CountryKeys.GEO_COUNTRY_NU, false);
@@ -87,7 +87,7 @@ public class CountryEntry implements DataEntry {
 	 * @return country name
 	 */
 	public String getName(){
-		return (String)this.entryMap.get(GeoConstants.EK_GEO_NAME);
+		return (String)this.entryMap.get(GeoKeys.GEO_NAME);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class CountryEntry implements DataEntry {
 	 * @return country continent
 	 */
 	public ContinentEntry getContinent(){
-		return (ContinentEntry)this.entryMap.get(GeoConstants.EK_GEO_CONTINENT);
+		return (ContinentEntry)this.entryMap.get(GeoKeys.GEO_CONTINENT);
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class CountryEntry implements DataEntry {
 	 * @return country continent link
 	 */
 	public String getContinentLink(){
-		return (String)this.entryMap.get(GeoConstants.EKLOCAL_GEO_CONTINENT_LINK);
+		return (String)this.entryMap.get(GeoKeys.LOCAL_GEO_CONTINENT_LINK);
 	}
 
 	/**
@@ -152,8 +152,8 @@ public class CountryEntry implements DataEntry {
 	@Override
 	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
 		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, this.loadedTypes, cs);
-		this.entryMap.put(GeoConstants.EKLOCAL_GEO_CONTINENT_LINK, DataUtilities.loadDataString(GeoConstants.EK_GEO_CONTINENT, data));
-		this.entryMap.put(CommonConstants.EK_KEY, this.getTld());
+		this.entryMap.put(GeoKeys.LOCAL_GEO_CONTINENT_LINK, DataUtilities.loadDataString(GeoKeys.GEO_CONTINENT, data));
+		this.entryMap.put(CommonKeys.KEY, this.getTld());
 	}
 
 	@Override

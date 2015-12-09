@@ -13,30 +13,20 @@
  * limitations under the License.
  */
 
-package de.vandermeer.skb.datatool.entries;
+package de.vandermeer.skb.datatool.entries.date.dow;
 
 import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 
 /**
- * Constants for entries (keys).
+ * Keys used by the day-of-week entry.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
  * @since      v0.0.1
  */
-public abstract class EntryConstants {
+public abstract class DayofweekKeys {
 
-	public static EntryKey EK_ACRONYM = new AbstractEntryKey("acronym", "an SKB link to an acronym", String.class, false, "skb://acronyms");
-
-	public static EntryKey EK_DESCR = new AbstractEntryKey("descr", "description of a data entry", String.class, true, null);
-
-	public static EntryKey EK_LATEX = new AbstractEntryKey("ltx", "latex representation", String.class, false, null);
-
-	public static EntryKey EK_ASCII_DOC = new AbstractEntryKey("ad", "AsciiDoc representation", String.class, false, null);
-
-	public static EntryKey EK_HTML_ENTITY = new AbstractEntryKey("he", "an HTML entity", String.class, false, null);
-
-	public static EntryKey EKLOCAL_ACRONYM_LINK = new AbstractEntryKey("acronym-link", "orignal acronym link", String.class, false, null);
-
+	/** Key for number of the day. */
+	public static EntryKey NUMBER = new AbstractEntryKey("#", "number of the day in the week", Integer.class, false, null);
 }

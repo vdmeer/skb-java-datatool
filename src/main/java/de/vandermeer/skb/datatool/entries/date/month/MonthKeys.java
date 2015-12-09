@@ -13,10 +13,20 @@
  * limitations under the License.
  */
 
+package de.vandermeer.skb.datatool.entries.date.month;
+
+import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
+import de.vandermeer.skb.datatool.commons.EntryKey;
+
 /**
- * Data tool application and options.
- * 
+ * Keys used by the month entry.
+ *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.1 build 150910 (10-Sep-15) for Java 1.7
+ * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
+ * @since      v0.0.1
  */
-package de.vandermeer.skb.datatool;
+public abstract class MonthKeys {
+
+	/** Key for number of the month. */
+	public static EntryKey NUMBER = new AbstractEntryKey("#", "number of the month", Integer.class, false, null);
+}

@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
-import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CommonKeys;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
@@ -33,7 +33,7 @@ import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
 import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
-import de.vandermeer.skb.datatool.entries.EntryConstants;
+import de.vandermeer.skb.datatool.entries.EntryKeys;
 
 /**
  * A single encoding entry.
@@ -62,12 +62,12 @@ public class EncodingEntry implements DataEntry {
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
 				put(EncodingKeys.ENC_DEC, true);
 				put(EncodingKeys.ENC_CHAR, true);
-				put(EntryConstants.EK_HTML_ENTITY, false);
+				put(EntryKeys.HTML_ENTITY, false);
 				put(EncodingKeys.UNICODE_BLOCK, false);
 				put(EncodingKeys.UNICODE_SET, false);
-				put(EntryConstants.EK_LATEX, false);
-				put(EntryConstants.EK_ASCII_DOC, false);
-				put(EntryConstants.EK_DESCR, false);
+				put(EntryKeys.LATEX, false);
+				put(EntryKeys.ASCII_DOC, false);
+				put(EntryKeys.DESCR, false);
 			}}
 	);
 
@@ -88,7 +88,7 @@ public class EncodingEntry implements DataEntry {
 	@Override
 	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
 		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, cs);
-		this.entryMap.put(CommonConstants.EK_KEY, Integer.toString(this.getDec()));
+		this.entryMap.put(CommonKeys.KEY, Integer.toString(this.getDec()));
 
 		if(this.getText()!=null){
 			this.entryMap.put(EncodingKeys.ENC_CHAR, StringUtils.replaceEach(
@@ -111,7 +111,7 @@ public class EncodingEntry implements DataEntry {
 //		this.ucNumber = String.format("U+%4H", this.getDec());
 
 		if(this.getLatex()!=null){
-			this.entryMap.put(EntryConstants.EK_LATEX, StringUtils.replaceEach(
+			this.entryMap.put(EntryKeys.LATEX, StringUtils.replaceEach(
 					this.getLatex(),
 					new String[]{"\"", "\\"},
 					new String[]{"\\\"", "\\\\"}
@@ -162,7 +162,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return the HTML entity set of the encoding, null if not set
 	 */
 	public String getHtmlEntity(){
-		return (String)this.entryMap.get(EntryConstants.EK_HTML_ENTITY);
+		return (String)this.entryMap.get(EntryKeys.HTML_ENTITY);
 	}
 
 	/**
@@ -194,7 +194,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return LaTeX representation of the encoding, null if not set
 	 */
 	public String getLatex(){
-		return (String)this.entryMap.get(EntryConstants.EK_LATEX);
+		return (String)this.entryMap.get(EntryKeys.LATEX);
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return AsciiDoc representation of the encoding, null if not set
 	 */
 	public String getAd(){
-		return (String)this.entryMap.get(EntryConstants.EK_ASCII_DOC);
+		return (String)this.entryMap.get(EntryKeys.ASCII_DOC);
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class EncodingEntry implements DataEntry {
 	 * @return encoding description, null if not set
 	 */
 	public String getDescription(){
-		return (String)this.entryMap.get(EntryConstants.EK_DESCR);
+		return (String)this.entryMap.get(EntryKeys.DESCR);
 	}
 
 	@Override

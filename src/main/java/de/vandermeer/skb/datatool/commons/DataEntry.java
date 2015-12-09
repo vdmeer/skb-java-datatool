@@ -36,7 +36,7 @@ public interface DataEntry extends Comparable<DataEntry> {
 	 * @return key, should not be null
 	 */
 	default String getKey(){
-		return (String)this.getEntryMap().get(CommonConstants.EK_KEY);
+		return (String)this.getEntryMap().get(CommonKeys.KEY);
 	}
 
 	/**
@@ -44,7 +44,7 @@ public interface DataEntry extends Comparable<DataEntry> {
 	 * @param key new key
 	 */
 	default void setKey(String key){
-		this.getEntryMap().put(CommonConstants.EK_KEY, key);
+		this.getEntryMap().put(CommonKeys.KEY, key);
 	}
 
 	/**

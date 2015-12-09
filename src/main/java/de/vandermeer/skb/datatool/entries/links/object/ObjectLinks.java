@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
-import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataUtilities;
@@ -37,15 +36,11 @@ import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
  */
 public class ObjectLinks implements EntryObject {
 
-	public static EntryKey OBJ_LINKS = new AbstractEntryKey("links", "a links object with URLs and URNs", ObjectLinks.class, false, null);
-	public static EntryKey OBJ_LINKS_U = new AbstractEntryKey("u", "a URL inside a links object", String.class, false, null);
-	public static EntryKey OBJ_LINKS_W = new AbstractEntryKey("w", "a URL to a Wikipedia page inside a links object", String.class, false, null);
-
 	/** Links object schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-				put(OBJ_LINKS_U, false);
-				put(OBJ_LINKS_W, false);
+				put(ObjectLinksKeys.OBJ_LINKS_U, false);
+				put(ObjectLinksKeys.OBJ_LINKS_W, false);
 			}}
 	);
 
@@ -66,7 +61,7 @@ public class ObjectLinks implements EntryObject {
 	 * @return URL link, null if none set
 	 */
 	public String getUrl(){
-		return (String)this.entryMap.get(OBJ_LINKS_U);
+		return (String)this.entryMap.get(ObjectLinksKeys.OBJ_LINKS_U);
 	}
 
 	/**
@@ -74,7 +69,7 @@ public class ObjectLinks implements EntryObject {
 	 * @return Wikipedia link, null if none set
 	 */
 	public String getWikipedia(){
-		return (String)this.entryMap.get(OBJ_LINKS_W);
+		return (String)this.entryMap.get(ObjectLinksKeys.OBJ_LINKS_W);
 	}
 
 	@Override

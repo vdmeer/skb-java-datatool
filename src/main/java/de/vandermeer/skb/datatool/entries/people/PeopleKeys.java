@@ -27,7 +27,12 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
  */
 public abstract class PeopleKeys {
 
+	/** Key for person first name. */
 	public static EntryKey PEOPLE_FIRST = new AbstractEntryKey("first", "first name of a person", String.class, true, null);
+
+	/** Key for person middle name. */
 	public static EntryKey PEOPLE_MIDDLE = new AbstractEntryKey("middle", "middle name of a person", String.class, true, null);
+
+	/** Key for person last name. */
 	public static EntryKey PEOPLE_LAST = new AbstractEntryKey("last", "last name of a person", String.class, true, null);
 }

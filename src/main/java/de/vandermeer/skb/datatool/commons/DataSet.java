@@ -130,10 +130,6 @@ public class DataSet<E extends DataEntry> {
 			try{
 				List<Map<String, Object>> jsonList = om.readValue(fs.asFile(), new TypeReference<ArrayList<HashMap<String, Object>>>(){});
 				for(Map<String, Object> entryMap : jsonList){
-//					AbstractDataLoader dl = new AbstractDataLoader(keyStart, this.cs, entryMap);
-//					DataSetLoader<?> dsl = this.cs.getSupportedTypes().get(this.type).newEntryInstance();
-//					DataEntry entry = this.cs.getSupportedTypes().get(this.type).newEntryInstance();
-//					entry.load(this.cs.getSupportedTypes().get(this.type).getDataLoader(keyStart, entryMap));
 					E entry = this.factory.newInstanceLoaded(keyStart, entryMap);
 					if(entry.getKey().contains("#dummy")){
 						continue;

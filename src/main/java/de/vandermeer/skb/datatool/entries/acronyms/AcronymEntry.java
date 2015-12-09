@@ -22,7 +22,7 @@ import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
-import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CommonKeys;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
@@ -31,8 +31,9 @@ import de.vandermeer.skb.datatool.commons.DataUtilities;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
 import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
-import de.vandermeer.skb.datatool.entries.EntryConstants;
+import de.vandermeer.skb.datatool.entries.EntryKeys;
 import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
+import de.vandermeer.skb.datatool.entries.links.object.ObjectLinksKeys;
 
 /**
  * A single acronym entry.
@@ -60,9 +61,9 @@ public class AcronymEntry implements DataEntry {
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
 				put(AcronymKeys.ACR_SHORT, true);
 				put(AcronymKeys.ACR_LONG, true);
-				put(CommonConstants.EK_KEY, false);
-				put(EntryConstants.EK_DESCR, false);
-				put(ObjectLinks.OBJ_LINKS, false);
+				put(CommonKeys.KEY, false);
+				put(EntryKeys.DESCR, false);
+				put(ObjectLinksKeys.OBJ_LINKS, false);
 			}}
 	);
 
@@ -96,11 +97,11 @@ public class AcronymEntry implements DataEntry {
 		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, cs);
 		this.entryMap.put(AcronymKeys.LOCAL_ACRONYM_SHORT_ORIG, DataUtilities.loadDataString(AcronymKeys.ACR_SHORT, data));
 
-		if(this.entryMap.get(CommonConstants.EK_KEY)!=null){
-			this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.entryMap.get(CommonConstants.EK_KEY));
+		if(this.entryMap.get(CommonKeys.KEY)!=null){
+			this.entryMap.put(CommonKeys.KEY, keyStart + this.entryMap.get(CommonKeys.KEY));
 		}
 		else{
-			this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.entryMap.get(AcronymKeys.LOCAL_ACRONYM_SHORT_ORIG));
+			this.entryMap.put(CommonKeys.KEY, keyStart + this.entryMap.get(AcronymKeys.LOCAL_ACRONYM_SHORT_ORIG));
 		}
 	}
 
@@ -133,7 +134,7 @@ public class AcronymEntry implements DataEntry {
 	 * @return links, null if not set
 	 */
 	public ObjectLinks getLinks() {
-		return (ObjectLinks)this.entryMap.get(ObjectLinks.OBJ_LINKS);
+		return (ObjectLinks)this.entryMap.get(ObjectLinksKeys.OBJ_LINKS);
 	}
 
 	/**
@@ -141,7 +142,7 @@ public class AcronymEntry implements DataEntry {
 	 * @return acronym description, null if not set
 	 */
 	public String getDescription() {
-		return (String)this.entryMap.get(EntryConstants.EK_DESCR);
+		return (String)this.entryMap.get(EntryKeys.DESCR);
 	}
 
 	@Override

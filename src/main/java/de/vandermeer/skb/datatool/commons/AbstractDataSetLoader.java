@@ -15,7 +15,6 @@
 
 package de.vandermeer.skb.datatool.commons;
 
-
 /**
  * Abstract implementation of a data set loader.
  *

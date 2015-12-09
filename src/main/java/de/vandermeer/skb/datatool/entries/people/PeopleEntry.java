@@ -22,7 +22,7 @@ import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
-import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CommonKeys;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
@@ -105,7 +105,7 @@ public class PeopleEntry implements DataEntry {
 	@Override
 	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
 		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, cs);
-		this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.getLastName() + "-" + this.getFirstName());
+		this.entryMap.put(CommonKeys.KEY, keyStart + this.getLastName() + "-" + this.getFirstName());
 	}
 
 	@Override

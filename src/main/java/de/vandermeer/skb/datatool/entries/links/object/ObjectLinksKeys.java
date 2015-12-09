@@ -1,4 +1,4 @@
-/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
+/* Copyright 2014 Sven van der Meer <vdmeer.sven@mykolab.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,26 @@
  * limitations under the License.
  */
 
-package de.vandermeer.skb.datatool.entries.encodings;
+package de.vandermeer.skb.datatool.entries.links.object;
 
 import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
 import de.vandermeer.skb.datatool.commons.EntryKey;
 
 /**
- * Keys used by the HTML entity entry.
+ * Keys used by the object links.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.3.0 build 150928 (28-Sep-15) for Java 1.8
  * @since      v0.0.1
  */
-public abstract class HtmlentryKeys {
+public class ObjectLinksKeys {
 
-	/** Key (local) for an HTML replacement string. */
-	public static EntryKey LOCAL_HTML_REPLACEMENT = new AbstractEntryKey("html-replacement", "replacement for an HTML code or entity", String.class, false, null);
+	/** Key pointing to a links object. */
+	public static EntryKey OBJ_LINKS = new AbstractEntryKey("links", "a links object with URLs and URNs", ObjectLinks.class, false, null);
+
+	/** Key for a normal URL. */
+	public static EntryKey OBJ_LINKS_U = new AbstractEntryKey("u", "a URL inside a links object", String.class, false, null);
+
+	/** Key for a URL to a Wikipedia article. */
+	public static EntryKey OBJ_LINKS_W = new AbstractEntryKey("w", "a URL to a Wikipedia page inside a links object", String.class, false, null);
 }

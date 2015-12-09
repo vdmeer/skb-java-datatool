@@ -13,10 +13,18 @@
  * limitations under the License.
  */
 
-/**
- * Data tool application and options.
- * 
- * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.1 build 150910 (10-Sep-15) for Java 1.7
+delimiters "$", "$"
+
+/*
+ * build
  */
-package de.vandermeer.skb.datatool;
+build(entry) ::= <<
+<html>
+	<head></head>
+	<body>
+		<table>
+			$entry:{c | <tr><td>$c.key$</td><td>$c.name$</td><td>$c.shortName$</td><td>$c.number$</td><td>$c.bibtex$</td></tr>}; separator="\n"$
+		</table>
+	</body>
+</html>
+>>

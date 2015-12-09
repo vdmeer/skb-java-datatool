@@ -40,11 +40,13 @@ public class Test_EclRun_DataTool {
 //					"acronyms",
 //					"affiliations",
 //					"affiliation-types",
-					"people",
+//					"people",
 //					"continents",
 //					"countries",
 //					"cities",
 //					"encodings",
+//					"months",
+					"day-of-week",
 
 					"--target",
 					"html-tab",
@@ -59,8 +61,8 @@ public class Test_EclRun_DataTool {
 
 					"--verbose",
 
-					"--output-file",
-					"target/2",
+//					"--output-file",
+//					"target/2",
 
 //					"--key-sep",
 //					"/"

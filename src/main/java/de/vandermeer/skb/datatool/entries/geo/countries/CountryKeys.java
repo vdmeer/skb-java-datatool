@@ -27,10 +27,18 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
  */
 public abstract class CountryKeys {
 
-	
+	/** Key for an ISO 3122 2-character code of a country. */
 	public static EntryKey GEO_COUNTRY_A2 = new AbstractEntryKey("a2", "ISO 3166-1, 2 character code for a country", String.class, false, null);
+
+	/** Key for an ISO 3122 3-character code of a country. */
 	public static EntryKey GEO_COUNTRY_A3 = new AbstractEntryKey("a3", "ISO 3166-1, 3 character code for a country", String.class, false, null);
+
+	/** Key for an ISO 3122 numeric code of a country. */
 	public static EntryKey GEO_COUNTRY_NU = new AbstractEntryKey("nu", "ISO 3166-1, numeric code for a country", String.class, false, null);
+
+	/** Key for an E.164 code of a country. */
 	public static EntryKey GEO_COUNTRY_E164 = new AbstractEntryKey("e", "E.164 code for a country", String.class, false, null);
+
+	/** Key for cc TLD of a country. */
 	public static EntryKey GEO_COUNTRY_TLD = new AbstractEntryKey("t", "cc TLD (top level domain) for a country", String.class, false, null);
 }

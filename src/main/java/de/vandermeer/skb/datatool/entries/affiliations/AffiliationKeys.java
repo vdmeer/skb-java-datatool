@@ -27,12 +27,18 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
  */
 public abstract class AffiliationKeys {
 
+	/** Key for the type of an affiliation. */
 	public static EntryKey AFF_TYPE = new AbstractEntryKey("type", "SKB link to an affiliation type", String.class, false, "skb://affiliation-types");
+
+	/** Key for the short name of an affiliation. */
 	public static EntryKey AFF_SHORT = new AbstractEntryKey("short", "short name of an affiliation as either plain text or an SKB link", String.class, true, null);//TODO Link extra
+
+	/** Key for the long name of an affiliation. */
 	public static EntryKey AFF_LONG = new AbstractEntryKey("long", "long name of an affiliation, not required if short is an SKB link to an acronym", String.class, true, null);
+
+	/** Key for the address of an affiliation. */
 	public static EntryKey AFF_ADDR = new AbstractEntryKey("addr", "address information for an affiliation", String.class, true, null);
 
+	/** Key (local) for the original affiliation type link. */
 	public static EntryKey LOCAL_AFF_TYPE_LINK = new AbstractEntryKey("type-link", "original affiliation type link", String.class, false, null);
-
-
 }

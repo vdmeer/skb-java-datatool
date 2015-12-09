@@ -22,7 +22,7 @@ import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
 import de.vandermeer.skb.datatool.commons.AbstractDataEntryType;
-import de.vandermeer.skb.datatool.commons.CommonConstants;
+import de.vandermeer.skb.datatool.commons.CommonKeys;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
@@ -32,9 +32,10 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
 import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
 import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
 import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
-import de.vandermeer.skb.datatool.entries.geo.GeoConstants;
+import de.vandermeer.skb.datatool.entries.geo.GeoKeys;
 import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntry;
 import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
+import de.vandermeer.skb.datatool.entries.links.object.ObjectLinksKeys;
 
 /**
  * A data entry for a city.
@@ -53,22 +54,22 @@ public class CityEntry implements DataEntry {
 						CountryEntry.ENTRY_TYPE
 					}
 			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/cities/targets/html-table.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/geo/cities/targets/html-table.stg"))
 	;
 
 	/** City schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-				put(GeoConstants.EK_GEO_NAME, true);
-				put(CommonConstants.EK_KEY, false);
-				put(GeoConstants.EK_GEO_COUNTRY, true);
+				put(GeoKeys.GEO_NAME, true);
+				put(CommonKeys.KEY, false);
+				put(GeoKeys.GEO_COUNTRY, true);
 				put(CityKeys.GEO_CITY_IATA, false);
 				put(CityKeys.GEO_CITY_ICAO, false);
 				put(CityKeys.GEO_CITY_WAC, false);
 				put(CityKeys.GEO_CITY_COUNTY, false);
 				put(CityKeys.GEO_CITY_REGION, false);
 				put(CityKeys.GEO_CITY_STATE, false);
-				put(ObjectLinks.OBJ_LINKS, false);
+				put(ObjectLinksKeys.OBJ_LINKS, false);
 			}}
 	);
 
@@ -96,7 +97,7 @@ public class CityEntry implements DataEntry {
 	 * @return city name
 	 */
 	public String getName(){
-		return (String)this.entryMap.get(GeoConstants.EK_GEO_NAME);
+		return (String)this.entryMap.get(GeoKeys.GEO_NAME);
 	}
 
 	/**
@@ -104,7 +105,7 @@ public class CityEntry implements DataEntry {
 	 * @return ccity's country
 	 */
 	public CountryEntry getCountry(){
-		return (CountryEntry)this.entryMap.get(GeoConstants.EK_GEO_COUNTRY);
+		return (CountryEntry)this.entryMap.get(GeoKeys.GEO_COUNTRY);
 	}
 
 	/**
@@ -112,7 +113,7 @@ public class CityEntry implements DataEntry {
 	 * @return ccity's country link
 	 */
 	public String getCountryLink(){
-		return (String)this.entryMap.get(GeoConstants.EKLOCAL_GEO_COUNTRY_LINK);
+		return (String)this.entryMap.get(GeoKeys.LOCAL_GEO_COUNTRY_LINK);
 	}
 
 	/**
@@ -120,7 +121,7 @@ public class CityEntry implements DataEntry {
 	 * @return links, null if not set
 	 */
 	public ObjectLinks getLinks() {
-		return (ObjectLinks)this.entryMap.get(ObjectLinks.OBJ_LINKS);
+		return (ObjectLinks)this.entryMap.get(ObjectLinksKeys.OBJ_LINKS);
 	}
 
 	/**
@@ -180,13 +181,13 @@ public class CityEntry implements DataEntry {
 	@Override
 	public void loadEntry(String keyStart, Map<String, Object> data, CoreSettings cs) throws URISyntaxException {
 		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, data, this.loadedTypes, cs);
-		this.entryMap.put(GeoConstants.EKLOCAL_GEO_COUNTRY_LINK, DataUtilities.loadDataString(GeoConstants.EK_GEO_COUNTRY, data));
+		this.entryMap.put(GeoKeys.LOCAL_GEO_COUNTRY_LINK, DataUtilities.loadDataString(GeoKeys.GEO_COUNTRY, data));
 
 		if(this.getKey()!=null){
-			this.entryMap.put(CommonConstants.EK_KEY, keyStart + this.getKey());
+			this.entryMap.put(CommonKeys.KEY, keyStart + this.getKey());
 		}
 		else if(this.getName()!=null){
-			this.entryMap.put(CommonConstants.EK_KEY, keyStart + DataUtilities.loadDataString(GeoConstants.EK_GEO_NAME, data));
+			this.entryMap.put(CommonKeys.KEY, keyStart + DataUtilities.loadDataString(GeoKeys.GEO_NAME, data));
 		}
 		else{
 			throw new IllegalArgumentException("could not generate key, no key or name given");
