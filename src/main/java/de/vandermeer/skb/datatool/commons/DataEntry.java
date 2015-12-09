@@ -64,8 +64,9 @@ public interface DataEntry extends Comparable<DataEntry> {
 	 * @param loader a fully configured loader object
 	 * @throws IllegalArgumentException if any of the required arguments or map entries are not set or empty
 	 * @throws URISyntaxException if an SKB link is used to de-reference an entry and the URL is not formed well
+	 * @throws InstantiationException 
 	 */
-	default void load(DataLoader loader) throws URISyntaxException, InstantiationException, IllegalAccessException{
+	default void load(DataLoader loader) throws URISyntaxException, IllegalAccessException, InstantiationException{
 		StrBuilder err = this.getSchema().testSchema(loader.getEntryMap());
 		if(err.size()>0){
 			throw new IllegalArgumentException(err.toString());

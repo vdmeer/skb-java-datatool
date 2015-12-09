@@ -15,10 +15,7 @@
 
 package de.vandermeer.skb.datatool.commons;
 
-import java.util.Map;
-
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.datatool.target.DataTarget;
 
 /**
  * A loader for a data set.
@@ -31,14 +28,9 @@ public interface DataSetLoader<E extends DataEntry> {
 
 	/**
 	 * Sets the loader an initial loader.
-	 * @param appName the name of the calling application
-	 * @param keySep the key separator
-	 * @param inputDir the input directory
-	 * @param target the target
-	 * @param verbose flag for verbose mode
-	 * @param supportedTypes types supported by the calling object
+	 * @param cs core arguments for the loader
 	 */
-	void setInitial(String appName, char keySep, String inputDir, DataTarget target, boolean verbose, Map<DataEntryType, DataSetLoader<?>> supportedTypes);
+	void setInitial(CoreSettings cs);
 
 	/**
 	 * Sets the loader for loading required entries.
@@ -47,28 +39,10 @@ public interface DataSetLoader<E extends DataEntry> {
 	void setAsRequired(DataSetLoader<?> originalLoader);
 
 	/**
-	 * Returns the target set for the loader.
-	 * @return set target
+	 * Returns the core settings.
+	 * @return core settings
 	 */
-	DataTarget getTarget();
-
-	/**
-	 * Returns the name of the calling application.
-	 * @return name of the calling application
-	 */
-	String getAppName();
-
-	/**
-	 * Returns the loader's data set builder.
-	 * @return date set builder
-	 */
-	DataSetBuilder<E> getDataSetBuilder();
-
-	/**
-	 * Returns the loader's verbose flag.
-	 * @return verbose flag
-	 */
-	boolean getVerboseFlag();
+	CoreSettings getCs();
 
 	/**
 	 * Returns the specific data entry type for the loader.
@@ -82,13 +56,13 @@ public interface DataSetLoader<E extends DataEntry> {
 	default void load() {
 		if(this.getDataEntryType().getRequiredTypes()!=null){
 			for(DataEntryType dt : this.getDataEntryType().getRequiredTypes()){
-				DataSetLoader<?> dsl = this.getDataSetBuilder().supportedTypes.get(dt);
+				DataSetLoader<?> dsl = this.getCs().getSupportedTypes().getMap().get(dt);
 				if(dsl==null){
-					Skb_Console.conError("{}: loading type <{}> requires <{}>, which is not supported in system", new Object[]{this.getAppName(), this.getDataEntryType().getType(), dt.getType()});
+					Skb_Console.conError("{}: loading type <{}> requires <{}>, which is not supported in system", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType(), dt.getType()});
 				}
 				else{
 					dsl.setAsRequired(this);
-					if(!this.getDataSetBuilder().linkMapContainsKey(dsl.getDataEntryType())){
+					if(!this.getCs().getLoadedTypes().containsKey(dsl.getDataEntryType())){
 						dsl.load();
 					}
 				}
@@ -100,8 +74,8 @@ public interface DataSetLoader<E extends DataEntry> {
 	 * Writes statistics about a data entry set, for instance loaded entries and parsed files.
 	 */
 	default void writeStats(){
-		if(this.getVerboseFlag()==true){
-			Skb_Console.conInfo("{}: parsed <{}> {} from <{}> files", new Object[]{this.getAppName(), this.getDataSetBuilder().getLoadedTypes().getTypeEntrySize(this.getDataEntryType()), this.getDataEntryType().getType(), this.getDataSetBuilder().getLoadedTypes().get(this.getDataEntryType()).getFileNumber()});
+		if(this.getCs().getVerbose()==true){
+			Skb_Console.conInfo("{}: parsed <{}> {} from <{}> files", new Object[]{this.getCs().getAppName(), this.getCs().getLoadedTypes().getTypeEntrySize(this.getDataEntryType()), this.getDataEntryType().getType(), this.getCs().getLoadedTypes().get(this.getDataEntryType()).getFileNumber()});
 		}
 	}
 
@@ -110,7 +84,7 @@ public interface DataSetLoader<E extends DataEntry> {
 	 * @return main data set
 	 */
 	default DataSet<?> getMainDataSet(){
-		return this.getDataSetBuilder().getLoadedTypes().get(this.getDataEntryType());
+		return this.getCs().getLoadedTypes().get(this.getDataEntryType());
 	}
 
 	/**
@@ -122,8 +96,14 @@ public interface DataSetLoader<E extends DataEntry> {
 	}
 
 	/**
-	 * Returns a new instance of the data entry type the loader supports.
-	 * @return new instance
+	 * Returns a new instance of the data set the loader supports.
+	 * @return new data set instance
 	 */
 	DataSet<E> newSetInstance();
+
+	/**
+	 * Returns a new instance of the data entry the loader supports.
+	 * @return new data entry instance
+	 */
+	DataEntry newEntryInstance();
 }

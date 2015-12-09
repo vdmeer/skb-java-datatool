@@ -17,6 +17,7 @@ package de.vandermeer.skb.datatool.entries.acronyms;
 
 import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
+import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
 
@@ -32,13 +33,13 @@ public class AcronymEntryLoader extends AbstractDataSetLoader<AcronymEntry> {
 	@Override
 	public void load() {
 		super.load();
-		DataSet<AcronymEntry> ds = this.getDataSetBuilder().build(this.getDataEntryType());
+		DataSet<AcronymEntry> ds = this.newSetInstance().build(this.getDataEntryType());
 		if(ds==null){
-			Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), this.getDataEntryType().getType()});
+			Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType()});
 			return;
 		}
 		AcronymUtilities.setLongestAcr(ds);
-		this.getDataSetBuilder().putLinkMap(this.getDataEntryType(), ds);
+		this.getCs().getLoadedTypes().put(this.getDataEntryType(), ds);
 		this.writeStats();
 	}
 
@@ -49,7 +50,11 @@ public class AcronymEntryLoader extends AbstractDataSetLoader<AcronymEntry> {
 
 	@Override
 	public DataSet<AcronymEntry> newSetInstance() {
-		return new DataSet<>(AcronymEntry.class);
+		return new DataSet<>(this.getCs(), this.getDataEntryType());
 	}
 
+	@Override
+	public DataEntry newEntryInstance() {
+		return new AcronymEntry();
+	}
 }

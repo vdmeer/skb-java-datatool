@@ -33,6 +33,7 @@ import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
 import de.vandermeer.skb.base.info.DirectoryLoader;
 import de.vandermeer.skb.base.info.FileTarget;
 import de.vandermeer.skb.base.info.StgFileLoader;
+import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
@@ -141,21 +142,8 @@ public class DataTool implements ExecS_Application {
 			this.verbose = true;
 		}
 
-		String typeCli = this.optionType.getValue();
-		if(typeCli==null){
-			Skb_Console.conError("{}: requires a type, try '--help entry-type' for details", this.getAppName());
-			return -1;
-		}
-
-		DataEntryType type = null;
-		for(DataEntryType sdet : this.tlMap.getMap().keySet()){
-			if(sdet.getType().equals(typeCli)){
-				type = sdet;
-				break;
-			}
-		}
+		DataEntryType type = this.setType();
 		if(type==null){
-			Skb_Console.conError("{}: unsupported type <{}>", new Object[]{this.getAppName(), typeCli});
 			return -1;
 		}
 
@@ -166,23 +154,16 @@ public class DataTool implements ExecS_Application {
 			}
 		}
 		else{
-			String targetCli = this.optionTarget.getValue();
-			for(String targetName : type.getSupportedTargets().keySet()){
-				if(targetName.equals(targetCli)){
-					target = type.getSupportedTargets().get(targetName);
-					break;
-				}
-			}
+			target = this.setTarget(type);
 			if(target==null){
-				Skb_Console.conError("{}: type <{}> does not support target <{}>", new Object[]{this.getAppName(), typeCli, targetCli});
-				return -1;
+				return -2;
 			}
 		}
 
 		DirectoryLoader dl = new CommonsDirectoryWalker(this.optionDirIn.getValue(), DirectoryFileFilter.INSTANCE, DirectoryFileFilter.INSTANCE);
 		if(dl.getLoadErrors().size()>0){
 			Skb_Console.conError("{}: errors reading from directory <{}>\n{}", new Object[]{this.getAppName(), this.optionDirIn.getValue(), dl.getLoadErrors().render()});
-			return -2;
+			return -3;
 		}
 
 		if(target==null && this.optionFileOut.getValue()!=null){
@@ -198,11 +179,16 @@ public class DataTool implements ExecS_Application {
 				ft = new FileTarget(fn);
 				if(ft.getInitError().size()>0){
 					Skb_Console.conError("{}: errors writing to file <{}>\n{}", new Object[]{this.getAppName(), this.optionFileOut.getValue(), ft.getInitError().render()});
-					return -3;
+					return -4;
 				}
 			}
 		}
 
+		return this.process(type, target, ft);
+	}
+
+	protected int process(DataEntryType type, DataTarget target, FileTarget ft){
+		int ret = 0;
 		if(this.verbose){
 			if(target==null){
 				Skb_Console.conInfo("{}: processing {} without output generation", new Object[]{this.getAppName(), type.getType()});
@@ -215,15 +201,17 @@ public class DataTool implements ExecS_Application {
 			}
 		}
 
+		CoreSettings cs = new CoreSettings(this.optionKeySep.getValue(), this.verbose, this.getAppName(), this.optionDirIn.getValue(), target, this.tlMap);
+
 		DataSetLoader<?> dsl = this.tlMap.getLoader(type);
-		dsl.setInitial(this.getAppName(), this.optionKeySep.getValue(), this.optionDirIn.getValue(), target, this.verbose, this.tlMap.getMap());
+		dsl.setInitial(cs);
 		dsl.load();
 
 		DataSet<?> entries1 = dsl.getMainDataSet();
 		DataSet<?> entries2 = dsl.getDataSet2();
 
 		if(entries1==null){
-			return -4;
+			return -5;
 		}
 
 		if(target!=null){
@@ -237,7 +225,43 @@ public class DataTool implements ExecS_Application {
 		if(this.verbose){
 			Skb_Console.conInfo("{}: done", this.getAppName());
 		}
-		return 0;
+		return ret;
+	}
+
+	protected DataEntryType setType(){
+		String typeCli = this.optionType.getValue();
+		if(typeCli==null){
+			Skb_Console.conError("{}: requires a type, try '--help entry-type' for details", this.getAppName());
+			return null;
+		}
+
+		DataEntryType type = null;
+		for(DataEntryType sdet : this.tlMap.getMap().keySet()){
+			if(sdet.getType().equals(typeCli)){
+				type = sdet;
+				break;
+			}
+		}
+		if(type==null){
+			Skb_Console.conError("{}: unsupported type <{}>", new Object[]{this.getAppName(), typeCli});
+			return null;
+		}
+		return type;
+	}
+
+	protected DataTarget setTarget(DataEntryType type){
+		DataTarget ret = null;
+		String targetCli = this.optionTarget.getValue();
+		for(String targetName : type.getSupportedTargets().keySet()){
+			if(targetName.equals(targetCli)){
+				ret = type.getSupportedTargets().get(targetName);
+				break;
+			}
+		}
+		if(ret==null){
+			Skb_Console.conError("{}: type <{}> does not support target <{}>", new Object[]{this.getAppName(), type.getType(), targetCli});
+		}
+		return ret;
 	}
 
 	@Override
@@ -290,7 +314,7 @@ public class DataTool implements ExecS_Application {
 			}
 			catch (IOException e) {
 				Skb_Console.conError("{}: catched IO Exception <{}> -> {}", new Object[]{this.getAppName(), e.getCause(), e.getMessage()});
-				return -7;
+				return -6;
 			}
 		}
 		else{

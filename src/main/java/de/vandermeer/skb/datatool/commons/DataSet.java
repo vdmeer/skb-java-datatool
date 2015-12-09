@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonParser;
@@ -33,8 +36,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import de.vandermeer.skb.base.console.Skb_Console;
-import de.vandermeer.skb.base.encodings.Translator;
+import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
+import de.vandermeer.skb.base.info.DirectoryLoader;
 import de.vandermeer.skb.base.info.FileSource;
+import de.vandermeer.skb.base.info.FileSourceList;
 
 /**
  * Generic data set for the data tools.
@@ -51,32 +56,21 @@ public class DataSet<E extends DataEntry> {
 	/** Number of read files. */
 	int files;
 
-	/** Class of the data entry implementation. */
-	Class<E> clazz;
+	/** The data entry type the loader supports. */
+	DataEntryType type;
 
-	/** Map of data entries that entries of this set can link to. */
-	LoadedTypeMap loadedTypes;
-
-	/** Separator character for auto-generated keys. */
-	char keySeparator;
-
-	/** Character and encoding translator. */
-	Translator translator;
+	/** Core settings. */
+	private CoreSettings cs;
 
 	/** Characters excluded from translation. */
 	String[] excluded;
 
-	/** Name of the calling application. */
-	String appName;
-
-	/**
-	 * Returns a new, empty data set.
-	 */
-	public DataSet(Class<E> clazz){
+	//TODO JDOC
+	public DataSet(CoreSettings cs, DataEntryType type){
 		this.entries = new HashMap<>();
 		this.files = 0;
-		this.clazz = clazz;
-		this.loadedTypes = new LoadedTypeMap();
+		this.type = type;
+		this.cs = cs;
 	}
 
 	/**
@@ -108,8 +102,8 @@ public class DataSet<E extends DataEntry> {
 		//remove common path
 		String ret = StringUtils.substringAfterLast(fs.getAbsoluteName(), commonPath + File.separator);
 
-		//replace all path sepataros with key separators
-		ret = StringUtils.replaceChars(ret, File.separatorChar, this.keySeparator);
+		//replace all path separators with key separators
+		ret = StringUtils.replaceChars(ret, File.separatorChar, this.cs.getKeySeparator());
 
 		//remove the last dot (".json")
 		ret = StringUtils.substringBeforeLast(ret, ".");
@@ -117,7 +111,42 @@ public class DataSet<E extends DataEntry> {
 		ret = StringUtils.substringBeforeLast(ret, ".");
 
 		//return the key plus a final separator
-		return ret + this.keySeparator;
+		return ret + this.cs.getKeySeparator();
+	}
+
+	/**
+	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
+	 * The local link map will be cleared.
+	 * @param entryType the data entry type
+	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
+	 */
+	public DataSet<E> build(DataEntryType entryType){
+		return this.build(entryType, null);
+	}
+
+	/**
+	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
+	 * The local link map will be cleared.
+	 * @param entryType the data entry type
+	 * @param excluded a set of characters excluded from translations, null or empty if not applicable
+	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
+	 */
+	public DataSet<E> build(DataEntryType entryType, String[] excluded){
+		IOFileFilter fileFilter = new WildcardFileFilter(new String[]{
+				"*." + entryType.getInputFileExtension() + ".json"
+		});
+		DirectoryLoader dl = new CommonsDirectoryWalker(this.cs.getInputDir(), DirectoryFileFilter.INSTANCE, fileFilter);
+		if(dl.getLoadErrors().size()>0){
+			Skb_Console.conError("{}: errors loading files from directory <{}>\n{}", new Object[]{this.cs.getAppName(), this.cs.getInputDir(), dl.getLoadErrors().render()});
+			return null;
+		}
+
+		@SuppressWarnings("unchecked")
+		DataSet<E> ds = (DataSet<E>) this.cs.getSupportedTypes().getMap().get(entryType).newSetInstance();
+		ds.cs = this.cs;
+		FileSourceList fsl = dl.load();
+		ds.load(fsl.getSource(), entryType.getInputFileExtension());
+		return ds;
 	}
 
 	/**
@@ -126,6 +155,7 @@ public class DataSet<E extends DataEntry> {
 	 * @param fileExt the file extension used (translated to "." + fileExt + ".json"), empty if none used
 	 * @return 0 on success, larger than zero on JSON parsing error (number of found errors)
 	 */
+	@SuppressWarnings("unchecked")
 	public int load(List<FileSource> fsl, String fileExt){
 		int ret = 0;
 		String commonPath = this.calcCommonPath(fsl);
@@ -137,35 +167,35 @@ public class DataSet<E extends DataEntry> {
 			try{
 				List<Map<String, Object>> jsonList = om.readValue(fs.asFile(), new TypeReference<ArrayList<HashMap<String, Object>>>(){});
 				for(Map<String, Object> entryMap : jsonList){
-					AbstractDataLoader dl = new AbstractDataLoader(keyStart, keySeparator, entryMap, translator, loadedTypes);
-					E entry = this.clazz.newInstance();
+					AbstractDataLoader dl = new AbstractDataLoader(keyStart, this.cs, entryMap);
+					DataSetLoader<?> dsl = this.cs.getSupportedTypes().getLoader(this.type);
+					DataEntry entry = dsl.newEntryInstance();
 					entry.load(dl);
 					if(entry.getKey().contains("#dummy")){
 						continue;
 					}
 
-					@SuppressWarnings("unchecked")
 					String dup = entry.testDuplicate((Collection<DataEntry>) this.entries.values());
 					if(this.entries.containsKey(entry.getKey())){
-						Skb_Console.conError("{}: duplicate key <{}> found in file <{}>", new Object[]{this.appName, entry.getKey(), fs.getAbsoluteName()});
+						Skb_Console.conError("{}: duplicate key <{}> found in file <{}>", new Object[]{this.cs.getAppName(), entry.getKey(), fs.getAbsoluteName()});
 					}
 					else if(dup!=null){
-						Skb_Console.conError("{}: entry already in map: k1 <{}> <> k2 <{}> found in file <{}>", new Object[]{this.appName, dup, entry.getKey(), fs.getAbsoluteName()});
+						Skb_Console.conError("{}: entry already in map: k1 <{}> <> k2 <{}> found in file <{}>", new Object[]{this.cs.getAppName(), dup, entry.getKey(), fs.getAbsoluteName()});
 					}
 					else{
 						if(this.excluded==null || (!ArrayUtils.contains(this.excluded, entry.getCompareString()))){
-							this.entries.put(entry.getKey(), entry);
+							this.entries.put(entry.getKey(), (E) entry);
 						}
 					}
 				}
 				this.files++;
 			}
 			catch(IllegalArgumentException iaex){
-				Skb_Console.conError("{}: problem creating entry: <{}> in file <{}>", new Object[]{this.appName, iaex.getMessage(), fs.getAbsoluteName()});
+				Skb_Console.conError("{}: problem creating entry: <{}> in file <{}>", new Object[]{this.cs.getAppName(), iaex.getMessage(), fs.getAbsoluteName()});
 				ret++;
 			}
 			catch(URISyntaxException ue){
-				Skb_Console.conError("{}: problem creating a URI for a link: <{}> in file <{}>", new Object[]{this.appName, ue.getMessage(), fs.getAbsoluteName()});
+				Skb_Console.conError("{}: problem creating a URI for a link: <{}> in file <{}>", new Object[]{this.cs.getAppName(), ue.getMessage(), fs.getAbsoluteName()});
 				ret++;
 			}
 			catch(NullPointerException npe){

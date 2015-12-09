@@ -25,31 +25,6 @@ package de.vandermeer.skb.datatool.std;
  */
 public enum StandardDataEntrySchemas {
 
-//	/** Schema keys for acronyms. */
-//	ACRONYMS(
-//			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-//				put(StandardEntryKeys.ACR_SHORT, true);
-//				put(StandardEntryKeys.ACR_LONG, true);
-//				put(StandardEntryKeys.KEY, false);
-//				put(StandardEntryKeys.DESCR, false);
-//				put(StandardEntryKeys.OBJ_LINKS, false);
-//			}}
-//	),
-
-//	/** Schema keys for affiliations. */
-//	AFFILIATIONS(
-//			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-//				put(StandardEntryKeys.AFF_TYPE, true);
-//				put(StandardEntryKeys.KEY, false);
-//				put(StandardEntryKeys.AFF_LONG, false);
-//				put(StandardEntryKeys.AFF_SHORT, false);
-//				put(StandardEntryKeys.ACRONYM, false);
-//				put(StandardEntryKeys.AFF_ADDR, false);
-//				put(StandardEntryKeys.OBJ_GEO, false);
-//				put(StandardEntryKeys.OBJ_LINKS, false);
-//			}}
-//	),
-
 //	/** Schema keys for affiliation types. */
 //	AFFILIATION_TYPES(
 //			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
@@ -89,43 +64,6 @@ public enum StandardDataEntrySchemas {
 //				put(StandardEntryKeys.LATEX, false);
 //				put(StandardEntryKeys.ASCII_DOC, false);
 //				put(StandardEntryKeys.DESCR, false);
-//			}}
-//	),
-
-//	/** Schema for keys of a continent. */
-//	GEO_CONTINENTS(
-//			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-//				put(StandardEntryKeys.KEY, true);
-//				put(StandardEntryKeys.GEO_NAME, true);
-//			}}
-//	),
-
-//	/** Schema for keys of a country. */
-//	GEO_COUNTRIES(
-//			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-//				put(StandardEntryKeys.GEO_NAME, true);
-//				put(StandardEntryKeys.GEO_CONTINENT, true);
-//				put(StandardEntryKeys.GEO_COUNTRY_A2, true);
-//				put(StandardEntryKeys.GEO_COUNTRY_A3, false);
-//				put(StandardEntryKeys.GEO_COUNTRY_NU, false);
-//				put(StandardEntryKeys.GEO_COUNTRY_E164, false);
-//				put(StandardEntryKeys.GEO_COUNTRY_TLD, true);
-//			}}
-//	),
-
-//	/** Schema for keys of a city. */
-//	GEO_CITIES(
-//			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
-//				put(StandardEntryKeys.GEO_NAME, true);
-//				put(StandardEntryKeys.KEY, false);
-//				put(StandardEntryKeys.GEO_COUNTRY, true);
-//				put(StandardEntryKeys.GEO_CITY_IATA, false);
-//				put(StandardEntryKeys.GEO_CITY_ICAO, false);
-//				put(StandardEntryKeys.GEO_CITY_WAC, false);
-//				put(StandardEntryKeys.GEO_CITY_COUNTY, false);
-//				put(StandardEntryKeys.GEO_CITY_REGION, false);
-//				put(StandardEntryKeys.GEO_CITY_STATE, false);
-//				put(StandardEntryKeys.OBJ_LINKS, false);
 //			}}
 //	),
 

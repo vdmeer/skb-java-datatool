@@ -17,6 +17,7 @@ package de.vandermeer.skb.datatool.entries.encodings;
 
 import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
+import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
 
@@ -32,12 +33,12 @@ public class EncodingEntryLoader extends AbstractDataSetLoader<EncodingEntry> {
 	@Override
 	public void load() {
 		super.load();
-		DataSet<EncodingEntry> ds = this.getDataSetBuilder().build(this.getDataEntryType(), this.getTarget().getDefinition().getExcluded());
+		DataSet<EncodingEntry> ds = this.newSetInstance().build(this.getDataEntryType(), this.getCs().getTarget().getDefinition().getExcluded());
 		if(ds==null){
-			Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getAppName(), this.getDataEntryType().getType()});
+			Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType()});
 			return;
 		}
-		this.getDataSetBuilder().putLinkMap(this.getDataEntryType(), ds);
+		this.getCs().getLoadedTypes().put(this.getDataEntryType(), ds);
 		this.writeStats();
 	}
 
@@ -48,11 +49,16 @@ public class EncodingEntryLoader extends AbstractDataSetLoader<EncodingEntry> {
 
 	@Override
 	public DataSet<?> getDataSet2(){
-		return (DataSet<?>) this.getDataSetBuilder().getLoadedTypes().get(Htmlentry.ENTRY_TYPE);
+		return this.getCs().getLoadedTypes().get(Htmlentry.ENTRY_TYPE);
 	}
 
 	@Override
 	public DataSet<EncodingEntry> newSetInstance() {
-		return new DataSet<>(EncodingEntry.class);
+		return new DataSet<EncodingEntry>(this.getCs(), this.getDataEntryType());
+	}
+
+	@Override
+	public DataEntry newEntryInstance() {
+		return new EncodingEntry();
 	}
 }

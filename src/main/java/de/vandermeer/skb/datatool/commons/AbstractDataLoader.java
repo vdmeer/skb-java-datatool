@@ -21,8 +21,6 @@ import java.util.Map;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import de.vandermeer.skb.base.encodings.Translator;
-
 /**
  * Helper object for loading data, transforming them, and if required load complex data objects.
  *
@@ -35,79 +33,34 @@ public class AbstractDataLoader implements DataLoader {
 	/** A string used to start a key. */
 	private String keyStart;
 
-	/** A character used to separate key elements. */
-	private char keySeparator;
+	/** Core settings. */
+	private CoreSettings cs;
 
 	/** A map of entries the load can process. */
 	private Map<String, Object> entryMap;
 
-	/** A translator the loader should use. */
-	private Translator translator;
-
-	/** A map of other entries the loader might use for further load operations. */
-	LoadedTypeMap loadedTypes;
-
 	/**
 	 * Returns a new data loader.
 	 * @param keyStart the string preceding a key
-	 * @param keySeparator the character used to separate key elements
+	 * @param cs core settings
 	 * @param entryMap a map with key/value pairs to read data from
 	 * @throws IllegalArgumentException if any of the input arguments are illegal
 	 */
-	public AbstractDataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap){
-		this(keyStart, keySeparator, entryMap, null, null);
-	}
-
-	/**
-	 * Returns a new data loader.
-	 * @param keyStart the string preceding a key
-	 * @param keySeparator the character used to separate key elements
-	 * @param entryMap a map with key/value pairs to read data from
-	 * @param translator a character encoding and/or string translator (null if none required)
-	 * @throws IllegalArgumentException if any of the input arguments are illegal
-	 */
-	public AbstractDataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, Translator translator){
-		this(keyStart, keySeparator, entryMap, translator, null);
-	}
-
-	/**
-	 * Returns a new data loader.
-	 * @param keyStart the string preceding a key
-	 * @param keySeparator the character used to separate key elements
-	 * @param entryMap a map with key/value pairs to read data from
-	 * @param loadedTypes a map of other Data Entries (null if none required)
-	 * @throws IllegalArgumentException if any of the input arguments are illegal
-	 */
-	public AbstractDataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, LoadedTypeMap loadedTypes){
-		this(keyStart, keySeparator, entryMap, null, loadedTypes);
-	}
-
-	/**
-	 * Returns a new data loader.
-	 * @param keyStart the string preceding a key
-	 * @param keySeparator the character used to separate key elements
-	 * @param entryMap a map with key/value pairs to read data from
-	 * @param translator a character encoding and/or string translator (null if none required)
-	 * @param loadedTypes a map of other Data Entries (null if none required)
-	 * @throws IllegalArgumentException if any of the input arguments are illegal
-	 */
-	public AbstractDataLoader(String keyStart, char keySeparator, Map<String, Object> entryMap, Translator translator, LoadedTypeMap loadedTypes){
+	public AbstractDataLoader(String keyStart, CoreSettings cs, Map<String, Object> entryMap){
 		if(keyStart==null){
 			throw new IllegalArgumentException("no keyStart given");
 		}
-		else if(!StringUtils.endsWith(keyStart, Character.toString(keySeparator))){
+		else if(!StringUtils.endsWith(keyStart, Character.toString(cs.getKeySeparator()))){
 			throw new IllegalArgumentException("wrong end of keyStart");
 		}
 		this.keyStart = keyStart;
-		this.keySeparator = keySeparator;
+
+		this.cs = cs;
 
 		this.entryMap = entryMap;
 		if(entryMap==null){
 			throw new IllegalArgumentException("entryMap is null");
 		}
-
-		this.translator = translator;
-		this.loadedTypes = loadedTypes;
 	}
 
 	/**
@@ -133,7 +86,7 @@ public class AbstractDataLoader implements DataLoader {
 		if(ClassUtils.isAssignable(key.getType(), EntryObject.class)){
 			EntryObject eo = (EntryObject)key.getType().newInstance();
 			if(data instanceof Map){
-				eo.loadObject(new AbstractDataLoader(this.keyStart, keySeparator, (Map<String, Object>)data, null, loadedTypes));
+				eo.loadObject(new AbstractDataLoader(this.keyStart, this.getCs(), (Map<String, Object>)data));
 			}
 			return eo;
 		}
@@ -148,13 +101,13 @@ public class AbstractDataLoader implements DataLoader {
 		return this.keyStart;
 	}
 
-	/**
-	 * Returns the link map of the loader
-	 * @return link map
-	 */
-	public LoadedTypeMap getLoadedTypes(){
-		return this.loadedTypes;
-	}
+//	/**
+//	 * Returns the link map of the loader
+//	 * @return link map
+//	 */
+//	public LoadedTypeMap getLoadedTypes(){
+//		return this.loadedTypes;
+//	}
 
 	/**
 	 * Returns the entry map of the loader
@@ -164,16 +117,21 @@ public class AbstractDataLoader implements DataLoader {
 		return this.entryMap;
 	}
 
-	/**
-	 * Returns the key separator
-	 * @return key separator
-	 */
-	public char getKeySeparator(){
-		return this.keySeparator;
+	@Override
+	public CoreSettings getCs(){
+		return this.cs;
 	}
 
-	@Override
-	public Translator getTranslator() {
-		return this.translator;
-	}
+//	/**
+//	 * Returns the key separator
+//	 * @return key separator
+//	 */
+//	public char getKeySeparator(){
+//		return this.keySeparator;
+//	}
+
+//	@Override
+//	public Translator getTranslator() {
+//		return this.translator;
+//	}
 }

@@ -15,10 +15,6 @@
 
 package de.vandermeer.skb.datatool.commons;
 
-import java.util.Map;
-
-import de.vandermeer.skb.base.encodings.TranslatorFactory;
-import de.vandermeer.skb.datatool.target.DataTarget;
 
 /**
  * Abstract implementation of a data set loader.
@@ -29,43 +25,12 @@ import de.vandermeer.skb.datatool.target.DataTarget;
  */
 public abstract class AbstractDataSetLoader<E extends DataEntry> implements DataSetLoader<E> {
 
-	/** Name of the calling application. */
-	private String appName;
-
-	/** Initialized data set builder. */
-	private DataSetBuilder<E> dsb;
-
-	/** Flag for verbose mode. */
-	private boolean verbose;
-
-	/** Loaders target. */
-	private DataTarget target;
+	/** Core settings. */
+	private CoreSettings cs;
 
 	@Override
-	public void setInitial(String appName, char keySep, String inputDir, DataTarget target, boolean verbose, Map<DataEntryType, DataSetLoader<?>> supportedTypes) {
-		if(appName==null){
-			throw new IllegalArgumentException("appName is null");
-		}
-		if(inputDir==null){
-			throw new IllegalArgumentException("input directory is null");
-		}
-
-		this.appName = appName;
-		this.verbose = verbose;
-
-		this.dsb = new DataSetBuilder<E>()
-			.setAppName(appName)
-			.setKeySeparator(keySep)
-			.setDirectory(inputDir)
-			.setSupportedTypes(supportedTypes)
-		;
-
-//		this.supportedTypes = supportedTypes;
-
-		if(target!=null){
-			this.dsb.setTranslator(TranslatorFactory.getTranslator(target.getDefinition().getTranslationTarget()));
-			this.target = target;
-		}
+	public void setInitial(CoreSettings cs) {
+		this.cs = cs;
 	}
 
 	@Override
@@ -73,27 +38,11 @@ public abstract class AbstractDataSetLoader<E extends DataEntry> implements Data
 		if(originalLoader==null){
 			throw new IllegalArgumentException("originalLoader is null");
 		}
-		this.setInitial(originalLoader.getAppName(), originalLoader.getDataSetBuilder().keySeparator, originalLoader.getDataSetBuilder().directory, originalLoader.getTarget(), originalLoader.getVerboseFlag(), originalLoader.getDataSetBuilder().supportedTypes);
-		this.dsb.loadedTypes = originalLoader.getDataSetBuilder().loadedTypes;
+		this.setInitial(originalLoader.getCs());
 	}
 
 	@Override
-	public String getAppName() {
-		return this.appName;
-	}
-
-	@Override
-	public DataSetBuilder<E> getDataSetBuilder() {
-		return this.dsb;
-	}
-
-	@Override
-	public boolean getVerboseFlag() {
-		return this.verbose;
-	}
-
-	@Override
-	public DataTarget getTarget(){
-		return this.target;
+	public CoreSettings getCs(){
+		return this.cs;
 	}
 }

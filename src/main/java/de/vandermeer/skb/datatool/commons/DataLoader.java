@@ -23,8 +23,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.vandermeer.skb.base.encodings.Translator;
-
 /**
  * Loads data.
  *
@@ -85,8 +83,8 @@ public interface DataLoader {
 		}
 
 		if(key.getType().equals(String.class) && data instanceof String){
-			if(key.useTranslator()==true && this.getTranslator()!=null){
-				return this.getTranslator().translate((String)data);
+			if(key.useTranslator()==true && this.getCs().getTranslator()!=null){
+				return this.getCs().getTranslator().translate((String)data);
 			}
 			return data;
 		}
@@ -115,7 +113,7 @@ public interface DataLoader {
 
 		String uriReq = uri.getScheme() + "://" + uri.getAuthority();
 		DataEntryType type = null;
-		for(DataEntryType det : this.getLoadedTypes().keySet()){
+		for(DataEntryType det : this.getCs().getLoadedTypes().keySet()){
 			if(uriReq.equals(det.getLinkUri())){
 				type = det;
 				break;
@@ -126,7 +124,7 @@ public interface DataLoader {
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> map = (Map<String, Object>) this.getLoadedTypes().getTypeMap(type);
+		Map<String, Object> map = (Map<String, Object>) this.getCs().getLoadedTypes().getTypeMap(type);
 		if(map==null){
 			throw new IllegalArgumentException("no entry for type <" + type.getType() + "> in link map");
 		}
@@ -167,11 +165,17 @@ public interface DataLoader {
 	 */
 	String getKeyStart();
 
+//	/**
+//	 * Returns the link map of the loader
+//	 * @return link map
+//	 */
+//	LoadedTypeMap getLoadedTypes();
+
 	/**
-	 * Returns the link map of the loader
-	 * @return link map
+	 * Returns the core settings.
+	 * @return core settings
 	 */
-	LoadedTypeMap getLoadedTypes();
+	CoreSettings getCs();
 
 	/**
 	 * Returns the entry map of the loader
@@ -179,15 +183,15 @@ public interface DataLoader {
 	 */
 	Map<String, Object> getEntryMap();
 
-	/**
-	 * Returns the key separator
-	 * @return key separator
-	 */
-	char getKeySeparator();
+//	/**
+//	 * Returns the key separator
+//	 * @return key separator
+//	 */
+//	char getKeySeparator();
 
-	/**
-	 * Returns the loaders translator.
-	 * @return translator, null if not set
-	 */
-	Translator getTranslator();
+//	/**
+//	 * Returns the loaders translator.
+//	 * @return translator, null if not set
+//	 */
+//	Translator getTranslator();
 }
