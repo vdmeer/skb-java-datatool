@@ -13,10 +13,38 @@
  * limitations under the License.
  */
 
+package de.vandermeer.skb.datatool;
+
+import de.vandermeer.execs.ExecS;
+import de.vandermeer.skb.datatool.applications.DataToolApp;
+import de.vandermeer.skb.datatool.applications.LatexAcrApp;
+
 /**
- * SKB data tools.
- * 
+ * The Data Tool execution service with all registered applications.
+ *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.1 build 151209 (09-Dec-15) for Java 1.8
+ * @since      v0.0.1
  */
-package de.vandermeer.skb.datatool;
+public class DtExecS extends ExecS {
+
+	/**
+	 * Returns a new ES service.
+	 */
+	public DtExecS(){
+		super("dms");
+
+		this.addApplication(DataToolApp.APP_NAME,		DataToolApp.class);
+		this.addApplication(LatexAcrApp.APP_NAME,		LatexAcrApp.class);
+	}
+
+	/**
+	 * Main method.
+	 * @param args CLI arguments
+	 */
+	public static void main(String[] args) {
+		DtExecS run=new DtExecS();
+		int ret=run.execute(args);
+		System.exit(ret);
+	}
+}

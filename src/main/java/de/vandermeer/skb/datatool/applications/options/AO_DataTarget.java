@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package de.vandermeer.skb.datatool;
+package de.vandermeer.skb.datatool.applications.options;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,7 +52,6 @@ public class AO_DataTarget extends AbstractApplicationOption<String> {
 		builder.hasArg().argName("TARGET");
 		builder.required(required);
 		this.setCliOption(builder.build());
-
 		this.tlMap = tlMap;
 	}
 

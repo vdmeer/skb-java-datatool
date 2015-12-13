@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package de.vandermeer.skb.datatool;
+package de.vandermeer.skb.datatool.applications.options;
 
 import org.apache.commons.cli.Option;
 

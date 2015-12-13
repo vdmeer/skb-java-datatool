@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Sven van der Meer <vdmeer.sven@mykolab.com>
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,6 @@
  * Builds the text output
  * entry - list of data entries
  */
-build(entry) ::= <<
+build(entry, entry2) ::= <<
 <entry:{a | <a.key> - <a.name> - <a.shortName><if(a.geo.cityName)> - <a.geo.cityName><endif><if(a.geo.countryExp)> - <a.geo.countryExp><endif>}; separator="\n">
 >>

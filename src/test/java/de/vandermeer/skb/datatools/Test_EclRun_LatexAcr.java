@@ -17,62 +17,43 @@ package de.vandermeer.skb.datatools;
 
 import org.junit.Test;
 
-import de.vandermeer.skb.datatool.applications.DataToolApp;
+import de.vandermeer.skb.datatool.applications.LatexAcrApp;
 
 /**
- * Tests for running the Data Tool in eclipse.
+ * Tests for running the Latex-Acr Application in eclipse.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.1 build 151209 (09-Dec-15) for Java 1.8
  * @since      v0.0.1
  */
-public class Test_EclRun_DataTool {
+public class Test_EclRun_LatexAcr {
 
 	@Test
-	public void test_Run_DataTool(){
+	public void test_Run_LatexAcr(){
 		if("true".equals(System.getProperty("EclRun"))){
 			String[] args = new String[]{
-					"--help",
-//					"target",
-//					"entry-type",
+//					"--help",
 
-//					"--entry-type",
-//					"acronyms",
-//					"affiliations",
-//					"affiliation-types",
-//					"people",
-//					"continents",
-//					"countries",
-//					"cities",
-//					"encodings",
-//					"months",
-//					"day-of-week",
+					"--input-dir",
+					"V:/dev/github/skb/data",
 
-//					"--target",
-//					"html-tab",
-//					"latex-acr",
-//					"text-plain",
-//					"java-skb-h2l",
-//					"java-skb-t2h",
-//					"java-skb-t2l",
+					"--verbose",
 
-//					"--input-dir",
-//					"V:/dev/github/skb/data",
+					"--input-file",
+					"V:/dev/ericsson/pristine/pristine-code/dms/doc/dms.log",
 
-//					"--verbose",
+					"--output-file",
+					"V:/dev/ericsson/pristine/pristine-code/dms/doc/acronyms/acronyms",
 
 //					"--output-file",
 //					"target/2",
 
-//					"--key-sep",
-//					"/"
 			};
-			DataToolApp dt = new DataToolApp();
-			int ret = dt.executeApplication(args);
+			LatexAcrApp ltx = new LatexAcrApp();
+			int ret = ltx.executeApplication(args);
 			if(ret!=0){
 				System.err.println(ret);
 			}
 		}
 	}
-
 }

@@ -27,7 +27,7 @@ delimiters "$", "$"
  * Builds the HTML table
  * entry - list of data entries
  */
-build(entry) ::= <<
+build(entry, entry2) ::= <<
 <html>
 	<head></head>
 	<body>
