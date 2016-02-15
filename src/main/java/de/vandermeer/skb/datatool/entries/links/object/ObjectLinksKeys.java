@@ -27,9 +27,6 @@ import de.vandermeer.skb.datatool.commons.EntryKey;
  */
 public class ObjectLinksKeys {
 
-	/** Key pointing to a links object. */
-	public static EntryKey OBJ_LINKS = new AbstractEntryKey("links", "a links object with URLs and URNs", ObjectLinks.class, false, null);
-
 	/** Key for a normal URL. */
 	public static EntryKey OBJ_LINKS_U = new AbstractEntryKey("u", "a URL inside a links object", String.class, false, null);
 

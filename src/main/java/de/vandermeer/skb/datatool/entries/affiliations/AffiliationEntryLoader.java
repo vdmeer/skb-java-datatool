@@ -75,5 +75,4 @@ public class AffiliationEntryLoader extends AbstractDataSetLoader<AffiliationEnt
 		};
 	}
 
-
 }

@@ -32,12 +32,12 @@ public class Test_EclRun_DataTool {
 	public void test_Run_DataTool(){
 		if("true".equals(System.getProperty("EclRun"))){
 			String[] args = new String[]{
-					"--help",
+//					"--help",
 //					"target",
 //					"entry-type",
 
-//					"--entry-type",
-//					"acronyms",
+					"--entry-type",
+					"acronyms",
 //					"affiliations",
 //					"affiliation-types",
 //					"people",
@@ -47,22 +47,31 @@ public class Test_EclRun_DataTool {
 //					"encodings",
 //					"months",
 //					"day-of-week",
+//					"conferences",
 
-//					"--target",
+					"--target",
 //					"html-tab",
-//					"latex-acr",
+					"latex-acr",
 //					"text-plain",
 //					"java-skb-h2l",
 //					"java-skb-t2h",
 //					"java-skb-t2l",
 
-//					"--input-dir",
-//					"V:/dev/github/skb/data",
+					"--input-dir",
+					"V:/dev/github/skb/data",
 
 //					"--verbose",
 
 //					"--output-file",
 //					"target/2",
+
+					//for DMS docs
+//					"--output-file",
+//					"V:/dev/ericsson/pristine/pristine-code/dms/doc/latex/acronyms/#acronyms",
+
+					//for SKB-LaTeX docs
+					"--output-file",
+					"V:/dev/github/skb-latex/doc/user-guide/database/acronyms-complete",
 
 //					"--key-sep",
 //					"/"

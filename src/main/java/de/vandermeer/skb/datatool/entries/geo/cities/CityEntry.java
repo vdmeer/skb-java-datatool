@@ -35,7 +35,6 @@ import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
 import de.vandermeer.skb.datatool.entries.geo.GeoKeys;
 import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntry;
 import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
-import de.vandermeer.skb.datatool.entries.links.object.ObjectLinksKeys;
 
 /**
  * A data entry for a city.
@@ -69,7 +68,7 @@ public class CityEntry implements DataEntry {
 				put(CityKeys.GEO_CITY_COUNTY, false);
 				put(CityKeys.GEO_CITY_REGION, false);
 				put(CityKeys.GEO_CITY_STATE, false);
-				put(ObjectLinksKeys.OBJ_LINKS, false);
+				put(ObjectLinks.OBJ_LINKS, false);
 			}}
 	);
 
@@ -121,7 +120,7 @@ public class CityEntry implements DataEntry {
 	 * @return links, null if not set
 	 */
 	public ObjectLinks getLinks() {
-		return (ObjectLinks)this.entryMap.get(ObjectLinksKeys.OBJ_LINKS);
+		return (ObjectLinks)this.entryMap.get(ObjectLinks.OBJ_LINKS);
 	}
 
 	/**

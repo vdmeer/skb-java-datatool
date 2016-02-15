@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.commons.lang3.text.StrBuilder;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
+import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataUtilities;
@@ -41,6 +42,9 @@ import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntry;
  */
 public class ObjectGeo implements EntryObject {
 
+	/** Key pointing to a geo object. */
+	public static EntryKey OBJ_GEO = new AbstractEntryKey("geo", "geographic information, e.g. city or country", ObjectGeo.class, false, null);
+
 	/** Geo object schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
@@ -57,7 +61,7 @@ public class ObjectGeo implements EntryObject {
 	@Override
 	public void loadObject(String keyStart, Object data, LoadedTypeMap loadedTypes, CoreSettings cs) throws URISyntaxException {
 		if(!(data instanceof Map)){
-			throw new IllegalArgumentException("object links - data must be a map");
+			throw new IllegalArgumentException("object geo - data must be a map");
 		}
 
 		this.entryMap = DataUtilities.loadEntry(this.getSchema(), keyStart, (Map<?, ?>)data, loadedTypes, cs);

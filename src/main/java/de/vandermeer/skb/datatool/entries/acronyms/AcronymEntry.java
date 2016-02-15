@@ -33,7 +33,6 @@ import de.vandermeer.skb.datatool.commons.target.AbstractDataTarget;
 import de.vandermeer.skb.datatool.commons.target.StandardDataTargetDefinitions;
 import de.vandermeer.skb.datatool.entries.EntryKeys;
 import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
-import de.vandermeer.skb.datatool.entries.links.object.ObjectLinksKeys;
 
 /**
  * A single acronym entry.
@@ -63,7 +62,7 @@ public class AcronymEntry implements DataEntry {
 				put(AcronymKeys.ACR_LONG, true);
 				put(CommonKeys.KEY, false);
 				put(EntryKeys.DESCR, false);
-				put(ObjectLinksKeys.OBJ_LINKS, false);
+				put(ObjectLinks.OBJ_LINKS, false);
 			}}
 	);
 
@@ -134,7 +133,7 @@ public class AcronymEntry implements DataEntry {
 	 * @return links, null if not set
 	 */
 	public ObjectLinks getLinks() {
-		return (ObjectLinks)this.entryMap.get(ObjectLinksKeys.OBJ_LINKS);
+		return (ObjectLinks)this.entryMap.get(ObjectLinks.OBJ_LINKS);
 	}
 
 	/**

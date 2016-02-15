@@ -40,7 +40,7 @@ public class ObjectAffiliations implements EntryObject {
 
 	public static EntryKey OBJ_AFF_LIST = new AbstractEntryKey("list", "a list of SKB links to affiliations", String.class, false, "skb://affiliations");
 
-	/** Geo object schema. */
+	/** Affiliation object object schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(
 			new HashMap<EntryKey, Boolean>() {private static final long serialVersionUID = 1L;{
 				put(OBJ_AFF_LIST, true);

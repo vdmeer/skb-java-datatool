@@ -87,12 +87,12 @@
 		<dependency>
 			<groupId>de.vandermeer</groupId>
 			<artifactId>execs</artifactId>
-			<version>0.3.1</version>
+			<version>0.3.3</version>
 		</dependency>
 		<dependency>
 			<groupId>de.vandermeer</groupId>
 			<artifactId>skb-base</artifactId>
-			<version>0.1.6</version>
+			<version>0.1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -128,7 +128,7 @@
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>1.5.2</version>
+				<version>1.5.3</version>
 				<executions>
 					<execution>
 						<id>bundle-asciidoc</id>

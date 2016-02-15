@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.vandermeer.skb.datatool.commons.AbstractDataEntrySchema;
+import de.vandermeer.skb.datatool.commons.AbstractEntryKey;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntrySchema;
 import de.vandermeer.skb.datatool.commons.DataUtilities;
@@ -35,6 +36,9 @@ import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
  * @since      v0.0.1
  */
 public class ObjectLinks implements EntryObject {
+
+	/** Key pointing to a links object. */
+	public static EntryKey OBJ_LINKS = new AbstractEntryKey("links", "a links object with URLs and URNs", ObjectLinks.class, false, null);
 
 	/** Links object schema. */
 	public static DataEntrySchema SCHEMA = new AbstractDataEntrySchema(

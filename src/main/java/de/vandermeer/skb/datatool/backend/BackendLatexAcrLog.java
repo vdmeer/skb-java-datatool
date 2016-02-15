@@ -67,7 +67,7 @@ public class BackendLatexAcrLog {
 	 * @throws IllegalArgumentException if any required argument is not valid
 	 */
 	public BackendLatexAcrLog(String fileName){
-		Validate.notBlank(fileName, "input file cvannot be null");
+		Validate.notBlank(fileName, "input file cannot be null");
 
 		this.file = new File(fileName);
 		Validate.validState(file.exists(), "input file <%s> does not exist", fileName);

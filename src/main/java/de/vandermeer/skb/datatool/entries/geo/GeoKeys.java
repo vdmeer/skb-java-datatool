@@ -33,6 +33,9 @@ public abstract class GeoKeys {
 	/** Key for an SKB link to a country. */
 	public static EntryKey GEO_COUNTRY = new AbstractEntryKey("country", "SKB link to a country entry", String.class, false, "skb://countries");
 
+	/** Key for an SKB link to a city. */
+	public static EntryKey GEO_CITY = new AbstractEntryKey("city", "SKB link to a city entry", String.class, false, "skb://cities");
+
 	/** Key for an SKB link to a continent. */
 	public static EntryKey GEO_CONTINENT = new AbstractEntryKey("continent", "SKB link to a continent entry", String.class, false, "skb://continents");
 
@@ -40,7 +43,7 @@ public abstract class GeoKeys {
 	public static EntryKey LOCAL_GEO_CONTINENT_LINK = new AbstractEntryKey("continent-link", "original continent link", String.class, false, null);
 
 	/** Key (local) for country link. */
-	public static EntryKey LOCAL_GEO_COUNTRY_LINK = new AbstractEntryKey	("country-link", "original country link", String.class, false, null);
+	public static EntryKey LOCAL_GEO_COUNTRY_LINK = new AbstractEntryKey("country-link", "original country link", String.class, false, null);
 
 	/** Key (local) for city link. */
 	public static EntryKey LOCAL_GEO_CITY_LINK = new AbstractEntryKey("city-link", "original city link", String.class, false, null);

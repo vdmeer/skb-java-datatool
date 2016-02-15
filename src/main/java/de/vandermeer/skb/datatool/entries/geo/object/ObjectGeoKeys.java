@@ -29,9 +29,6 @@ import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntry;
  */
 public class ObjectGeoKeys {
 
-	/** Key pointing to a geo object. */
-	public static EntryKey OBJ_GEO = new AbstractEntryKey("geo", "geographic information, e.g. city or country", ObjectGeo.class, false, null);
-
 	/** Name of a city. */
 	public static EntryKey OBJ_GEO_CITY_NAME = new AbstractEntryKey("city-name", "name of a city", String.class, true, null);
 

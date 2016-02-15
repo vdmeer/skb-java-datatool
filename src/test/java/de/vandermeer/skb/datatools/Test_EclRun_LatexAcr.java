@@ -39,11 +39,17 @@ public class Test_EclRun_LatexAcr {
 
 					"--verbose",
 
-					"--input-file",
-					"V:/dev/ericsson/pristine/pristine-code/dms/doc/dms.log",
+					// for the DMS docs
+//					"--input-file",
+//					"V:/dev/ericsson/pristine/pristine-code/dms/doc/latex/dms.log",
+//					"--output-file",
+//					"V:/dev/ericsson/pristine/pristine-code/dms/doc/latex/acronyms/acronyms",
 
+					//for the SKB-LaTeX docs
+					"--input-file",
+					"V:/dev/github/skb-latex/doc/skb.log",
 					"--output-file",
-					"V:/dev/ericsson/pristine/pristine-code/dms/doc/acronyms/acronyms",
+					"V:/dev/github/skb-latex/doc/user-guide/database/acronyms",
 
 //					"--output-file",
 //					"target/2",

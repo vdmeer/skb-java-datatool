@@ -38,9 +38,7 @@ import de.vandermeer.skb.datatool.entries.EntryKeys;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntry;
 import de.vandermeer.skb.datatool.entries.geo.cities.CityEntry;
 import de.vandermeer.skb.datatool.entries.geo.object.ObjectGeo;
-import de.vandermeer.skb.datatool.entries.geo.object.ObjectGeoKeys;
 import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
-import de.vandermeer.skb.datatool.entries.links.object.ObjectLinksKeys;
 
 /**
  * A single affiliation entry.
@@ -73,8 +71,8 @@ public class AffiliationEntry implements DataEntry {
 				put(AffiliationKeys.AFF_SHORT, false);
 				put(EntryKeys.ACRONYM, false);
 				put(AffiliationKeys.AFF_ADDR, false);
-				put(ObjectGeoKeys.OBJ_GEO, false);
-				put(ObjectLinksKeys.OBJ_LINKS, false);
+				put(ObjectGeo.OBJ_GEO, false);
+				put(ObjectLinks.OBJ_LINKS, false);
 			}}
 	);
 
@@ -145,7 +143,7 @@ public class AffiliationEntry implements DataEntry {
 	 * @return affiliation geo information
 	 */
 	public ObjectGeo getGeo(){
-		return (ObjectGeo)this.entryMap.get(ObjectGeoKeys.OBJ_GEO);
+		return (ObjectGeo)this.entryMap.get(ObjectGeo.OBJ_GEO);
 	}
 
 	/**
@@ -161,7 +159,7 @@ public class AffiliationEntry implements DataEntry {
 	 * @return links, null if not set
 	 */
 	public ObjectLinks getLinks() {
-		return (ObjectLinks)this.entryMap.get(ObjectLinksKeys.OBJ_LINKS);
+		return (ObjectLinks)this.entryMap.get(ObjectLinks.OBJ_LINKS);
 	}
 
 	@Override

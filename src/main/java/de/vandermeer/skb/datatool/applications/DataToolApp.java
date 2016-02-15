@@ -31,6 +31,7 @@ import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntryLoader;
 import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntryLoader;
 import de.vandermeer.skb.datatool.entries.affiliations.AffiliationtypeEntryLoader;
+import de.vandermeer.skb.datatool.entries.conferences.ConferenceEntryLoader;
 import de.vandermeer.skb.datatool.entries.date.dow.DayofweekEntryLoader;
 import de.vandermeer.skb.datatool.entries.date.month.MonthEntryLoader;
 import de.vandermeer.skb.datatool.entries.encodings.EncodingEntryLoader;
@@ -115,6 +116,7 @@ public class DataToolApp implements ExecS_Application {
 		this.tlMap.put(new PeopleEntryLoader());
 		this.tlMap.put(new MonthEntryLoader());
 		this.tlMap.put(new DayofweekEntryLoader());
+		this.tlMap.put(new ConferenceEntryLoader());
 
 		this.optionType = new AO_DataEntryType(this.tlMap);
 		this.cli.addOption(this.optionType);
