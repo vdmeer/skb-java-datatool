@@ -87,13 +87,30 @@
 		<dependency>
 			<groupId>de.vandermeer</groupId>
 			<artifactId>execs</artifactId>
-			<version>0.3.3</version>
+			<version>0.3.4</version>
 		</dependency>
 		<dependency>
 			<groupId>de.vandermeer</groupId>
 			<artifactId>skb-base</artifactId>
-			<version>0.1.8</version>
+			<version>0.1.9</version>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.8.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.8.5</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+<!--
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -119,7 +136,7 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-
+-->
 	</dependencies>
 
 	<build>
@@ -289,6 +306,7 @@
 			</plugin>
 		</plugins>
 	</build>
+
 
 	<profiles>
 		<profile>
