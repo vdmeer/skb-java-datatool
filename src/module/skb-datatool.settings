@@ -13,4 +13,6 @@ skb.module.scm.url=https://github.com/vdmeer/skb-java-datatool
 skb.module.issueManagement.url=https://github.com/vdmeer/skb-java-datatool/issues
 skb.module.issueManagement.system=github
 skb.module.internalDependencies=execs skb-base
+skb.module.externalDependencies.compile=jackson-core-asl jackson-mapper-asl
+skb.module.externalDependencies.test=junit
 skb.module.packaging=
