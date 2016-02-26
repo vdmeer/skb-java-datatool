@@ -37,25 +37,27 @@ public class Test_EclRun_DataTool {
 //					"entry-type",
 
 					"--entry-type",
-					"acronyms",
+//					"acronyms",
 //					"affiliations",
 //					"affiliation-types",
 //					"people",
 //					"continents",
 //					"countries",
 //					"cities",
-//					"encodings",
+					"encodings",
 //					"months",
 //					"day-of-week",
 //					"conferences",
 
 					"--target",
 //					"html-tab",
-					"latex-acr",
+//					"latex-acr",
 //					"text-plain",
 //					"java-skb-h2l",
 //					"java-skb-t2h",
 //					"java-skb-t2l",
+//					"java-skb-h2ad",
+					"java-skb-t2ad",
 
 					"--input-dir",
 					"V:/dev/github/skb/data",
@@ -70,8 +72,8 @@ public class Test_EclRun_DataTool {
 //					"V:/dev/ericsson/pristine/pristine-code/dms/doc/latex/acronyms/#acronyms",
 
 					//for SKB-LaTeX docs
-					"--output-file",
-					"V:/dev/github/skb-latex/doc/user-guide/database/acronyms-complete",
+//					"--output-file",
+//					"V:/dev/github/skb-latex/doc/user-guide/database/acronyms-complete",
 
 //					"--key-sep",
 //					"/"

@@ -55,6 +55,8 @@ public class EncodingEntry implements DataEntry {
 			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_T2L, "de/vandermeer/skb/datatool/encodings/targets/java-skb-t2l.stg"))
 			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_H2L, "de/vandermeer/skb/datatool/encodings/targets/java-skb-h2l.stg"))
 			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_T2H, "de/vandermeer/skb/datatool/encodings/targets/java-skb-t2h.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_H2AD, "de/vandermeer/skb/datatool/encodings/targets/java-skb-h2ad.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.JAVA_SKB_T2AD, "de/vandermeer/skb/datatool/encodings/targets/java-skb-t2ad.stg"))
 	;
 
 	/** Encoding schema. */

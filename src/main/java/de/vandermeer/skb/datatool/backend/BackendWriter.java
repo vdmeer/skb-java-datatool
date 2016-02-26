@@ -118,7 +118,9 @@ public class BackendWriter {
 	public void writeOutput(BackendLoader bl) throws IOException{
 		Validate.notNull(bl);
 		String toWrite = null;
+
 		if(this.cs.getTarget()!=null){
+
 			ST st = this.fillTemplate(bl);
 			if(st!=null){
 				toWrite = st.render();
@@ -163,6 +165,7 @@ public class BackendWriter {
 	/**
 	 * Writes a data set to a template.
 	 * @param ds the data set to write
+	 * @param E type of the data set
 	 * @return the created template
 	 */
 	public <E extends DataEntry> ST writeST(DataSet<E> ds) {
@@ -181,6 +184,7 @@ public class BackendWriter {
 	/**
 	 * Adds a data set to the ST (entry2)
 	 * @param ds the data set to be added 
+	 * @param E type of data set
 	 * @param st the template to add to
 	 * @return the template
 	 */
@@ -192,7 +196,7 @@ public class BackendWriter {
 			st.add("entry2", entry2);
 		}
 
-		return null;
+		return st;
 	}
 
 	/**
