@@ -38,7 +38,7 @@ import de.vandermeer.skb.datatool.entries.acronyms.AcronymUtilities;
  * Backend to process a LaTeX log file for acronyms.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.1 build 151209 (09-Dec-15) for Java 1.8
+ * @version    v0.0.1 build 160301 (01-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class BackendLatexAcrLog {

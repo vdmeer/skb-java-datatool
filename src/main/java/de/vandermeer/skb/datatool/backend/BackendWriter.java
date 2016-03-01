@@ -38,7 +38,7 @@ import de.vandermeer.skb.datatool.commons.DataSet;
  * Backend to write templates to file.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.1 build 151209 (09-Dec-15) for Java 1.8
+ * @version    v0.0.1 build 160301 (01-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class BackendWriter {
@@ -165,7 +165,7 @@ public class BackendWriter {
 	/**
 	 * Writes a data set to a template.
 	 * @param ds the data set to write
-	 * @param E type of the data set
+	 * @param <E> type of the data set
 	 * @return the created template
 	 */
 	public <E extends DataEntry> ST writeST(DataSet<E> ds) {
@@ -184,7 +184,7 @@ public class BackendWriter {
 	/**
 	 * Adds a data set to the ST (entry2)
 	 * @param ds the data set to be added 
-	 * @param E type of data set
+	 * @param <E> type of data set
 	 * @param st the template to add to
 	 * @return the template
 	 */
