@@ -1,0 +1,92 @@
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * STG for generating JAVA code that realizes an text to LaTeX translator for the SKB-Java.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.1 build 160301 (01-Mar-16)
+ *
+ */
+
+/*
+ * Builds the text output
+ * entry - list of data entries
+ * entry2 - another list of data entries, of a different type
+ */
+build(entry, entry2) ::= <<
+/* Copyright 2015 Sven van der Meer \<vdmeer.sven@mykolab.com\>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.vandermeer.skb.base.encodings;
+
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * Dictionary to translate text character encodings to LaTeX character encodings.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.1 build 151209 (09-Dec-15)
+ */
+public class Text2Latex implements Translator {
+
+	/** Array of searchable strings. */
+	protected String[] searchList = new String[]{
+		<entry:{e | "<e.text>"}; separator=", ">
+	};
+
+	/** Array of replacements for searchable strings. */
+	protected String[] replacementList = new String[]{
+		<entry:{e | "<e.latex>"}; separator=", ">
+	};
+
+	/** Array of searchable HTML entity strings. */
+	protected String[] searchListHE = new String[]{
+		<entry2:{h | "<h.htmlEntity>"}; separator=", ">
+	};
+
+	/** Array of replacements for searchable HTML entity strings. */
+	protected String[] replacementListHE = new String[]{
+		<entry2:{h | "<h.htmlEntityReplacement>"}; separator=", ">
+	};
+
+	/** Array of LaTeX replacements for replacements of HTML entity strings. */
+	protected String[] latexListHE = new String[]{
+		<entry2:{h | "<h.latex>"}; separator=", ">
+	};
+
+	@Override
+	public String translate(String input){
+		String ret = StringUtils.replaceEach(input, this.searchListHE, this.replacementListHE);
+		ret = StringUtils.replaceEach(ret, this.searchList, this.replacementList);
+		ret = StringUtils.replaceEach(ret, this.replacementListHE, this.searchListHE);
+		ret = StringUtils.replaceEach(ret, this.searchListHE, this.latexListHE);
+		return ret;
+	}
+}
+
+>>

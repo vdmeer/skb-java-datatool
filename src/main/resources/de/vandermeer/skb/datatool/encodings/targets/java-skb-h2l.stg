@@ -1,0 +1,73 @@
+/* Copyright 2015 Sven van der Meer <vdmeer.sven@mykolab.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * STG for generating JAVA code that realizes an HTML to LaTeX translator for the SKB-Java.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.1 build 160301 (01-Mar-16)
+ *
+ */
+
+/*
+ * Builds the text output
+ * entry - list of data entries
+ * entry2 - another list of data entries, of a different type
+ */
+build(entry, entry2) ::= <<
+/* Copyright 2015 Sven van der Meer \<vdmeer.sven@mykolab.com\>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.vandermeer.skb.base.encodings;
+
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * Dictionary to translate HTML character encodings to LaTeX character encodings.
+ *
+ * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
+ * @version    v0.0.1 build 151209 (09-Dec-15)
+ */
+public class Html2Latex implements Translator {
+
+	/** Array of searchable strings. */
+	protected String[] searchList = new String[]{
+		<entry:{e | <if(e.htmlCode&&e.htmlEntity)>"<e.htmlCode>", "<e.htmlEntity>"<elseif(e.htmlCode)>"<e.htmlCode>"<elseif(e.htmlEntity)>"<e.htmlEntity>"<endif>}; separator=", ">
+	};
+
+	/** Array of replacements for searchable strings. */
+	protected String[] replacementList = new String[]{
+		<entry:{e | <if(e.htmlCode&&e.htmlEntity)>"<e.latex>", "<e.latex>"<elseif(e.htmlCode)>"<e.latex>"<elseif(e.htmlEntity)>"<e.latex>"<endif>}; separator=", ">
+	};
+
+	@Override
+	public String translate(String input){
+		return StringUtils.replaceEach(input, this.searchList, this.replacementList);
+	}
+}
+
+>>
