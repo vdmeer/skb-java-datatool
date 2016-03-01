@@ -86,13 +86,13 @@
         <dependency>
             <groupId>de.vandermeer</groupId>
             <artifactId>execs</artifactId>
-            <version>0.3.4-SNAPSHOT</version>
+            <version>0.3.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>de.vandermeer</groupId>
             <artifactId>skb-base</artifactId>
-            <version>0.1.9-SNAPSHOT</version>
+            <version>0.1.9</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -277,8 +277,6 @@
         </plugins>
     </build>
 
-</project>
-
     <!-- Environment Settings -->
     <issueManagement>
         <system>github</system>
@@ -305,3 +303,5 @@
 <pluginRepositories>...</pluginRepositories>
 <distributionManagement>...</distributionManagement>
 -->
+
+</project>
