@@ -24,7 +24,7 @@ import org.apache.commons.lang3.text.StrBuilder;
  * Base of the special data objects.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.1 build 160301 (01-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public interface EntryObject {

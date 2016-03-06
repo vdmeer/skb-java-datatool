@@ -17,7 +17,7 @@
  * STG for generating JAVA code that realizes a text to HTML translator for the SKB-Java.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.1 build 160301 (01-Mar-16)
+ * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16)
  *
  */
 

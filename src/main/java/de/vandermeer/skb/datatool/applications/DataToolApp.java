@@ -45,7 +45,7 @@ import de.vandermeer.skb.datatool.entries.people.PeopleEntryLoader;
  * Application to read all SKB data and cross reference if possible.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.1 build 160301 (01-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class DataToolApp implements ExecS_Application {
@@ -57,7 +57,7 @@ public class DataToolApp implements ExecS_Application {
 	public final static String APP_DISPLAY_NAME = "SKB Datatool";
 
 	/** Application version, should be same as the version in the class JavaDoc. */
-	public final static String APP_VERSION = "v0.0.1 build 160301 (01-Mar-16) for Java 1.8";
+	public final static String APP_VERSION = "v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8";
 
 	/** Application description. */
 	public final static String APP_DESCR = "Reads all SKB data from a given directory, builds cross references if possible, and generates targeted output.";
