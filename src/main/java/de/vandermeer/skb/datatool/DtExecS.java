@@ -16,14 +16,16 @@
 package de.vandermeer.skb.datatool;
 
 import de.vandermeer.execs.ExecS;
+import de.vandermeer.skb.datatool.applications.CharJavaTranslatorApp;
 import de.vandermeer.skb.datatool.applications.DataToolApp;
+import de.vandermeer.skb.datatool.applications.HeJavaTranslatorApp;
 import de.vandermeer.skb.datatool.applications.LatexAcrApp;
 
 /**
  * The Data Tool execution service with all registered applications.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class DtExecS extends ExecS {
@@ -34,8 +36,10 @@ public class DtExecS extends ExecS {
 	public DtExecS(){
 		super("dms");
 
-		this.addApplication(DataToolApp.APP_NAME,		DataToolApp.class);
-		this.addApplication(LatexAcrApp.APP_NAME,		LatexAcrApp.class);
+		this.addApplication(DataToolApp.APP_NAME,				DataToolApp.class);
+		this.addApplication(LatexAcrApp.APP_NAME,				LatexAcrApp.class);
+		this.addApplication(CharJavaTranslatorApp.APP_NAME,		CharJavaTranslatorApp.class);
+		this.addApplication(HeJavaTranslatorApp.APP_NAME,		HeJavaTranslatorApp.class);
 	}
 
 	/**

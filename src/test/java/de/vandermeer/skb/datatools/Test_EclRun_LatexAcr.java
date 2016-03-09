@@ -23,7 +23,7 @@ import de.vandermeer.skb.datatool.applications.LatexAcrApp;
  * Tests for running the Latex-Acr Application in eclipse.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class Test_EclRun_LatexAcr {
@@ -55,6 +55,7 @@ public class Test_EclRun_LatexAcr {
 //					"target/2",
 
 			};
+
 			LatexAcrApp ltx = new LatexAcrApp();
 			int ret = ltx.executeApplication(args);
 			if(ret!=0){

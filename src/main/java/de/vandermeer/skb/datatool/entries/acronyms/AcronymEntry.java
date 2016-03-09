@@ -38,7 +38,7 @@ import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
  * A single acronym entry.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class AcronymEntry implements DataEntry {
@@ -48,11 +48,11 @@ public class AcronymEntry implements DataEntry {
 			new AbstractDataEntryType(
 				"acronyms", "acr"
 			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.LATEX_TABLE, "de/vandermeer/skb/datatool/acronyms/targets/latex-table.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.LATEX_ACRONYMS, "de/vandermeer/skb/datatool/acronyms/targets/latex-acronym.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/acronyms/targets/html-table.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.SQL_SIMPLE, "de/vandermeer/skb/datatool/acronyms/targets/sql-simple.stg"))
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN, "de/vandermeer/skb/datatool/acronyms/targets/text-plain.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.LATEX_TABLE,  "de/vandermeer/skb/datatool/targets/acronyms/latex-table.stg"))
+			.addTarget(new AbstractDataTarget(AcronymTargetDefinitions.LATEX_ACRONYMS,    "de/vandermeer/skb/datatool/targets/acronyms/latex-acronym.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE,   "de/vandermeer/skb/datatool/targets/acronyms/html-table.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.SQL_SIMPLE,   "de/vandermeer/skb/datatool/targets/acronyms/sql-simple.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN,   "de/vandermeer/skb/datatool/targets/acronyms/text-plain.stg"))
 	;
 
 	/** Acronym schema. */

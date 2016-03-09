@@ -32,7 +32,7 @@ import de.vandermeer.skb.datatool.commons.target.DataTarget;
  * Backend to read all SKB data and cross reference if possible.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class BackendLoader {
@@ -65,7 +65,19 @@ public class BackendLoader {
 	private String appName;
 
 	/**
-	 * Creates a new backend loader
+	 * Creates a new backend loader with a default key separator of '/'.
+	 * @param tlMap supported type map
+	 * @param inputDirectory input directory
+	 * @param appName calling application name
+	 * @param verbose flag for verbose mode
+	 * @throws IllegalArgumentException if any required argument is not valid
+	 */
+	public BackendLoader(TypeLoaderMap tlMap, String inputDirectory, String appName, boolean verbose){
+		this(tlMap, inputDirectory, appName, '/', verbose);
+	}
+
+	/**
+	 * Creates a new backend loader.
 	 * @param tlMap supported type map
 	 * @param inputDirectory input directory
 	 * @param appName calling application name
@@ -101,12 +113,15 @@ public class BackendLoader {
 				break;
 			}
 		}
+		if(tt==null){
+			throw new IllegalArgumentException("unknown data entry type <" + type + ">");
+		}
 		this.setType(tt);
 	}
 
 	/**
 	 * Sets the entry type
-	 * @param type actual antry type
+	 * @param type actual entry type
 	 * @throws IllegalArgumentException if any required argument is not valid
 	 */
 	public void setType(DataEntryType type){
@@ -209,20 +224,9 @@ public class BackendLoader {
 	 * Returns the loaded main data set.
 	 * @return main data set
 	 */
-	public DataSet<?> getMainDataSet(){
+	public DataSet<?> getDataSet(){
 		if(this.dsl!=null){
-			return this.dsl.getMainDataSet();
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the loaded secondary data set.
-	 * @return secondary data set
-	 */
-	public DataSet<?> getSecondayDataSet(){
-		if(this.dsl!=null){
-			return this.dsl.getDataSet2();
+			return this.dsl.getDataSet();
 		}
 		return null;
 	}

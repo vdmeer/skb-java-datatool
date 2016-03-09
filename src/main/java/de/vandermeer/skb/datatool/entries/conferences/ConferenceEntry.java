@@ -47,7 +47,7 @@ import de.vandermeer.skb.datatool.entries.links.object.ObjectLinks;
  * A single conference entry.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class ConferenceEntry implements DataEntry {
@@ -62,7 +62,7 @@ public class ConferenceEntry implements DataEntry {
 							MonthEntry.ENTRY_TYPE,
 					}
 			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN, "de/vandermeer/skb/datatool/conferences/targets/text-plain.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.TEXT_PLAIN, "de/vandermeer/skb/datatool/targets/conferences/text-plain.stg"))
 	;
 
 	/** Conference schema. */

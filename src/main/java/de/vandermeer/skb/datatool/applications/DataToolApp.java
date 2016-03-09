@@ -31,21 +31,21 @@ import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntryLoader;
 import de.vandermeer.skb.datatool.entries.affiliations.AffiliationEntryLoader;
 import de.vandermeer.skb.datatool.entries.affiliations.AffiliationtypeEntryLoader;
+import de.vandermeer.skb.datatool.entries.charactermaps.CharacterMapEntryLoader;
 import de.vandermeer.skb.datatool.entries.conferences.ConferenceEntryLoader;
 import de.vandermeer.skb.datatool.entries.date.dow.DayofweekEntryLoader;
 import de.vandermeer.skb.datatool.entries.date.month.MonthEntryLoader;
-import de.vandermeer.skb.datatool.entries.encodings.EncodingEntryLoader;
-import de.vandermeer.skb.datatool.entries.encodings.HtmlentryLoader;
 import de.vandermeer.skb.datatool.entries.geo.cities.CityEntryLoader;
 import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntryLoader;
 import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntryLoader;
+import de.vandermeer.skb.datatool.entries.helemmaps.HtmlElementEntryLoader;
 import de.vandermeer.skb.datatool.entries.people.PeopleEntryLoader;
 
 /**
  * Application to read all SKB data and cross reference if possible.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class DataToolApp implements ExecS_Application {
@@ -57,7 +57,7 @@ public class DataToolApp implements ExecS_Application {
 	public final static String APP_DISPLAY_NAME = "SKB Datatool";
 
 	/** Application version, should be same as the version in the class JavaDoc. */
-	public final static String APP_VERSION = "v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8";
+	public final static String APP_VERSION = "v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8";
 
 	/** Application description. */
 	public final static String APP_DESCR = "Reads all SKB data from a given directory, builds cross references if possible, and generates targeted output.";
@@ -111,8 +111,8 @@ public class DataToolApp implements ExecS_Application {
 		this.tlMap.put(new CityEntryLoader());
 		this.tlMap.put(new CountryEntryLoader());
 		this.tlMap.put(new ContinentEntryLoader());
-		this.tlMap.put(new EncodingEntryLoader());
-		this.tlMap.put(new HtmlentryLoader());
+		this.tlMap.put(new CharacterMapEntryLoader());
+		this.tlMap.put(new HtmlElementEntryLoader());
 		this.tlMap.put(new PeopleEntryLoader());
 		this.tlMap.put(new MonthEntryLoader());
 		this.tlMap.put(new DayofweekEntryLoader());
@@ -162,6 +162,7 @@ public class DataToolApp implements ExecS_Application {
 			}
 
 			bl.loadEntry();
+			bl.getDataSetLoader().prepareDataSet();
 			bw.writeOutput(bl);
 		}
 		catch(Exception ex){

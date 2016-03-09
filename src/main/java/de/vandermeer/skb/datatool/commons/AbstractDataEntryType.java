@@ -24,7 +24,7 @@ import de.vandermeer.skb.datatool.commons.target.DataTarget;
  * Abstract implementation of a data entry type.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class AbstractDataEntryType implements DataEntryType {
@@ -86,6 +86,11 @@ public class AbstractDataEntryType implements DataEntryType {
 		return this.targets;
 	}
 
+	/**
+	 * Adds a new supported target to the data entry type.
+	 * @param target new supported target
+	 * @return self to allow for chaining
+	 */
 	public AbstractDataEntryType addTarget(DataTarget target){
 		this.targets.put(target.getDefinition().getTargetName(), target);
 		return this;

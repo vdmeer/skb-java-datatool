@@ -38,7 +38,7 @@ import de.vandermeer.skb.datatool.commons.DataSet;
  * Backend to write templates to file.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class BackendWriter {
@@ -64,8 +64,8 @@ public class BackendWriter {
 	/** Expected chunks for the ST template. */
 	private final Map<String, Set<String>> expectedStChunks = new HashMap<String, Set<String>>() {private static final long serialVersionUID = 1L;{
 		put("build", new HashSet<String>() {private static final long serialVersionUID = 1L;{
+			add("context");
 			add("entry");
-			add("entry2");
 		}});
 	}};
 
@@ -116,18 +116,28 @@ public class BackendWriter {
 	 * @throws IOException if writing to a file failed
 	 */
 	public void writeOutput(BackendLoader bl) throws IOException{
+		this.writeOutput(bl, null);
+	}
+
+	/**
+	 * Writes output.
+	 * @param bl the backend loader
+	 * @param context a context object with information that might be understood by the template
+	 * @throws IllegalArgumentException if any required argument is not valid
+	 * @throws IOException if writing to a file failed
+	 */
+	public void writeOutput(BackendLoader bl, Object context) throws IOException{
 		Validate.notNull(bl);
 		String toWrite = null;
 
 		if(this.cs.getTarget()!=null){
-
-			ST st = this.fillTemplate(bl);
+			ST st = this.fillTemplate(bl, context);
 			if(st!=null){
 				toWrite = st.render();
 			}
 		}
 		else{
-			toWrite = Skb_CollectionTransformer.MAP_TO_TEXT(bl.getMainDataSet().getMap());
+			toWrite = Skb_CollectionTransformer.MAP_TO_TEXT(bl.getDataSet().getMap());
 		}
 
 		if(toWrite!=null){
@@ -146,17 +156,14 @@ public class BackendWriter {
 	/**
 	 * Fills the template with all found data sets
 	 * @param bl backend loader with data sets
+	 * @param context a context object with information that might be understood by the template
 	 * @return created template
 	 */
-	public ST fillTemplate(BackendLoader bl){
+	public ST fillTemplate(BackendLoader bl, Object context){
 		Validate.notNull(bl);
-		DataSet<?> entries1 = bl.getMainDataSet();
+		DataSet<?> entries1 = bl.getDataSet();
 		if(entries1!=null){
-			ST st = this.writeST(entries1);
-			DataSet<?> entries2 = bl.getSecondayDataSet();
-			if(entries2!=null){
-				st = this.addToST(entries2, st);
-			}
+			ST st = this.writeST(entries1, context);
 			return st;
 		}
 		return null;
@@ -165,10 +172,11 @@ public class BackendWriter {
 	/**
 	 * Writes a data set to a template.
 	 * @param ds the data set to write
+	 * @param context a context object with information that might be understood by the template
 	 * @param <E> type of the data set
 	 * @return the created template
 	 */
-	public <E extends DataEntry> ST writeST(DataSet<E> ds) {
+	public <E extends DataEntry> ST writeST(DataSet<E> ds, Object context) {
 		Validate.notNull(ds);
 
 		if(this.cs.getTarget()!=null){
@@ -176,27 +184,10 @@ public class BackendWriter {
 			for(E entry : ds.getEntries()){
 				st.add("entry", entry);
 			}
+			st.add("context", context);
 			return st;
 		}
 		return null;
-	}
-
-	/**
-	 * Adds a data set to the ST (entry2)
-	 * @param ds the data set to be added 
-	 * @param <E> type of data set
-	 * @param st the template to add to
-	 * @return the template
-	 */
-	public <E extends DataEntry> ST addToST(DataSet<E> ds, ST st) {
-		Validate.notNull(ds);
-		Validate.notNull(st);
-
-		for(E entry2 : ds.getEntries()){
-			st.add("entry2", entry2);
-		}
-
-		return st;
 	}
 
 	/**

@@ -37,7 +37,7 @@ import de.vandermeer.skb.datatool.entries.geo.GeoKeys;
  * A data entry for continents.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class ContinentEntry implements DataEntry {
@@ -47,7 +47,7 @@ public class ContinentEntry implements DataEntry {
 			new AbstractDataEntryType(
 					"continents", "cont"
 			)
-			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/geo/continents/targets/html-table.stg"))
+			.addTarget(new AbstractDataTarget(StandardDataTargetDefinitions.HTML_TABLE, "de/vandermeer/skb/datatool/targets/geo/continents/html-table.stg"))
 	;
 
 	/** Continent schema. */

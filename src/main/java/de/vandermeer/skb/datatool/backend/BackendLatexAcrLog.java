@@ -38,7 +38,7 @@ import de.vandermeer.skb.datatool.entries.acronyms.AcronymUtilities;
  * Backend to process a LaTeX log file for acronyms.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class BackendLatexAcrLog {
@@ -52,7 +52,7 @@ public class BackendLatexAcrLog {
 	/** Set of found acronyms. */
 	final private Set<String> acronymsLog;
 
-	/** How often are (any) acornyms used in the LaTeX log. */
+	/** How often are (any) acronyms used in the LaTeX log. */
 	private int acronymsUsed;
 
 	/** Acronym loader. */
@@ -139,7 +139,7 @@ public class BackendLatexAcrLog {
 
 		Set<String> found = new TreeSet<>();
 		Set<String> notFound = new TreeSet<>();
-		Set<String> dsAcronyms = this.bl.getMainDataSet().getMap().keySet();
+		Set<String> dsAcronyms = this.bl.getDataSet().getMap().keySet();
 
 		for(String a : this.acronymsLog){
 			if(dsAcronyms.contains(a)){
@@ -161,9 +161,9 @@ public class BackendLatexAcrLog {
 			}
 		}
 		for(String a : remove){
-			this.bl.getMainDataSet().getMap().remove(a);
+			this.bl.getDataSet().getMap().remove(a);
 		}
-		AcronymUtilities.setLongestAcr((DataSet<AcronymEntry>)this.bl.getMainDataSet());
+		AcronymUtilities.setLongestAcr((DataSet<AcronymEntry>)this.bl.getDataSet());
 
 		if(bl.getCs().getVerbose()==true){
 			Skb_Console.conInfo("{}: acronyms not found are: {}", new Object[]{this.bl.getCs().getAppName(), notFound});

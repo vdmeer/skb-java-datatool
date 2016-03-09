@@ -30,7 +30,7 @@ import de.vandermeer.skb.base.info.FileSourceList;
  * A loader for a data set.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160304 (04-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public interface DataSetLoader<E extends DataEntry> {
@@ -42,53 +42,30 @@ public interface DataSetLoader<E extends DataEntry> {
 	CoreSettings getCs();
 
 	/**
-	 * Sets core settings for the loader.
-	 * @param cs core settings
+	 * Returns the specific data entry type for the loader.
+	 * @return data entry type
 	 */
-	void setCs(CoreSettings cs);
+	DataEntryType getDataEntryType();
 
 	/**
-	 * Sets core settings for the loader.
-	 * @param loader another loader
+	 * Returns the data set loaded by the loader.
+	 * @return data set
 	 */
-	default void setCs(DataSetLoader<?> loader){
-		this.setCs(loader.getCs());
+	default DataSet<?> getDataSet(){
+		return this.getLoadedTypes().get(this.getDataEntryType());
 	}
 
 	/**
-	 * Sets loaded types this loader produced or can use.
-	 * @param loadedTypes loaded data entry types
+	 * Returns a factory for creating data entries.
+	 * @return data entry factory
 	 */
-	void setLoadedTypes(LoadedTypeMap loadedTypes);
-
-	/**
-	 * Sets loaded types this loader produced or can use.
-	 * @param loader another loader
-	 */
-	default void setLoadedTypes(DataSetLoader<?> loader){
-		this.setLoadedTypes(loader.getLoadedTypes());
-	}
-
-	/**
-	 * Takes settings from a loader to set local settings.
-	 * @param loader another loader
-	 */
-	default void set(DataSetLoader<?> loader){
-		this.setCs(loader);
-		this.setLoadedTypes(loader);
-	}
+	DataEntryFactory<E> getEntryFactory();
 
 	/**
 	 * Returns the loaded types this loader has.
 	 * @return loaded data entry types
 	 */
 	LoadedTypeMap getLoadedTypes();
-
-	/**
-	 * Returns the specific data entry type for the loader.
-	 * @return data entry type
-	 */
-	DataEntryType getDataEntryType();
 
 	/**
 	 * Loads a set of data entries.
@@ -114,48 +91,12 @@ public interface DataSetLoader<E extends DataEntry> {
 	}
 
 	/**
-	 * Writes statistics about a data entry set, for instance loaded entries and parsed files.
-	 */
-	default void writeStats(){
-		if(this.getCs().getVerbose()==true){
-			Skb_Console.conInfo("{}: parsed <{}> {} from <{}> files", new Object[]{this.getCs().getAppName(), this.getLoadedTypes().getTypeEntrySize(this.getDataEntryType()), this.getDataEntryType().getType(), getLoadedTypes().get(this.getDataEntryType()).getFileNumber()});
-		}
-	}
-
-	/**
-	 * Returns the main data set loaded by the loader.
-	 * @return main data set
-	 */
-	default DataSet<?> getMainDataSet(){
-		return this.getLoadedTypes().get(this.getDataEntryType());
-	}
-
-	/**
-	 * Returns a secondary data set loaded by the loader.
-	 * @return secondary data set, null if not applicable
-	 */
-	default DataSet<?> getDataSet2(){
-		return null;
-	}
-
-	/**
 	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
 	 * The local link map will be cleared.
 	 * @param entryType the data entry type
 	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
 	 */
 	default DataSet<E> loadFiles(DataEntryType entryType){
-		return this.loadFiles(entryType, null);
-	}
-
-	/**
-	 * Loads a data set with entries, does consistency checks, marks errors, translates encodings.
-	 * The local link map will be cleared.
-	 * @param entryType the data entry type
-	 * @param excluded a set of characters excluded from translations, null or empty if not applicable
-	 * @return a fully loaded, checked data set on success, null on error (errors are logged)
-	 */
-	default DataSet<E> loadFiles(DataEntryType entryType, String[] excluded){
 		IOFileFilter fileFilter = new WildcardFileFilter(new String[]{
 				"*." + entryType.getInputFileExtension() + ".json"
 		});
@@ -178,8 +119,59 @@ public interface DataSetLoader<E extends DataEntry> {
 	DataSet<E> newSetInstance();
 
 	/**
-	 * Returns a factory for creating data entries.
-	 * @return data entry factory
+	 * Takes settings from a loader to set local settings.
+	 * @param loader another loader
 	 */
-	DataEntryFactory<E> getEntryFactory();
+	default void set(DataSetLoader<?> loader){
+		this.setCs(loader);
+		this.setLoadedTypes(loader);
+	}
+
+	/**
+	 * Sets core settings for the loader.
+	 * @param cs core settings
+	 */
+	void setCs(CoreSettings cs);
+
+	/**
+	 * Sets core settings for the loader.
+	 * @param loader another loader
+	 */
+	default void setCs(DataSetLoader<?> loader){
+		this.setCs(loader.getCs());
+	}
+
+	/**
+	 * Sets loaded types this loader produced or can use.
+	 * @param loader another loader
+	 */
+	default void setLoadedTypes(DataSetLoader<?> loader){
+		this.setLoadedTypes(loader.getLoadedTypes());
+	}
+
+	/**
+	 * Sets loaded types this loader produced or can use.
+	 * @param loadedTypes loaded data entry types
+	 */
+	void setLoadedTypes(LoadedTypeMap loadedTypes);
+
+	/**
+	 * Writes statistics about a data entry set, for instance loaded entries and parsed files.
+	 */
+	default void writeStats(){
+		if(this.getCs().getVerbose()==true){
+			Skb_Console.conInfo("{}: parsed <{}> {} from <{}> files", new Object[]{this.getCs().getAppName(), this.getLoadedTypes().getTypeEntrySize(this.getDataEntryType()), this.getDataEntryType().getType(), getLoadedTypes().get(this.getDataEntryType()).getFileNumber()});
+		}
+	}
+
+	/**
+	 * Prepares a loaded data set for a target.
+	 * Some data sets require target-specific preparations.
+	 * For example, when taking character maps to generate translators, some targets require special dealing with some characters.
+	 * Furthermore, this method can optimize a data set for a specific target, e.g. remove entries that have (for the target) no special meaning or provide blank information.
+	 * The default action is do nothing. 
+	 */
+	default void prepareDataSet(){
+		return;
+	}
 }
