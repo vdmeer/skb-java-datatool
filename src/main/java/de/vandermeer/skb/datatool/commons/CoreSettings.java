@@ -15,16 +15,14 @@
 
 package de.vandermeer.skb.datatool.commons;
 
-import de.vandermeer.skb.base.encodings.Translator;
-import de.vandermeer.skb.base.encodings.TranslatorFactory;
-import de.vandermeer.skb.base.encodings.TranslatorFactory.Target;
 import de.vandermeer.skb.datatool.commons.target.DataTarget;
+import de.vandermeer.skb.interfaces.translators.TargetTranslator;
 
 /**
  * Core settings for the data tool and all processing components.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class CoreSettings {
@@ -104,12 +102,9 @@ public class CoreSettings {
 	 * Returns the translator.
 	 * @return translator, null if none set in the target
 	 */
-	public Translator getTranslator(){
+	public TargetTranslator getTranslator(){
 		if(this.getTarget()!=null){
-			Target target = this.getTarget().getDefinition().getTranslationTarget();
-			if(target!=null){
-				return TranslatorFactory.getTranslator(target);
-			}
+			return this.getTarget().getDefinition().getTranslator();
 		}
 		return null;
 	}

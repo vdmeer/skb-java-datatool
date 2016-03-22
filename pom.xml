@@ -94,6 +94,12 @@
     <dependencies>
         <dependency>
             <groupId>de.vandermeer</groupId>
+            <artifactId>char-translation</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.vandermeer</groupId>
             <artifactId>execs</artifactId>
             <version>0.3.6</version>
             <scope>compile</scope>

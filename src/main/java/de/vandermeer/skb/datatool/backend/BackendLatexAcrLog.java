@@ -26,19 +26,19 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
 import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntry;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntryLoader;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymUtilities;
+import de.vandermeer.skb.interfaces.MessageConsole;
 
 /**
  * Backend to process a LaTeX log file for acronyms.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class BackendLatexAcrLog {
@@ -134,7 +134,7 @@ public class BackendLatexAcrLog {
 	public void processAcronyms(){
 		this.bl.loadEntry();
 		if(bl.getCs().getVerbose()==true){
-			Skb_Console.conInfo("{}: found <{}> acronyms in LaTeX log used <{}> times", new Object[]{this.bl.getCs().getAppName(), this.acronymsLog.size(), this.acronymsUsed});
+			MessageConsole.conInfo("{}: found <{}> acronyms in LaTeX log used <{}> times", new Object[]{this.bl.getCs().getAppName(), this.acronymsLog.size(), this.acronymsUsed});
 		}
 
 		Set<String> found = new TreeSet<>();
@@ -150,8 +150,8 @@ public class BackendLatexAcrLog {
 			}
 		}
 		if(bl.getCs().getVerbose()==true){
-			Skb_Console.conInfo("{}: acronyms found in data:     <{}>", new Object[]{this.bl.getCs().getAppName(), found.size()});
-			Skb_Console.conInfo("{}: acronyms not found in data: <{}>", new Object[]{this.bl.getCs().getAppName(), notFound.size()});
+			MessageConsole.conInfo("{}: acronyms found in data:     <{}>", new Object[]{this.bl.getCs().getAppName(), found.size()});
+			MessageConsole.conInfo("{}: acronyms not found in data: <{}>", new Object[]{this.bl.getCs().getAppName(), notFound.size()});
 		}
 
 		Set<String> remove = new HashSet<String>();
@@ -166,7 +166,7 @@ public class BackendLatexAcrLog {
 		AcronymUtilities.setLongestAcr((DataSet<AcronymEntry>)this.bl.getDataSet());
 
 		if(bl.getCs().getVerbose()==true){
-			Skb_Console.conInfo("{}: acronyms not found are: {}", new Object[]{this.bl.getCs().getAppName(), notFound});
+			MessageConsole.conInfo("{}: acronyms not found are: {}", new Object[]{this.bl.getCs().getAppName(), notFound});
 		}
 
 	}

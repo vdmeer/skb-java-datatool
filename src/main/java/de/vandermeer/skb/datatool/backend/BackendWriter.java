@@ -29,16 +29,16 @@ import org.stringtemplate.v4.STGroup;
 import de.vandermeer.skb.base.info.FileTarget;
 import de.vandermeer.skb.base.info.STGroupValidator;
 import de.vandermeer.skb.base.info.StgFileLoader;
-import de.vandermeer.skb.base.utils.collections.Skb_CollectionTransformer;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataSet;
+import de.vandermeer.skb.interfaces.categories.is.transformers.Map_To_Text;
 
 /**
  * Backend to write templates to file.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class BackendWriter {
@@ -95,14 +95,14 @@ public class BackendWriter {
 
 		if(cs.getTarget()!=null){
 			this.stgLoader = new StgFileLoader(cs.getTarget().getStgFileName());
-			Validate.validState(this.stgLoader.getLoadErrors().size()==0, "problem creating STG loader for file <%s>\n%s", cs.getTarget().getStgFileName(), this.stgLoader.getLoadErrors().render());
+			Validate.validState(!this.stgLoader.getLoadErrors().hasErrors(), "problem creating STG loader for file <%s>\n%s", cs.getTarget().getStgFileName(), this.stgLoader.getLoadErrors().render());
 
 			STGroup stg = this.stgLoader.load();
-			Validate.validState(this.stgLoader.getLoadErrors().size()==0, "errors loading STG file <%s>\n%s", cs.getTarget().getStgFileName(), this.stgLoader.getLoadErrors().render());
+			Validate.validState(!this.stgLoader.getLoadErrors().hasErrors(), "errors loading STG file <%s>\n%s", cs.getTarget().getStgFileName(), this.stgLoader.getLoadErrors().render());
 			Validate.notNull(stg, "unknown error loading STG file <%s>", cs.getTarget().getStgFileName());
 
 			STGroupValidator stgVal = new STGroupValidator(stg, this.expectedStChunks);
-			Validate.validState(stgVal.getValidationErrors().size()==0, "STG validation errors for file <%s>\n%s", cs.getTarget().getStgFileName(), stgVal.getValidationErrors().render());
+			Validate.validState(!stgVal.getValidationErrors().hasErrors(), "STG validation errors for file <%s>\n%s", cs.getTarget().getStgFileName(), stgVal.getValidationErrors().render());
 
 			this.stg = stg;
 			Validate.notNull(this.stg);
@@ -137,7 +137,7 @@ public class BackendWriter {
 			}
 		}
 		else{
-			toWrite = Skb_CollectionTransformer.MAP_TO_TEXT(bl.getDataSet().getMap());
+			toWrite = Map_To_Text.create().transform(bl.getDataSet().getMap());
 		}
 
 		if(toWrite!=null){

@@ -29,7 +29,7 @@ import de.vandermeer.skb.datatool.commons.target.DataTarget;
  * Particularly, it removes entry from the data set that are not valid (need to be excluded) or not have no information for the target.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.2
  */
 public class PrepareDataSet {

@@ -15,14 +15,14 @@
 
 package de.vandermeer.skb.datatool.entries.helemmaps;
 
-import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.datatool.commons.target.DataTargetDefinition;
+import de.vandermeer.skb.interfaces.translators.TargetTranslator;
 
 /**
  * A HTML element map specific data targets.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.2
  */
 public enum HtmlElementTargetDefinitions implements DataTargetDefinition {
@@ -58,9 +58,6 @@ public enum HtmlElementTargetDefinitions implements DataTargetDefinition {
 	/** Description. */
 	String description;
 
-	/** Target for encoding translations. */
-	TranslatorFactory.Target translationTarget;
-
 	/**
 	 * Creates a new standard data target.
 	 * @param targetName the target name
@@ -79,8 +76,8 @@ public enum HtmlElementTargetDefinitions implements DataTargetDefinition {
 	}
 
 	@Override
-	public TranslatorFactory.Target getTranslationTarget(){
-		return this.translationTarget;
+	public TargetTranslator getTranslator(){
+		return null;
 	}
 
 	@Override

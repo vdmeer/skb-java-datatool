@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
  * Utilities to load data from maps.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public abstract class DataUtilities {
@@ -104,7 +104,15 @@ public abstract class DataUtilities {
 
 		if(key.getType().equals(String.class) && data instanceof String){
 			if(key.useTranslator()==true && cs.getTranslator()!=null){
-				return cs.getTranslator().translate((String)data);
+				if(cs.getTranslator().getCombinedTranslator()!=null){
+					return cs.getTranslator().getCombinedTranslator().translate(data);
+				}
+				else if(cs.getTranslator().getCharacterTranslator()!=null){
+					return cs.getTranslator().getCharacterTranslator().translateCharacters(data);
+				}
+				else if(cs.getTranslator().getHtmlElementTanslator()!=null){
+					return cs.getTranslator().getHtmlElementTanslator().translateHtmlElements(data);
+				}
 			}
 			return data;
 		}

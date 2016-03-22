@@ -18,19 +18,19 @@ package de.vandermeer.skb.datatool.entries.geo.continents;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.commons.AbstractDataSetLoader;
 import de.vandermeer.skb.datatool.commons.DataEntryFactory;
 import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
 import de.vandermeer.skb.datatool.commons.DataSetLoader;
 import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
+import de.vandermeer.skb.interfaces.MessageConsole;
 
 /**
  * Loader for continents.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class ContinentEntryLoader extends AbstractDataSetLoader<ContinentEntry> {
@@ -40,7 +40,7 @@ public class ContinentEntryLoader extends AbstractDataSetLoader<ContinentEntry> 
 		super.load(supportedTypes, loadedType);
 		DataSet<ContinentEntry> ds = this.loadFiles(this.getDataEntryType());
 		if(ds==null){
-			Skb_Console.conError("{}: errors creating data set for <{}>", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType()});
+			MessageConsole.conError("{}: errors creating data set for <{}>", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType()});
 			return;
 		}
 		loadedType.put(this.getDataEntryType(), ds);

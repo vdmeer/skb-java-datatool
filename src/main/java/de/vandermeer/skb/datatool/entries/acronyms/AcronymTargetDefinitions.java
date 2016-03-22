@@ -15,14 +15,15 @@
 
 package de.vandermeer.skb.datatool.entries.acronyms;
 
-import de.vandermeer.skb.base.encodings.TranslatorFactory;
 import de.vandermeer.skb.datatool.commons.target.DataTargetDefinition;
+import de.vandermeer.skb.interfaces.translators.TargetTranslator;
+import de.vandermeer.translation.targets.Text2Latex;
 
 /**
  * A acronym specific data targets.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.2
  */
 public enum AcronymTargetDefinitions implements DataTargetDefinition {
@@ -31,7 +32,7 @@ public enum AcronymTargetDefinitions implements DataTargetDefinition {
 	LATEX_ACRONYMS(
 			"latex-acr",
 			"tex",
-			TranslatorFactory.Target.Text2LaTeX,
+			new Text2Latex(),
 			"LaTeX for acronym package"
 	),
 	;
@@ -45,20 +46,20 @@ public enum AcronymTargetDefinitions implements DataTargetDefinition {
 	/** Description. */
 	String description;
 
-	/** Target for encoding translations. */
-	TranslatorFactory.Target translationTarget;
+	/** Translator for encoding translations. */
+	TargetTranslator translator;
 
 	/**
 	 * Creates a new standard data target.
 	 * @param targetName the target name
 	 * @param extension the file extension for output files
-	 * @param translationTarget a target for character translation
+	 * @param translator a target for character translation
 	 * @param description a description
 	 */
-	AcronymTargetDefinitions(String targetName, String extension, TranslatorFactory.Target translationTarget, String description){
+	AcronymTargetDefinitions(String targetName, String extension, TargetTranslator translator, String description){
 		this.targetName = targetName;
 		this.extension = extension;
-		this.translationTarget = translationTarget;
+		this.translator = translator;
 		this.description = description;
 	}
 
@@ -68,8 +69,8 @@ public enum AcronymTargetDefinitions implements DataTargetDefinition {
 	}
 
 	@Override
-	public TranslatorFactory.Target getTranslationTarget(){
-		return this.translationTarget;
+	public TargetTranslator getTranslator(){
+		return this.translator;
 	}
 
 	@Override

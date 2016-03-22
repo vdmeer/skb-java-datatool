@@ -22,14 +22,14 @@ import de.vandermeer.execs.options.AO_FileOut;
 import de.vandermeer.execs.options.AO_Verbose;
 import de.vandermeer.execs.options.ApplicationOption;
 import de.vandermeer.execs.options.ExecS_CliParser;
-import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.backend.BackendLatexAcrLog;
+import de.vandermeer.skb.interfaces.MessageConsole;
 
 /**
  * Application to process acronyms and LaTeX log files creating definitions for the LaTeX package acronyms.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class LatexAcrApp implements ExecS_Application {
@@ -41,7 +41,7 @@ public class LatexAcrApp implements ExecS_Application {
 	public final static String APP_DISPLAY_NAME = "SKB Datatool - LaTeX Acronyms";
 
 	/** Application version, should be same as the version in the class JavaDoc. */
-	public final static String APP_VERSION = "v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8";
+	public final static String APP_VERSION = "v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8";
 
 	/** Application description. */
 	public final static String APP_DESCR = "Processes acronyms and LaTeX log files creating definitions for the LaTeX package acronyms.";
@@ -71,7 +71,7 @@ public class LatexAcrApp implements ExecS_Application {
 	 */
 	public LatexAcrApp() {
 		this.verbose = false;
-		Skb_Console.USE_CONSOLE = true;
+		MessageConsole.PRINT_MESSAGES = true;
 
 		this.cli = new ExecS_CliParser();
 		this.cli.addOption(this.optionDirIn);
@@ -98,19 +98,19 @@ public class LatexAcrApp implements ExecS_Application {
 			llog.prepareBackend(this.getAppName(), this.verbose, this.optionDirIn.getValue(), this.optionFileOut.getValue());
 
 			if(this.verbose){
-				Skb_Console.conInfo("{}: processing <{}> {}", new Object[]{this.getAppName(), llog.getEntryType().getType(), llog.getOutputMode()});
+				MessageConsole.conInfo("{}: processing <{}> {}", new Object[]{this.getAppName(), llog.getEntryType().getType(), llog.getOutputMode()});
 			}
 
 			llog.processAcronyms();
 			llog.writeOutput();
 		}
 		catch(Exception ex){
-			Skb_Console.conError("{}: {}", new Object[]{this.getAppName(), ex.getMessage()});
+			MessageConsole.conError("{}: {}", new Object[]{this.getAppName(), ex.getMessage()});
 			return -1;
 		}
 
 		if(this.verbose){
-			Skb_Console.conInfo("{}: done", this.getAppName());
+			MessageConsole.conInfo("{}: done", this.getAppName());
 		}
 		return 0;
 	}

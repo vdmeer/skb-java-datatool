@@ -21,16 +21,16 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
-import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
 import de.vandermeer.skb.base.info.DirectoryLoader;
 import de.vandermeer.skb.base.info.FileSourceList;
+import de.vandermeer.skb.interfaces.MessageConsole;
 
 /**
  * A loader for a data set.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public interface DataSetLoader<E extends DataEntry> {
@@ -77,7 +77,7 @@ public interface DataSetLoader<E extends DataEntry> {
 			for(DataEntryType dt : this.getDataEntryType().getRequiredTypes()){
 				DataSetLoader<?> dsl = supportedTypes.get(dt);
 				if(dsl==null){
-					Skb_Console.conError("{}: loading type <{}> requires <{}>, which is not supported in system", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType(), dt.getType()});
+					MessageConsole.conError("{}: loading type <{}> requires <{}>, which is not supported in system", new Object[]{this.getCs().getAppName(), this.getDataEntryType().getType(), dt.getType()});
 				}
 				else{
 					dsl.setCs(this);
@@ -101,8 +101,8 @@ public interface DataSetLoader<E extends DataEntry> {
 				"*." + entryType.getInputFileExtension() + ".json"
 		});
 		DirectoryLoader dl = new CommonsDirectoryWalker(this.getCs().getInputDir(), DirectoryFileFilter.INSTANCE, fileFilter);
-		if(dl.getLoadErrors().size()>0){
-			Skb_Console.conError("{}: errors loading files from directory <{}>\n{}", new Object[]{this.getCs().getAppName(), this.getCs().getInputDir(), dl.getLoadErrors().render()});
+		if(dl.getLoadErrors().hasErrors()){
+			MessageConsole.conError("{}: errors loading files from directory <{}>\n{}", new Object[]{this.getCs().getAppName(), this.getCs().getInputDir(), dl.getLoadErrors().render()});
 			return null;
 		}
 
@@ -160,7 +160,7 @@ public interface DataSetLoader<E extends DataEntry> {
 	 */
 	default void writeStats(){
 		if(this.getCs().getVerbose()==true){
-			Skb_Console.conInfo("{}: parsed <{}> {} from <{}> files", new Object[]{this.getCs().getAppName(), this.getLoadedTypes().getTypeEntrySize(this.getDataEntryType()), this.getDataEntryType().getType(), getLoadedTypes().get(this.getDataEntryType()).getFileNumber()});
+			MessageConsole.conInfo("{}: parsed <{}> {} from <{}> files", new Object[]{this.getCs().getAppName(), this.getLoadedTypes().getTypeEntrySize(this.getDataEntryType()), this.getDataEntryType().getType(), getLoadedTypes().get(this.getDataEntryType()).getFileNumber()});
 		}
 	}
 

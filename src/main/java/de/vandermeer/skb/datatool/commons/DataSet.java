@@ -32,14 +32,14 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
-import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.base.info.FileSource;
+import de.vandermeer.skb.interfaces.MessageConsole;
 
 /**
  * Generic data set for the data tools.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class DataSet<E extends DataEntry> {
@@ -137,10 +137,10 @@ public class DataSet<E extends DataEntry> {
 
 					String dup = entry.testDuplicate((Collection<DataEntry>) this.entries.values());
 					if(this.entries.containsKey(entry.getKey())){
-						Skb_Console.conError("{}: duplicate key <{}> found in file <{}>", new Object[]{this.cs.getAppName(), entry.getKey(), fs.getAbsoluteName()});
+						MessageConsole.conError("{}: duplicate key <{}> found in file <{}>", new Object[]{this.cs.getAppName(), entry.getKey(), fs.getAbsoluteName()});
 					}
 					else if(dup!=null){
-						Skb_Console.conError("{}: entry already in map: k1 <{}> <> k2 <{}> found in file <{}>", new Object[]{this.cs.getAppName(), dup, entry.getKey(), fs.getAbsoluteName()});
+						MessageConsole.conError("{}: entry already in map: k1 <{}> <> k2 <{}> found in file <{}>", new Object[]{this.cs.getAppName(), dup, entry.getKey(), fs.getAbsoluteName()});
 					}
 					else{
 						if(this.excluded==null || (!ArrayUtils.contains(this.excluded, entry.getCompareString()))){
@@ -151,11 +151,11 @@ public class DataSet<E extends DataEntry> {
 				this.files++;
 			}
 			catch(IllegalArgumentException iaex){
-				Skb_Console.conError("{}: problem creating entry: <{}> in file <{}>", new Object[]{this.cs.getAppName(), iaex.getMessage(), fs.getAbsoluteName()});
+				MessageConsole.conError("{}: problem creating entry: <{}> in file <{}>", new Object[]{this.cs.getAppName(), iaex.getMessage(), fs.getAbsoluteName()});
 				ret++;
 			}
 			catch(URISyntaxException ue){
-				Skb_Console.conError("{}: problem creating a URI for a link: <{}> in file <{}>", new Object[]{this.cs.getAppName(), ue.getMessage(), fs.getAbsoluteName()});
+				MessageConsole.conError("{}: problem creating a URI for a link: <{}> in file <{}>", new Object[]{this.cs.getAppName(), ue.getMessage(), fs.getAbsoluteName()});
 				ret++;
 			}
 			catch(NullPointerException npe){
@@ -163,7 +163,7 @@ public class DataSet<E extends DataEntry> {
 				ret++;
 			}
 			catch(Exception ex){
-				Skb_Console.conError("reading acronym from JSON failed with exception <{}>, cause <{}> and message <{}> in file <{}>", new Object[]{ex.getClass().getSimpleName(), ex.getCause(), ex.getMessage(), fs.getAbsoluteName()});
+				MessageConsole.conError("reading acronym from JSON failed with exception <{}>, cause <{}> and message <{}> in file <{}>", new Object[]{ex.getClass().getSimpleName(), ex.getCause(), ex.getMessage(), fs.getAbsoluteName()});
 				ret++;
 			}
 		}

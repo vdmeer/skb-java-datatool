@@ -32,7 +32,7 @@ import de.vandermeer.skb.datatool.commons.target.DataTarget;
  * Backend to read all SKB data and cross reference if possible.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.1
  */
 public class BackendLoader {
@@ -91,7 +91,7 @@ public class BackendLoader {
 
 		Validate.notBlank(inputDirectory);
 		DirectoryLoader dl = new CommonsDirectoryWalker(inputDirectory, DirectoryFileFilter.INSTANCE, DirectoryFileFilter.INSTANCE);
-		Validate.validState(dl.getLoadErrors().size()==0, "errors reading from directory <%s>\n%s", inputDirectory, dl.getLoadErrors().render());
+		Validate.validState(!dl.getLoadErrors().hasErrors(), "errors reading from directory <%s>\n%s", inputDirectory, dl.getLoadErrors().render());
 		this.inputDir = inputDirectory;
 
 		this.appName = appName;

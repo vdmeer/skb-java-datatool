@@ -26,7 +26,6 @@ import de.vandermeer.execs.options.AO_FileOut;
 import de.vandermeer.execs.options.AO_Verbose;
 import de.vandermeer.execs.options.ApplicationOption;
 import de.vandermeer.execs.options.ExecS_CliParser;
-import de.vandermeer.skb.base.console.Skb_Console;
 import de.vandermeer.skb.datatool.applications.options.AO_DataTarget;
 import de.vandermeer.skb.datatool.applications.options.AO_PackageName;
 import de.vandermeer.skb.datatool.backend.BackendLoader;
@@ -34,12 +33,13 @@ import de.vandermeer.skb.datatool.backend.BackendWriter;
 import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
 import de.vandermeer.skb.datatool.entries.helemmaps.HtmlElementEntry;
 import de.vandermeer.skb.datatool.entries.helemmaps.HtmlElementEntryLoader;
+import de.vandermeer.skb.interfaces.MessageConsole;
 
 /**
  * Application to process HTML Elements maps and generate Java translator classes.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
  * @since      v0.0.2
  */
 public class HeJavaTranslatorApp implements ExecS_Application {
@@ -51,7 +51,7 @@ public class HeJavaTranslatorApp implements ExecS_Application {
 	public final static String APP_DISPLAY_NAME = "SKB Datatool - HTML Element Map - Java Translators";
 
 	/** Application version, should be same as the version in the class JavaDoc. */
-	public final static String APP_VERSION = "v0.0.2-SNAPSHOT build 160306 (06-Mar-16) for Java 1.8";
+	public final static String APP_VERSION = "v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8";
 
 	/** Application description. */
 	public final static String APP_DESCR = "Processes HTML Element maps and generate Java translator classes.";
@@ -87,7 +87,7 @@ public class HeJavaTranslatorApp implements ExecS_Application {
 	 */
 	public HeJavaTranslatorApp() {
 		this.verbose = false;
-		Skb_Console.USE_CONSOLE = true;
+		MessageConsole.PRINT_MESSAGES = true;
 
 		this.tlMap = new TypeLoaderMap();
 		this.tlMap.put(new HtmlElementEntryLoader());
@@ -116,7 +116,7 @@ public class HeJavaTranslatorApp implements ExecS_Application {
 
 		if(this.optionPkgName.getValue()==null){
 			if(this.verbose){
-				Skb_Console.conError("{}: no java package name given", new Object[]{this.getAppName()});
+				MessageConsole.conError("{}: no java package name given", new Object[]{this.getAppName()});
 				return -1;
 			}
 		}
@@ -127,7 +127,7 @@ public class HeJavaTranslatorApp implements ExecS_Application {
 
 			if(this.optionTarget.getValue()==null){
 				if(this.verbose){
-					Skb_Console.conInfo("{}: no target given, will not generate output", new Object[]{this.getAppName()});
+					MessageConsole.conInfo("{}: no target given, will not generate output", new Object[]{this.getAppName()});
 				}
 			}
 			else{
@@ -136,14 +136,14 @@ public class HeJavaTranslatorApp implements ExecS_Application {
 
 			if(bl.getTarget()==null && this.optionFileOut.getValue()!=null){
 				if(this.verbose){
-					Skb_Console.conInfo("{}: no target given but output file specified - will ignore output file", new Object[]{this.getAppName()});
+					MessageConsole.conInfo("{}: no target given but output file specified - will ignore output file", new Object[]{this.getAppName()});
 				}
 			}
 
 			bl.setCs();
 			BackendWriter bw = new BackendWriter(this.optionFileOut.getValue(), bl.getCs());
 			if(this.verbose){
-				Skb_Console.conInfo("{}: processing <{}> {}", new Object[]{this.getAppName(), bl.getType().getType(), bw.getOutputMode()});
+				MessageConsole.conInfo("{}: processing <{}> {}", new Object[]{this.getAppName(), bl.getType().getType(), bw.getOutputMode()});
 			}
 
 			//load entries
@@ -157,13 +157,13 @@ public class HeJavaTranslatorApp implements ExecS_Application {
 			bw.writeOutput(bl, context);
 		}
 		catch(Exception ex){
-			Skb_Console.conError("{}: {}", new Object[]{this.getAppName(), ex.getMessage()});
+			MessageConsole.conError("{}: {}", new Object[]{this.getAppName(), ex.getMessage()});
 ex.printStackTrace();
 			return -1;
 		}
 
 		if(this.verbose){
-			Skb_Console.conInfo("{}: done", this.getAppName());
+			MessageConsole.conInfo("{}: done", this.getAppName());
 		}
 		return 0;
 	}
