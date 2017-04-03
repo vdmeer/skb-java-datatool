@@ -19,7 +19,7 @@ package de.vandermeer.skb.datatool.commons;
  * Abstract implementation of a data set loader.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 170331 (31-Mar-17) for Java 1.8
  * @since      v0.0.1
  */
 public abstract class AbstractDataSetLoader<E extends DataEntry> implements DataSetLoader<E> {

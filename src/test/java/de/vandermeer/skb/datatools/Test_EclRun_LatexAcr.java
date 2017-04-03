@@ -23,7 +23,7 @@ import de.vandermeer.skb.datatool.applications.LatexAcrApp;
  * Tests for running the Latex-Acr Application in eclipse.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 170331 (31-Mar-17) for Java 1.8
  * @since      v0.0.1
  */
 public class Test_EclRun_LatexAcr {
@@ -47,9 +47,12 @@ public class Test_EclRun_LatexAcr {
 
 					//for the SKB-LaTeX docs
 					"--input-file",
-					"V:/dev/github/skb-latex/doc/skb.log",
+//					"V:/dev/github/skb-latex/doc/skb.log",
+					"V:/work/ericsson/projects/upt/latex/book.log",
+
 					"--output-file",
-					"V:/dev/github/skb-latex/doc/user-guide/database/acronyms",
+//					"V:/dev/github/skb-latex/doc/user-guide/database/acronyms",
+					"V:/work/ericsson/projects/upt/latex/book/db-acronyms/acronyms",
 
 //					"--output-file",
 //					"target/2",

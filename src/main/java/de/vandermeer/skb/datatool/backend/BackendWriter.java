@@ -32,13 +32,13 @@ import de.vandermeer.skb.base.info.StgFileLoader;
 import de.vandermeer.skb.datatool.commons.CoreSettings;
 import de.vandermeer.skb.datatool.commons.DataEntry;
 import de.vandermeer.skb.datatool.commons.DataSet;
-import de.vandermeer.skb.interfaces.categories.is.transformers.Map_To_Text;
+import de.vandermeer.skb.interfaces.transformers.Map_To_Text;
 
 /**
  * Backend to write templates to file.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 170331 (31-Mar-17) for Java 1.8
  * @since      v0.0.1
  */
 public class BackendWriter {

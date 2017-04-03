@@ -26,7 +26,7 @@ import org.apache.commons.lang3.text.StrBuilder;
  * A data entry schema.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 170331 (31-Mar-17) for Java 1.8
  * @since      v0.0.1
  */
 public interface DataEntrySchema {

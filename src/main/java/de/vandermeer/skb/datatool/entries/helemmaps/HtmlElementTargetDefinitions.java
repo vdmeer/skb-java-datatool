@@ -22,7 +22,7 @@ import de.vandermeer.skb.interfaces.translators.TargetTranslator;
  * A HTML element map specific data targets.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 160319 (19-Mar-16) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 170331 (31-Mar-17) for Java 1.8
  * @since      v0.0.2
  */
 public enum HtmlElementTargetDefinitions implements DataTargetDefinition {
