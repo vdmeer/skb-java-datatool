@@ -33,7 +33,7 @@ import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
  * A special data objects for affiliation lists as SKB links.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 170331 (31-Mar-17) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 170404 (04-Apr-17) for Java 1.8
  * @since      v0.0.1
  */
 public class ObjectAffiliations implements EntryObject {

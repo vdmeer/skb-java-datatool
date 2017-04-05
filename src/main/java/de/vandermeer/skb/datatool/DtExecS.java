@@ -25,7 +25,7 @@ import de.vandermeer.skb.datatool.applications.LatexAcrApp;
  * The Data Tool execution service with all registered applications.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 170331 (31-Mar-17) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 170404 (04-Apr-17) for Java 1.8
  * @since      v0.0.1
  */
 public class DtExecS extends ExecS {
@@ -34,7 +34,7 @@ public class DtExecS extends ExecS {
 	 * Returns a new ES service.
 	 */
 	public DtExecS(){
-		super("dms");
+		super("dt");
 
 		this.addApplication(DataToolApp.APP_NAME,				DataToolApp.class);
 		this.addApplication(LatexAcrApp.APP_NAME,				LatexAcrApp.class);

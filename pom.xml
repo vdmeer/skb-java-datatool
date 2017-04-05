@@ -96,19 +96,19 @@
         <dependency>
             <groupId>de.vandermeer</groupId>
             <artifactId>char-translation</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>de.vandermeer</groupId>
             <artifactId>execs</artifactId>
-            <version>0.3.6</version>
+            <version>0.3.8</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>de.vandermeer</groupId>
             <artifactId>skb-base</artifactId>
-            <version>0.1.10-SNAPSHOT</version>
+            <version>0.2.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

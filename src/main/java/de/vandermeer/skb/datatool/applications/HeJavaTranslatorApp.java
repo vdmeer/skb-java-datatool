@@ -39,7 +39,7 @@ import de.vandermeer.skb.interfaces.MessageConsole;
  * Application to process HTML Elements maps and generate Java translator classes.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
- * @version    v0.0.2-SNAPSHOT build 170331 (31-Mar-17) for Java 1.8
+ * @version    v0.0.2-SNAPSHOT build 170404 (04-Apr-17) for Java 1.8
  * @since      v0.0.2
  */
 public class HeJavaTranslatorApp implements ExecS_Application {
@@ -51,7 +51,7 @@ public class HeJavaTranslatorApp implements ExecS_Application {
 	public final static String APP_DISPLAY_NAME = "SKB Datatool - HTML Element Map - Java Translators";
 
 	/** Application version, should be same as the version in the class JavaDoc. */
-	public final static String APP_VERSION = "v0.0.2-SNAPSHOT build 170331 (31-Mar-17) for Java 1.8";
+	public final static String APP_VERSION = "v0.0.2-SNAPSHOT build 170404 (04-Apr-17) for Java 1.8";
 
 	/** Application description. */
 	public final static String APP_DESCR = "Processes HTML Element maps and generate Java translator classes.";
