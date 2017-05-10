@@ -19,10 +19,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.cli.Option;
 import org.apache.commons.lang3.text.StrBuilder;
 
-import de.vandermeer.execs.options.AbstractApplicationOption;
+import de.vandermeer.execs.options.Option_TypedC_String;
 import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
 
 /**
@@ -32,7 +31,35 @@ import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
  * @version    v0.0.2-SNAPSHOT build 170404 (04-Apr-17) for Java 1.8
  * @since      v0.0.1
  */
-public class AO_DataEntryType extends AbstractApplicationOption<String> {
+public class AO_DataEntryType extends Option_TypedC_String {
+
+	/**
+	 * Creates the long description of the option.
+	 * @param tlMap type map for detailed information
+	 * @return long description
+	 */
+	static final String longDescription(TypeLoaderMap tlMap){
+		StrBuilder ret = new StrBuilder(50);
+
+		ret.append("This options directs the data tool to process a particular entry type. ");
+		ret.append("The tool will then load all required entry types and de-reference any SKB links. ");
+		ret.appendNewLine();
+
+		ret.append("Available targets for output generation depend on the type, not all types support all targets.");
+		ret.appendNewLine();
+
+		ret.append("Available types are: ");
+		Map<String, Set<String>> types = tlMap.getTypes();
+		for(Entry<String, Set<String>> es : types.entrySet()){
+			ret.append(" - ").append(es.getKey());
+			ret.append(" -> supporting targets: ");
+			ret.appendWithSeparators(es.getValue(), ", ");
+			ret.appendNewLine();
+		}
+
+		ret.appendNewLine();
+		return ret.toString();
+	}
 
 	/** The entry types supported by an application for long description. */
 	private TypeLoaderMap tlMap;
@@ -44,46 +71,26 @@ public class AO_DataEntryType extends AbstractApplicationOption<String> {
 	 * @throws IllegalArgumentException - if description parameter is empty
 	 */
 	public AO_DataEntryType(TypeLoaderMap tlMap){
-		super("specifies the type the tool should process", "###");
-
-		Option.Builder builder = Option.builder("e");
-		builder.longOpt("entry-type");
-		builder.required(true);
-		builder.hasArg().argName("TYPE");
-		this.setCliOption(builder.build());
+		super(
+				"Entry Type",
+				'e', 
+				"entry-type",
+				true, 
+				"TYPE",
+				false,
+				"the entry type to process",
+				"specifies the type the tool should process",
+				longDescription(tlMap)
+		);
 
 		this.tlMap = tlMap;
 	}
 
-	@Override
-	public String convertValue(Object value) {
-		if(value==null){
-			return null;
-		}
-		return value.toString();
-	}
-
-	@Override
-	public String getDescriptionLong(){
-		StrBuilder ret = new StrBuilder(50);
-
-		ret.append("This options directs the data tool to process a particular entry type. ");
-		ret.append("The tool will then load all required entry types and de-reference any SKB links. ");
-		ret.appendNewLine();
-
-		ret.append("Available targets for output generation depend on the type, not all types support all targets.");
-		ret.appendNewLine();
-
-		ret.append("Available types are: ");
-		Map<String, Set<String>> types = this.tlMap.getTypes();
-		for(Entry<String, Set<String>> es : types.entrySet()){
-			ret.append(" - ").append(es.getKey());
-			ret.append(" -> supporting targets: ");
-			ret.appendWithSeparators(es.getValue(), ", ");
-			ret.appendNewLine();
-		}
-
-		ret.appendNewLine();
-		return ret.toString();
+	/**
+	 * Returns the type loader map.
+	 * @return type loader map
+	 */
+	public TypeLoaderMap getTlMap(){
+		return this.tlMap;
 	}
 }

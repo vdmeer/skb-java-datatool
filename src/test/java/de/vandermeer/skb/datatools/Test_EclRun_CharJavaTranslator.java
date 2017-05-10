@@ -55,9 +55,9 @@ public class Test_EclRun_CharJavaTranslator {
 			};
 
 			CharJavaTranslatorApp cjt = new CharJavaTranslatorApp();
-			int ret = cjt.executeApplication(args);
-			if(ret!=0){
-				System.err.println(ret);
+			cjt.executeApplication(args);
+			if(cjt.getErrNo()!=0){
+				System.err.println(cjt.getErrNo());
 			}
 		}
 	}

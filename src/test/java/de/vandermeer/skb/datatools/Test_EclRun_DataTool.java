@@ -80,9 +80,9 @@ public class Test_EclRun_DataTool {
 			};
 
 			DataToolApp dt = new DataToolApp();
-			int ret = dt.executeApplication(args);
-			if(ret!=0){
-				System.err.println(ret);
+			dt.executeApplication(args);
+			if(dt.getErrNo()!=0){
+				System.err.println(dt.getErrNo());
 			}
 		}
 	}

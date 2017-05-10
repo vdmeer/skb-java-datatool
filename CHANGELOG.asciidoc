@@ -1,5 +1,12 @@
-v0.0.2 - ### - 2016-##-##
--------------------------
+v0.0.2 - feature add - 2016-03-##
+---------------------------------
+* changed encoding to cmap (character map), similar to the change in the SKB data
+* moved HTML Entities into its own package
+* added a CharJavaTranslator application
+* added an HeJavaTranslator application
+* removed "excluded" arrays from DataSet and other classes
+* added a "prepare" method to the DataSetLoader for target-specific DataSet preparations
+  ** moved all old "exclude" arrays from Java targets into the Character Map prepare object
 
 
 v0.0.1 - initial release - 2016-03-01

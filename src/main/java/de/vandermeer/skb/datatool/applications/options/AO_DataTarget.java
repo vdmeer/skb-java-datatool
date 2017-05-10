@@ -19,10 +19,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.cli.Option;
 import org.apache.commons.lang3.text.StrBuilder;
 
-import de.vandermeer.execs.options.AbstractApplicationOption;
+import de.vandermeer.execs.options.Option_TypedC_String;
 import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
 
 /**
@@ -32,39 +31,14 @@ import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
  * @version    v0.0.2-SNAPSHOT build 170404 (04-Apr-17) for Java 1.8
  * @since      v0.0.1
  */
-public class AO_DataTarget extends AbstractApplicationOption<String> {
-
-	/** The entry types supported by an application for long description. */
-	private TypeLoaderMap tlMap;
+public class AO_DataTarget extends Option_TypedC_String {
 
 	/**
-	 * Returns the new option.
-	 * @param required true if option is required, false of it is optional
-	 * @param tlMap entry types supported by an application for long description
-	 * @throws NullPointerException - if description parameter is null
-	 * @throws IllegalArgumentException - if description parameter is empty
+	 * Creates long description.
+	 * @param tlMap type map for detailed information
+	 * @return long description
 	 */
-	public AO_DataTarget(boolean required, TypeLoaderMap tlMap){
-		super("specifies a target for output generation and character conversion", "###");
-
-		Option.Builder builder = Option.builder("t");
-		builder.longOpt("target");
-		builder.hasArg().argName("TARGET");
-		builder.required(required);
-		this.setCliOption(builder.build());
-		this.tlMap = tlMap;
-	}
-
-	@Override
-	public String convertValue(Object value) {
-		if(value==null){
-			return null;
-		}
-		return value.toString();
-	}
-
-	@Override
-	public String getDescriptionLong(){
+	static final String longDescription(TypeLoaderMap tlMap){
 		StrBuilder ret = new StrBuilder(50);
 
 		ret.append("This options sets the target for the data tool. ");
@@ -80,7 +54,7 @@ public class AO_DataTarget extends AbstractApplicationOption<String> {
 
 		ret.append("Available targets are: ");
 		ret.appendNewLine();
-		Map<String, Set<String>> targets = this.tlMap.getTargets();
+		Map<String, Set<String>> targets = tlMap.getTargets();
 		for(Entry<String, Set<String>> entry : targets.entrySet()){
 			ret.append(" - ").append(entry.getKey());
 			ret.append(" -> supporting types: ");
@@ -90,5 +64,40 @@ public class AO_DataTarget extends AbstractApplicationOption<String> {
 
 		ret.appendNewLine();
 		return ret.toString();
+	}
+
+	/** The entry types supported by an application for long description. */
+	private TypeLoaderMap tlMap;
+
+	/**
+	 * Returns the new option.
+	 * @param required true if option is required, false of it is optional
+	 * @param tlMap entry types supported by an application for long description
+	 * @throws NullPointerException - if description parameter is null
+	 * @throws IllegalArgumentException - if description parameter is empty
+	 */
+	public AO_DataTarget(boolean required, TypeLoaderMap tlMap){
+		super(
+				"Target",
+				't', 
+				"target",
+				true, 
+				"TARGET",
+				false,
+				"the target",
+				"specifies a target for output generation and character conversion",
+				longDescription(tlMap)
+		);
+
+
+		this.tlMap = tlMap;
+	}
+
+	/**
+	 * Returns the type loader map.
+	 * @return type loader map
+	 */
+	public TypeLoaderMap getTlMap(){
+		return this.tlMap;
 	}
 }

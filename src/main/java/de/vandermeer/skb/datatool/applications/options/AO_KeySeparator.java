@@ -15,18 +15,16 @@
 
 package de.vandermeer.skb.datatool.applications.options;
 
-import org.apache.commons.cli.Option;
-
-import de.vandermeer.execs.options.AbstractApplicationOption;
+import de.vandermeer.execs.options.Option_TypedC_Character;
 
 /**
- * Application option "key-sep", a string to separate keys.
+ * Application option "key-sep", a character to separate keys.
  *
  * @author     Sven van der Meer &lt;vdmeer.sven@mykolab.com&gt;
  * @version    v0.0.2-SNAPSHOT build 170404 (04-Apr-17) for Java 1.8
  * @since      v0.0.1
  */
-public class AO_KeySeparator extends AbstractApplicationOption<Character> {
+public class AO_KeySeparator extends Option_TypedC_Character {
 
 	/**
 	 * Returns the new option.
@@ -36,28 +34,17 @@ public class AO_KeySeparator extends AbstractApplicationOption<Character> {
 	 * @throws IllegalArgumentException - if description parameter is empty
 	 */
 	public AO_KeySeparator(Character defaultValue, String longDescription){
-		super(defaultValue, "a character as separator between elements of a key", longDescription);
-
-		Option.Builder builder = Option.builder();
-		builder.longOpt("key-sep");
-		builder.hasArg().argName("SEP");
-		builder.required(false);
-		this.setCliOption(builder.build());
-	}
-
-	@Override
-	public Character convertValue(Object value) {
-		if(value instanceof Character){
-			return (Character)value;
-		}
-		else if(value instanceof String){
-			String s = (String)value;
-			if(s.length()==0 || s.length()>1){
-				return null;
-			}
-			return s.toCharArray()[0];
-		}
-		return null;
+		super(
+				"Key Separator",
+				null, 
+				"key-sep",
+				true, 
+				"SEP",
+				false,
+				"the separator character to use",
+				"a character as separator between elements of a key",
+				"Simply sets the separation character for key names."
+		);
 	}
 
 }

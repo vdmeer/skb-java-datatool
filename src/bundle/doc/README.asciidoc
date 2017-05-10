@@ -1,4 +1,0 @@
-Datatool
-========
-Reads structured files with (SKB) data, encoded in JSON, and converts it into several output formats.
-:toc:

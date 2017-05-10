@@ -60,9 +60,9 @@ public class Test_EclRun_LatexAcr {
 			};
 
 			LatexAcrApp ltx = new LatexAcrApp();
-			int ret = ltx.executeApplication(args);
-			if(ret!=0){
-				System.err.println(ret);
+			ltx.executeApplication(args);
+			if(ltx.getErrNo()!=0){
+				System.err.println(ltx.getErrNo());
 			}
 		}
 	}

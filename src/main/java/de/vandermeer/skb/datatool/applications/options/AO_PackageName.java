@@ -15,9 +15,7 @@
 
 package de.vandermeer.skb.datatool.applications.options;
 
-import org.apache.commons.cli.Option;
-
-import de.vandermeer.execs.options.AbstractApplicationOption;
+import de.vandermeer.execs.options.Option_TypedC_String;
 
 /**
  * Application option "package-name", sets the (Java) package name.
@@ -26,7 +24,7 @@ import de.vandermeer.execs.options.AbstractApplicationOption;
  * @version    v0.0.2-SNAPSHOT build 170404 (04-Apr-17) for Java 1.8
  * @since      v0.0.2
  */
-public class AO_PackageName extends AbstractApplicationOption<String> {
+public class AO_PackageName extends Option_TypedC_String {
 
 	/**
 	 * Returns the new option.
@@ -34,20 +32,17 @@ public class AO_PackageName extends AbstractApplicationOption<String> {
 	 * @throws IllegalArgumentException - if description parameter is empty
 	 */
 	public AO_PackageName(){
-		super("sets the Java package name for the generated class", "###");
-
-		Option.Builder builder = Option.builder("p");
-		builder.longOpt("package-name");
-		builder.required(true);
-		builder.hasArg().argName("PKG-NAME");
-		this.setCliOption(builder.build());
+		super(
+				"Package Name",
+				'p', 
+				"package-name",
+				true, 
+				"PKG-NAME",
+				false,
+				"the name of the package",
+				"sets the Java package name for the generated class",
+				"Simply sets the name to use as 'package' name for a generateed Java class."
+		);
 	}
 
-	@Override
-	public String convertValue(Object value) {
-		if(value==null){
-			return null;
-		}
-		return value.toString();
-	}
 }

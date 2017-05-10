@@ -15,12 +15,10 @@
 
 package de.vandermeer.skb.datatool.applications;
 
-import de.vandermeer.execs.ExecS_Application;
-import de.vandermeer.execs.options.AO_DirectoryIn;
-import de.vandermeer.execs.options.AO_FileOut;
-import de.vandermeer.execs.options.AO_Verbose;
-import de.vandermeer.execs.options.ApplicationOption;
-import de.vandermeer.execs.options.ExecS_CliParser;
+import de.vandermeer.execs.AbstractAppliction;
+import de.vandermeer.execs.options.simple.AO_Verbose;
+import de.vandermeer.execs.options.typed.AO_DirectoryIn;
+import de.vandermeer.execs.options.typed.AO_FileOut;
 import de.vandermeer.skb.datatool.applications.options.AO_DataEntryType;
 import de.vandermeer.skb.datatool.applications.options.AO_DataTarget;
 import de.vandermeer.skb.datatool.applications.options.AO_KeySeparator;
@@ -40,6 +38,7 @@ import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntryLoader;
 import de.vandermeer.skb.datatool.entries.helemmaps.HtmlElementEntryLoader;
 import de.vandermeer.skb.datatool.entries.people.PeopleEntryLoader;
 import de.vandermeer.skb.interfaces.MessageConsole;
+import de.vandermeer.skb.interfaces.application.ApoCliParser;
 
 /**
  * Application to read all SKB data and cross reference if possible.
@@ -48,7 +47,7 @@ import de.vandermeer.skb.interfaces.MessageConsole;
  * @version    v0.0.2-SNAPSHOT build 170404 (04-Apr-17) for Java 1.8
  * @since      v0.0.1
  */
-public class DataToolApp implements ExecS_Application {
+public class DataToolApp extends AbstractAppliction {
 
 	/** Application name. */
 	public final static String APP_NAME = "data-tool";
@@ -62,9 +61,6 @@ public class DataToolApp implements ExecS_Application {
 	/** Application description. */
 	public final static String APP_DESCR = "Reads all SKB data from a given directory, builds cross references if possible, and generates targeted output.";
 
-	/** Tool CLI parser and interface. */
-	protected ExecS_CliParser cli;
-
 	/** The option for the data entry type. */
 	protected AO_DataEntryType optionType;
 
@@ -72,13 +68,13 @@ public class DataToolApp implements ExecS_Application {
 	protected AO_DataTarget optionTarget;
 
 	/** The option for the input directory. */
-	protected AO_DirectoryIn optionDirIn = new AO_DirectoryIn(true, 'd', "The top level directory with JSON files for the selected type.");
+	protected AO_DirectoryIn optionDirIn = new AO_DirectoryIn('i', true, "directory name", "sets the top level JSON directory", "The top level directory with JSON files for character maps.");
 
 	/** The option for the output file. */
-	protected AO_FileOut optionFileOut = new AO_FileOut(false, 'o', "The output file name, without extension.");
+	protected AO_FileOut optionFileOut = new AO_FileOut('o', false, "output file name, no extension", "sets output file name", "The output file name, without extension.");
 
 	/** The option for verbose mode, with extended progress messages. */
-	protected AO_Verbose optionVerbose = new AO_Verbose();
+	protected AO_Verbose optionVerbose = new AO_Verbose('v', "Application in verbose mode");
 
 	/** The options for the key separator. */
 	protected AO_KeySeparator optionKeySep = new AO_KeySeparator(':', "The separator for key elements, default is ':'.");
@@ -95,14 +91,14 @@ public class DataToolApp implements ExecS_Application {
 	 * Use the executeService method to initiate a compilation manually, all arguments presented as if they are coming from command line.
 	 */
 	public DataToolApp() {
+		super(APP_NAME, ApoCliParser.defaultParser(APP_NAME), null, null, null);
 		this.verbose = false;
-		MessageConsole.PRINT_MESSAGES = true;
+		MessageConsole.activateAll();
 
-		this.cli = new ExecS_CliParser();
-		this.cli.addOption(this.optionDirIn);
-		this.cli.addOption(this.optionFileOut);
-		this.cli.addOption(this.optionVerbose);
-		this.cli.addOption(this.optionKeySep);
+		this.getCliParser().getOptions().addOption(this.optionDirIn);
+		this.getCliParser().getOptions().addOption(this.optionFileOut);
+		this.getCliParser().getOptions().addOption(this.optionVerbose);
+		this.getCliParser().getOptions().addOption(this.optionKeySep);
 
 		this.tlMap = new TypeLoaderMap();
 		this.tlMap.put(new AcronymEntryLoader());
@@ -119,20 +115,14 @@ public class DataToolApp implements ExecS_Application {
 		this.tlMap.put(new ConferenceEntryLoader());
 
 		this.optionType = new AO_DataEntryType(this.tlMap);
-		this.cli.addOption(this.optionType);
+		this.getCliParser().getOptions().addOption(this.optionType);
 		this.optionTarget = new AO_DataTarget(false, this.tlMap);
-		this.cli.addOption(this.optionTarget);
+		this.getCliParser().getOptions().addOption(this.optionTarget);
 	}
 
 	@Override
-	public int executeApplication(String[] args) {
-		// parse command line, exit with help screen if error
-		int ret = ExecS_Application.super.executeApplication(args);
-		if(ret!=0){
-			return ret;
-		}
-
-		if(this.optionVerbose.inVerboseMode()){
+	public void runApplication() {
+		if(this.optionVerbose.inCli()){
 			this.verbose = true;
 		}
 
@@ -171,13 +161,13 @@ public class DataToolApp implements ExecS_Application {
 //System.err.println("@: " + ex.getCause());
 //System.err.println("#: " + ex.getMessage());
 ex.printStackTrace();
-			return -1;
+			this.errNo = -1;
+			return;
 		}
 
 		if(this.verbose){
 			MessageConsole.conInfo("{}: done", this.getAppName());
 		}
-		return ret;
 	}
 
 	@Override
@@ -198,22 +188,5 @@ ex.printStackTrace();
 	@Override
 	public String getAppVersion() {
 		return APP_VERSION;
-	}
-
-	@Override
-	public ApplicationOption<?>[] getAppOptions() {
-		return new ApplicationOption<?>[]{
-				this.optionType,
-				this.optionDirIn,
-				this.optionFileOut,
-				this.optionTarget,
-				this.optionVerbose,
-				this.optionKeySep,
-			};
-	}
-
-	@Override
-	public ExecS_CliParser getCli(){
-		return this.cli;
 	}
 }
