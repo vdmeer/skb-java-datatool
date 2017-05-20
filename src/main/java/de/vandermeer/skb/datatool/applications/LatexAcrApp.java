@@ -21,8 +21,8 @@ import de.vandermeer.execs.options.typed.AO_DirectoryIn;
 import de.vandermeer.execs.options.typed.AO_FileIn;
 import de.vandermeer.execs.options.typed.AO_FileOut;
 import de.vandermeer.skb.datatool.backend.BackendLatexAcrLog;
-import de.vandermeer.skb.interfaces.MessageConsole;
 import de.vandermeer.skb.interfaces.application.ApoCliParser;
+import de.vandermeer.skb.interfaces.console.MessageConsole;
 
 /**
  * Application to process acronyms and LaTeX log files creating definitions for the LaTeX package acronyms.

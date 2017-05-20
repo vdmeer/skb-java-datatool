@@ -37,8 +37,8 @@ import de.vandermeer.skb.datatool.entries.geo.continents.ContinentEntryLoader;
 import de.vandermeer.skb.datatool.entries.geo.countries.CountryEntryLoader;
 import de.vandermeer.skb.datatool.entries.helemmaps.HtmlElementEntryLoader;
 import de.vandermeer.skb.datatool.entries.people.PeopleEntryLoader;
-import de.vandermeer.skb.interfaces.MessageConsole;
 import de.vandermeer.skb.interfaces.application.ApoCliParser;
+import de.vandermeer.skb.interfaces.console.MessageConsole;
 
 /**
  * Application to read all SKB data and cross reference if possible.

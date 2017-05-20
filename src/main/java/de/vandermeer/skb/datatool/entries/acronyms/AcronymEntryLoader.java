@@ -24,7 +24,7 @@ import de.vandermeer.skb.datatool.commons.DataEntryType;
 import de.vandermeer.skb.datatool.commons.DataSet;
 import de.vandermeer.skb.datatool.commons.DataSetLoader;
 import de.vandermeer.skb.datatool.commons.LoadedTypeMap;
-import de.vandermeer.skb.interfaces.MessageConsole;
+import de.vandermeer.skb.interfaces.console.MessageConsole;
 
 /**
  * Loader for acronyms.

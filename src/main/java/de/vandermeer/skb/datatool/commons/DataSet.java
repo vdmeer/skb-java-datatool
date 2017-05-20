@@ -33,7 +33,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import de.vandermeer.skb.base.info.FileSource;
-import de.vandermeer.skb.interfaces.MessageConsole;
+import de.vandermeer.skb.interfaces.console.MessageConsole;
 
 /**
  * Generic data set for the data tools.

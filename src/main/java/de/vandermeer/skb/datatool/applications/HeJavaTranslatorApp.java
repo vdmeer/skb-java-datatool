@@ -31,8 +31,8 @@ import de.vandermeer.skb.datatool.backend.BackendWriter;
 import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
 import de.vandermeer.skb.datatool.entries.helemmaps.HtmlElementEntry;
 import de.vandermeer.skb.datatool.entries.helemmaps.HtmlElementEntryLoader;
-import de.vandermeer.skb.interfaces.MessageConsole;
 import de.vandermeer.skb.interfaces.application.ApoCliParser;
+import de.vandermeer.skb.interfaces.console.MessageConsole;
 
 /**
  * Application to process HTML Elements maps and generate Java translator classes.

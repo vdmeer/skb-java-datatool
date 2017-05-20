@@ -32,7 +32,7 @@ import de.vandermeer.skb.datatool.commons.TypeLoaderMap;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntry;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymEntryLoader;
 import de.vandermeer.skb.datatool.entries.acronyms.AcronymUtilities;
-import de.vandermeer.skb.interfaces.MessageConsole;
+import de.vandermeer.skb.interfaces.console.MessageConsole;
 
 /**
  * Backend to process a LaTeX log file for acronyms.

@@ -17,7 +17,7 @@ package de.vandermeer.skb.datatool.entries.acronyms;
 
 import de.vandermeer.skb.datatool.commons.target.DataTargetDefinition;
 import de.vandermeer.skb.interfaces.translators.TargetTranslator;
-import de.vandermeer.translation.targets.Text2Latex;
+import de.vandermeer.skb.interfaces.translators.target.Text2Latex;
 
 /**
  * A acronym specific data targets.

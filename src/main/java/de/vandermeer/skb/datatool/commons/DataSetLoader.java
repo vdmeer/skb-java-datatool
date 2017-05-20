@@ -24,7 +24,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import de.vandermeer.skb.base.info.CommonsDirectoryWalker;
 import de.vandermeer.skb.base.info.DirectoryLoader;
 import de.vandermeer.skb.base.info.FileSourceList;
-import de.vandermeer.skb.interfaces.MessageConsole;
+import de.vandermeer.skb.interfaces.console.MessageConsole;
 
 /**
  * A loader for a data set.
